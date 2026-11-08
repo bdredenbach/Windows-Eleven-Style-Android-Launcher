@@ -31,3 +31,9 @@ Ten 0.2 uses Google ML Kit GenAI Prompt API 1.0.0-beta4 and Android AICore on su
 ## Owner-supplied Windows 10 icon artwork
 
 Ten 0.14.0 uses thirty original Microsoft Windows icon resources from the owner's supplied `10125_icons.zip` (Windows 10 build 10125 icon collection). The selected ICO frames were converted losslessly to transparent PNG without editing the artwork. Windows and these icon designs belong to Microsoft. These assets are separate from the original Nth artwork and are not relicensed under the source code license. Exact resource filenames, kind mappings and source/output SHA-256 values are recorded in `docs/TEN_0_14_ICON_ASSETS.json`. Collection link supplied by the owner: https://winaero.com/download-icons-from-windows-10-build-10125/ .
+
+## WindowsIcons collection (Eleven 0.2.1)
+
+46 Windows 11 icon images are supplied from [HaydenReeve/WindowsIcons](https://github.com/HaydenReeve/WindowsIcons), revision `9442e3ef014520d4337409a24be10b970a36d66b`, at the project owner’s request. Windows/Microsoft product imagery remains the property of its corresponding rights holders. The upstream README describes direct use and lists source applications, Windows resource libraries, Superfolders, Sysinternals and PowerToys. A verbatim README copy is included at `third_party/windows-icons/README.upstream.md`; source paths and hashes are in `docs/ELEVEN_ICON_ASSETS.json`. The pinned upstream repository contains no standalone license file; no public-domain, MIT or other additional license is asserted here.
+
+Only source ICO frame decoding and lossless PNG encoding were performed. The bitmap artwork is not described as original Nth artwork. App branding and original fallback illustrations retain their existing provenance.

@@ -36,12 +36,13 @@ jobs:
           javac -d build/eleven-checks app/src/main/java/com/nthexperience/desktop/ElevenLayout.java checks/ElevenLayoutCheck.java app/src/main/java/com/nthexperience/desktop/TenSettingsCatalog.java app/src/main/java/com/nthexperience/desktop/TenNotaActions.java checks/TenNotaActionsCheck.java
           java -cp build/eleven-checks com.nthexperience.desktop.ElevenLayoutCheck
           java -cp build/eleven-checks com.nthexperience.desktop.TenNotaActionsCheck
+          python3 checks/CheckElevenIconAssets.py
       - run: ./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :fixture:assembleDebug :installprobe:assembleDebug --no-daemon
       - name: Check installed identity and runner
         run: python3 checks/CheckElevenManifest.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Nth-Desktop-Eleven-0.2.0-api-${{ matrix.api }}
+          name: Nth-Desktop-Eleven-0.2.1-api-${{ matrix.api }}
           path: app/build/outputs/apk/debug/app-debug.apk
       - name: Enable emulator acceleration
         run: |
