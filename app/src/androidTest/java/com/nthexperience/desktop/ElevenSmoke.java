@@ -20,6 +20,7 @@ public final class ElevenSmoke extends Instrumentation {
   getTargetContext().getSharedPreferences(StorageAccess.PREFS,0).edit().putBoolean("seen",true).commit();getTargetContext().getSharedPreferences(StartupExperience.SESSION,0).edit().putBoolean("seen",true).putBoolean("welcome_seen",true).putBoolean(StartupExperience.HOME_OFFERED,true).commit();
   home=(MainActivity)startActivitySync(new Intent(Intent.ACTION_MAIN).setComponent(new ComponentName(getTargetContext(),MainActivity.class)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));root=home.getWindow().getDecorView();waitForIdleSync();
   check(getTargetContext().getPackageName().equals("com.nthexperience.desktop.eleven"),"Independent Eleven package");
+  ui(()->{View taskView=TenSmoke.description(root,"Task View");check(taskView!=null&&taskView.isShown(),"Task View remains available on phones");});
   for(int orientation:new int[]{ActivityInfo.SCREEN_ORIENTATION_PORTRAIT,ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE}){
    ui(()->home.setRequestedOrientation(orientation));SystemClock.sleep(1800);waitForIdleSync();
    for(boolean light:new boolean[]{true,false}){
