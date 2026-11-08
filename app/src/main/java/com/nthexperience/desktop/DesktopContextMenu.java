@@ -29,14 +29,15 @@ final class DesktopContextMenu {
     }
     void item(String title,String icon,Runnable action){item(title,icon,true,action);}
     void item(String title,String icon,boolean enabled,Runnable action){
-        if(plain){TextView text=Aero.text(context,title,12,0xfff2f2f2);text.setPadding(dp(26),0,dp(18),0);text.setMinHeight(dp(rowHeight));text.setContentDescription(title);text.setFocusable(true);text.setBackground(TenStyle.hover(context,Color.TRANSPARENT));text.setEnabled(enabled);text.setOnClickListener(v->{if(enabled){dismiss();action.run();}});items.addView(text,new LinearLayout.LayoutParams(-1,dp(rowHeight)));return;}
+        if(plain){TextView text=Aero.text(context,title,12,0xfff2f2f2);text.setPadding(dp(26),0,dp(18),0);text.setMinHeight(dp(rowHeight));text.setContentDescription(title);text.setFocusable(true);text.setBackground(TenStyle.hover(context,Color.TRANSPARENT));text.setEnabled(enabled);keyboardBack(text);text.setOnClickListener(v->{if(enabled){dismiss();action.run();}});items.addView(text,new LinearLayout.LayoutParams(-1,dp(rowHeight)));return;}
         LinearLayout row=new LinearLayout(context);row.setGravity(Gravity.CENTER_VERTICAL);row.setFocusable(true);row.setContentDescription(title);
         row.setBackground(TenStyle.hover(context,Color.TRANSPARENT));
         FrameLayout gutter=new FrameLayout(context);gutter.setBackgroundColor(Color.TRANSPARENT);View image;
         if(icon.equals("empty")){image=new View(context);}else if(icon.equals("checked")){TextView mark=Aero.text(context,"✓",18,0xff235f91);mark.setGravity(Gravity.CENTER);image=mark;}else if(icon.equals("refresh")){TextView glyph=Aero.text(context,"↻",20,0xff4b86ab);glyph.setGravity(Gravity.CENTER);image=glyph;}else image=new AeroIcon(context,icon);
         gutter.addView(image,new FrameLayout.LayoutParams(dp(20),dp(20),Gravity.CENTER));row.addView(gutter,new LinearLayout.LayoutParams(dp(31),-1));
-        TextView label=Aero.text(context,title,rowHeight<36?12:13,0xff151a1f);label.setPadding(dp(9),0,dp(12),0);row.addView(label,new LinearLayout.LayoutParams(0,-1,1));row.setEnabled(enabled);row.setAlpha(enabled?1:.42f);row.setOnClickListener(v->{if(enabled){dismiss();action.run();}});items.addView(row,new LinearLayout.LayoutParams(-1,dp(rowHeight)));
+        TextView label=Aero.text(context,title,rowHeight<36?12:13,0xff151a1f);label.setPadding(dp(9),0,dp(12),0);row.addView(label,new LinearLayout.LayoutParams(0,-1,1));keyboardBack(row);row.setEnabled(enabled);row.setAlpha(enabled?1:.42f);row.setOnClickListener(v->{if(enabled){dismiss();action.run();}});items.addView(row,new LinearLayout.LayoutParams(-1,dp(rowHeight)));
     }
+    private void keyboardBack(View row){row.setOnKeyListener((v,key,event)->{if(event.getAction()==KeyEvent.ACTION_DOWN&&key==KeyEvent.KEYCODE_DPAD_LEFT&&parent!=null){closeBranch();if(parentRow!=null)parentRow.requestFocus();return true;}return false;});}
     void section(String title){
         TextView label=Aero.text(context,title,11,0xff345974);
         label.setPadding(dp(10),0,dp(6),0);

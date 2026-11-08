@@ -51,6 +51,7 @@ final class TenStyle {
                 case "accessibility":canvas.drawCircle(16,5,3,p);canvas.drawLine(4,11,28,11,p);canvas.drawLine(16,9,16,20,p);canvas.drawLine(16,20,8,29,p);canvas.drawLine(16,20,24,29,p);break;
                 case "more":p.setStyle(Paint.Style.FILL);for(int x=7;x<=25;x+=9)canvas.drawCircle(x,16,1.6f,p);p.setStyle(Paint.Style.STROKE);break;
                 case "rename":canvas.drawLine(5,7,5,25,p);canvas.drawLine(3,7,8,7,p);canvas.drawLine(3,25,8,25,p);canvas.drawRect(11,8,28,24,p);canvas.drawLine(15,20,20,12,p);canvas.drawLine(20,12,25,20,p);canvas.drawLine(17,17,23,17,p);break;
+                case "filter":path.reset();path.moveTo(4,6);path.lineTo(28,6);path.lineTo(19,17);path.lineTo(19,26);path.lineTo(13,23);path.lineTo(13,17);path.close();canvas.drawPath(path,p);break;
                 case "sort":canvas.drawLine(9,5,9,27,p);canvas.drawLine(5,10,9,5,p);canvas.drawLine(9,5,13,10,p);canvas.drawLine(22,5,22,27,p);canvas.drawLine(18,22,22,27,p);canvas.drawLine(22,27,26,22,p);break;
                 case "copy":canvas.drawRect(6,6,20,23,p);canvas.drawRect(12,11,26,28,p);break;
                 case "cut":canvas.drawCircle(9,23,4,p);canvas.drawCircle(23,23,4,p);canvas.drawLine(11,20,24,4,p);canvas.drawLine(21,20,8,4,p);break;
