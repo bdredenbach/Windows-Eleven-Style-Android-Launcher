@@ -40,8 +40,12 @@ Reference review sampled every six seconds, then inspected full-resolution frame
 
 ## Validation
 
-Local: 23 unit tests, main/debug APK build and all instrumentation compilation pass. Tests cover snap partitions/bounds/minimum sizes, Unicode app headings, backed-up choice validation, prior Nota state/action behavior and calculator/accent behavior.
+Local: 24 unit tests, main/debug APK build and all instrumentation compilation pass. Tests cover snap partitions/bounds/minimum sizes, Unicode app headings, backed-up choice validation, prior Nota state/action behavior and calculator/accent behavior.
 
-Native regression: Android 11/API 30 and Android 16/API 36 runs exercise Start, search/state/reorder, independent shell panels, brightness/volume, Settings navigation, orientation/themes, Explorer tabs/session restoration, snap/restore geometry, Nth Nota drafts/privacy/IME, Browser and existing edge snapping. Final run identifiers and outcomes are recorded after completed execution and screenshot review.
+Native regression: Android 11/API 30 and Android 16/API 36 runs exercise Start, search/state/reorder, independent shell panels, brightness/volume, Settings navigation, orientation/themes, Explorer tabs/session restoration, snap/restore geometry, Nth Nota drafts/privacy/IME, Browser and existing edge snapping. Final run [42527193946](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42527193946) passed all six native suites on both API 30 and API 36 at source `31b0d47a94843fbeff41dcb1b6abf8708d27e9b8`. Each platform passed 117 Eleven shell assertions and 171 Nota assertions, plus shared command/cold-process/Browser/Snap suites. The final run had no Android Runtime errors or ANRs. Screenshot review covered both themes and orientations, tabbed Explorer, Settings, Quick Settings, Widgets, Task View, Calculator and native quadrant placement.
+
+Earlier checks exposed redundant Start layout requests, a snap test reading dimensions before layout and an Android 11 IME visibility/resize race. The layout request was fixed; tests now await measured sizes and settled keyboard controls, retaining their bounds/visibility assertions.
+
+The delivered APK uses the retained preview certificate `b704c7a2da2d0d4425fa5fe61c122483389b07be327ad565ff198064af696265` and has SHA-256 `d36ab352fe4b3b9ac5159c9896891184072c613c6ee827f77332c5aa9a8ba11b`. All 452 non-signing entries match both CI builds. APK v2/v3 signature verification and 16 KiB ZIP alignment passed. No physical Pixel 10 or production cloud-writing call was tested.
 
 The reference is a design target, not a numerical 99% certification. Platform-controlled screens and third-party apps necessarily retain their Android behavior.
