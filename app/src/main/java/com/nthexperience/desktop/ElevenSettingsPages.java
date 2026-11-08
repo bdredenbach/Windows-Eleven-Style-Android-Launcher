@@ -21,7 +21,7 @@ final class ElevenSettingsPages {
             case "display":
                 s.detail("Brightness & color", "");
                 ElevenSettingsCard brightness=s.group("Brightness", "Adjust the built-in display", "display", true);
-                LinearLayout light=Aero.column(s.getContext());new BrightnessControl((Activity)s.getContext()).content(light);brightness.child(light);
+                LinearLayout light=Aero.column(s.getContext());new BrightnessControl((Activity)s.getContext()).content(light,true);brightness.child(light);
                 s.card("Night light", "Eye comfort and color temperature", "display", ()->s.navigate("night-light"));
                 s.card("Color profile", "Device color preferences", "personalization", ()->s.navigate("color-management"));
                 s.card("HDR", "Reported display capabilities", "display", ()->s.navigate("hdr"));

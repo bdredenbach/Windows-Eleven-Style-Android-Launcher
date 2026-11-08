@@ -60,6 +60,7 @@ final class DesktopContextMenu {
         int x=Math.max(left,Math.min(Math.round(screenX),right-width)),y=Math.max(top,Math.min(Math.round(screenY),bottom-height));
         if(openingParent!=null&&openingParent.showing()&&openingRow!=null){parent=openingParent;parentRow=openingRow;parent.child=this;int[] at=new int[2];parentRow.getLocationOnScreen(at);android.graphics.Rect anchor=new android.graphics.Rect(at[0],at[1],at[0]+parentRow.getWidth(),at[1]+parentRow.getHeight());x=anchor.right+width<=right?anchor.right-dp(3):Math.max(left,anchor.left-width+dp(3));y=Math.max(top,Math.min(anchor.top,bottom-height));}
         popup.showAtLocation(root,Gravity.TOP|Gravity.LEFT,x,y);
+        if(!root.isInTouchMode())for(int i=0;i<items.getChildCount();i++){View row=items.getChildAt(i);if(row.isEnabled()&&row.isFocusable()&&row.requestFocus())break;}
     }
     boolean showing(){return popup.isShowing();}
     void dismiss(){DesktopContextMenu root=this;while(root.parent!=null)root=root.parent;root.closeBranch();}
