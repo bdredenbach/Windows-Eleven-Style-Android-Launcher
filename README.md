@@ -1,6 +1,6 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. First preview: **0.1.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.1.1**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
@@ -12,13 +12,15 @@ Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten,
 - Rounded floating windows and flush maximized/snapped windows. Hold maximize for viable half-screen placement options.
 - Compact Explorer command bar over the inherited real file operations, linked-folder access and recovery.
 - Settings category navigation, rounded cards and updated Eleven Start instructions.
-- Ten's resizable windows, virtual desktops, browser, notes, media, backups and Nth Nota command/writing engines.
+- Ten's resizable windows, virtual desktops, browser, notes, media and backups.
+- Nth Nota category summaries, instructions and composer hints, separate real replies, and a compact New command control.
+- Full ordinary Nota drafts, task/origin/reply state and private restoration placeholders scoped to each virtual desktop.
 
 ## Build and validation
 
 Use Java 17, Android SDK 36 and `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`. Native and shared-engine checks run with `bash checks/run-eleven-checks.sh` on a connected test device. GitHub Actions covers Android 11 and 16. The Eleven suite checks identity, Start/search/reorder/state, the split panels, Settings and retained tool routes across orientations and light/dark modes.
 
-See [0.1.0 validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
+See [0.1.1 Nota validation](docs/ELEVEN_0_1_1_NOTA.md) and [0.1.0 shell validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
 
 ## Scope
 
