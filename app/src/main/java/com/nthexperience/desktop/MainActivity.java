@@ -728,7 +728,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             case "@run":TenRun.show(this,store,this::runCommand);return;
             case "@power":Aero.dialog(this).setTitle("Power").setItems(new String[]{"Show desktop","Restart Nth Desktop","Android power settings"},(d,w)->{if(w==0)showDesktop();else if(w==1)vistaAction("restart-desktop");else vistaAction("android:battery");}).show();return;
             case "@settings":if(!restoreTool(id))window(id,"Settings",new TenSettings(this,store,this::open));return;
-            case "@nota":if(!restoreTool(id))window(id,"Nth Nota",new TenNotaPanel(this,store));return;
+            case "@nota":if(!restoreTool(id))window(id,"Nth Nota",new TenNotaPanel(this,store,tenDesktops.current()));return;
             case "@news":if(previews!=null)previews.dismiss();tenNews.show();return;
             case "@tenactions":tenActions.show();return;
             case "@taskview":case "@flip3d":showTenTasks();return;
