@@ -141,7 +141,14 @@ public final class SnapSmoke extends Instrumentation {
             input(MotionEvent.ACTION_CANCEL, work.centerX(), edgeY);
             settle();
             check(left.maximized() && work.equals(bounds(left)), "Cancel restores the maximized placement");
-            tap(find(left, v -> "Maximize or restore window".equals(v.getContentDescription())));
+            View restoreControl=find(left, v -> "Maximize or restore window".equals(v.getContentDescription()));
+            Rect rootRect=new Rect();restoreControl.getGlobalVisibleRect(rootRect);
+            progress("restore control screen="+screenBounds(restoreControl)+", root-visible="+rootRect);
+            runOnMainSync(()->restoreControl.setOnTouchListener((v,event)->{
+                progress("restore control touch="+event.getActionMasked()+", x="+event.getX()+", y="+event.getY());return false;
+            }));
+            tap(restoreControl);
+            runOnMainSync(()->restoreControl.setOnTouchListener(null));
             check(moved.equals(bounds(left)), "Restore control returns to the previous floating bounds: expected="+moved+", actual="+bounds(left)+", maximized="+left.maximized());
 
             Thread.sleep(340);
@@ -361,7 +368,10 @@ public final class SnapSmoke extends Instrumentation {
     private static Rect screenBounds(View view) {
         Rect result = new Rect();
         check(view != null && view.getGlobalVisibleRect(result), "Title or control is visible");
-        return result;
+        // getGlobalVisibleRect is in root-view coordinates, whereas injected input
+        // uses display coordinates. A rotated window may have an inset root.
+        int[] location=new int[2];view.getLocationOnScreen(location);
+        return new Rect(location[0],location[1],location[0]+view.getWidth(),location[1]+view.getHeight());
     }
 
     private static View find(View root, Predicate<View> predicate) {
