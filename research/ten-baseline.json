@@ -1,0 +1,19 @@
+{
+  "project": "Nth Desktop Eleven",
+  "phase": "research and build blueprint",
+  "checked_on": "2026-11-08",
+  "base_repository": "https://github.com/bdredenbach/Windows-Ten-Style-Android-Launcher",
+  "base_ref": "main",
+  "base_commit": "e31109dd202b88d1476c4ba35b35d49cca1a7f62",
+  "base_version": "0.19.0",
+  "source_inspected": true,
+  "source_imported": false,
+  "windows_vm_booted": false,
+  "android_build_performed": false,
+  "proposed_application_id": "com.nthexperience.desktop.eleven",
+  "notes": [
+    "Ten source was inspected read-only at the pinned commit.",
+    "This checkpoint contains research and a build plan; it is not a runnable Android launcher.",
+    "Proposed visual tokens are Android adaptation choices, not measured Windows constants."
+  ]
+}
