@@ -142,7 +142,7 @@ public final class SnapSmoke extends Instrumentation {
             settle();
             check(left.maximized() && work.equals(bounds(left)), "Cancel restores the maximized placement");
             tap(find(left, v -> "Maximize or restore window".equals(v.getContentDescription())));
-            check(moved.equals(bounds(left)), "Restore control returns to the previous floating bounds");
+            check(moved.equals(bounds(left)), "Restore control returns to the previous floating bounds: expected="+moved+", actual="+bounds(left)+", maximized="+left.maximized());
 
             Thread.sleep(340);
             doubleTap(title(left));
@@ -267,12 +267,16 @@ public final class SnapSmoke extends Instrumentation {
 
     private void tap(View view) throws Exception {
         Rect rect = screenBounds(view);
-        int[] origin = new int[2];
-        workspace.getLocationOnScreen(origin);
-        down = SystemClock.uptimeMillis();
-        input(MotionEvent.ACTION_DOWN, rect.centerX() - origin[0], rect.centerY() - origin[1]);
-        input(MotionEvent.ACTION_UP, rect.centerX() - origin[0], rect.centerY() - origin[1]);
-        settle();
+        int[] origin = new int[2];workspace.getLocationOnScreen(origin);
+        int x=rect.centerX()-origin[0],y=rect.centerY()-origin[1];
+        // Queue both edges of a short tap before waiting. A synchronous DOWN can
+        // spend >500 ms in an older emulator and accidentally test a long press.
+        down=SystemClock.uptimeMillis()-50;
+        for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){
+            MotionEvent event=MotionEvent.obtain(down,action==MotionEvent.ACTION_DOWN?down:down+40,action,origin[0]+x,origin[1]+y,0);
+            try{event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,false),"Short tap edge was injected");}finally{event.recycle();}
+        }
+        pointerX=x;pointerY=y;pointerDown=false;Thread.sleep(80);settle();
     }
 
     private void doubleTap(View view) throws Exception {
