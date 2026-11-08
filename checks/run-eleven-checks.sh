@@ -7,6 +7,7 @@ adb install -r fixture/build/outputs/apk/debug/fixture-debug.apk
 adb install -r installprobe/build/outputs/apk/debug/installprobe-debug.apk
 mkdir -p screenshots
 collect() {
+adb logcat -d -s AndroidRuntime:E > eleven-android-runtime.txt
 for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^eleven-.*\.png$/p'); do
  adb exec-out run-as "$launcher" cat "files/$file" > "screenshots/$file"
 done

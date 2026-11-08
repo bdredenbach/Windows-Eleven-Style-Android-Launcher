@@ -52,7 +52,7 @@ public final class SnapSmoke extends Instrumentation {
             target.getSharedPreferences(StartupExperience.SESSION, Context.MODE_PRIVATE).edit()
                     .putBoolean("seen", true).putBoolean("welcome_seen", true)
                     .putBoolean(StartupExperience.HOME_OFFERED, true).commit();
-            progress("launching Seven for native Snap checks");
+            progress("launching Eleven for native Snap checks");
             home = (MainActivity) startActivitySync(new Intent(Intent.ACTION_MAIN)
                     .setComponent(new ComponentName(target, MainActivity.class))
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
@@ -64,10 +64,10 @@ public final class SnapSmoke extends Instrumentation {
             DesktopWindow left = window("@computer");
             workspace = (View) left.getParent();
             GadgetSidebar sidebar = (GadgetSidebar) find(workspace, v -> v instanceof GadgetSidebar);
-            runOnMainSync(() -> sidebar.visible(true));
+            check(sidebar == null, "Eleven does not instantiate the legacy gadget sidebar");
             settle();
 
-            // Freestanding gadgets do not reserve part of the workspace.
+            // Eleven windows use the full workspace above the taskbar.
             runOnMainSync(left::maximize);
             settle();
             Rect work = new Rect(0, (int) left.getY(), workspace.getWidth(), workspace.getHeight());
@@ -105,7 +105,7 @@ public final class SnapSmoke extends Instrumentation {
             int rightEdge = work.right - dp(12);
             begin(right);
             moveTo(rightEdge, edgeY);
-            checkPreview(right, rightHalf, "Right outline fills the usable workspace behind floating gadgets");
+            checkPreview(right, rightHalf, "Right outline fills the usable workspace inside the Eleven work area");
             input(MotionEvent.ACTION_UP, rightEdge, edgeY);
             settle();
             check(rightHalf.equals(bounds(right)), "Right window fills the exact right half");
@@ -153,7 +153,7 @@ public final class SnapSmoke extends Instrumentation {
 
             progress("checking portrait Snap, Shake and keyboard controls");
             rotate(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            runOnMainSync(() -> sidebar.visible(false));
+            check(sidebar == null, "Portrait remains free of the legacy gadget sidebar");
             settle();
             runOnMainSync(() -> left.arrange(dp(12), dp(50), dp(290), dp(250)));
             settle();
