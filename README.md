@@ -1,10 +1,12 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.2.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.2.1**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
 ## Recording-based update
+
+0.2.1 uses pristine WindowsIcons bitmap assets for the primary shell apps, folders, devices, file types and Recycle Bin. Task View has supplied light/dark variants. Source and ownership notes are in [asset provenance](ASSETS.md) and [the pinned icon manifest](docs/ELEVEN_ICON_ASSETS.json).
 
 - Left or centered taskbar, scrolling app strip, original N11 identity and blue folded-ribbon wallpaper.
 - Unified Start with Pinned and All in one scroll surface, alphabetical List/Grid views, search, profile, configurable folder shortcuts and Power. Pin/unpin and reorder through a pin's menu or Ctrl+Left/Right.

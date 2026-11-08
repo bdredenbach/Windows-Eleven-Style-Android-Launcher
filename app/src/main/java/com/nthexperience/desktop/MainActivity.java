@@ -680,7 +680,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         return button;
     }
     View icon(String id,int size){
-        if(TenSystemTools.tool(id))return new AeroIcon(this,id.equals("@devices")||id.equals("@management")?"computer":id.equals("@events")?"notes":"run");
+        if(TenSystemTools.tool(id))return new AeroIcon(this,id.equals("@devices")||id.equals("@management")?"computer":id.equals("@events")?"notes":"terminal");
         if(id.equals("@gadgets"))return new AeroIcon(MainActivity.this,"feeds");
         if(id.equals("@nota"))return TenStyle.accentGlyph(MainActivity.this,"nota");
         AppCatalog.Entry entry=entries.get(id);

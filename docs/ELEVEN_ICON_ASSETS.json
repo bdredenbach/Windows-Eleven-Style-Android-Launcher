@@ -1,0 +1,2316 @@
+{
+  "repository": "https://github.com/HaydenReeve/WindowsIcons",
+  "commit": "9442e3ef014520d4337409a24be10b970a36d66b",
+  "upstream_readme": "https://github.com/HaydenReeve/WindowsIcons/blob/9442e3ef014520d4337409a24be10b970a36d66b/README.md",
+  "license_status": "No standalone LICENSE or COPYING file is present at this revision. Upstream README describes direct use of individual icons and identifies Windows/Microsoft and other source products; this is not represented as a new open-source license grant.",
+  "conversion": "Extract largest supplied ICO frame to lossless RGBA PNG without resizing, recoloring, cropping or flattening transparency. Exported RGBA pixels verified identical.",
+  "icons": [
+    {
+      "resource": "win11_folder",
+      "kinds": [
+        "files",
+        "folderapps"
+      ],
+      "upstream_path": "Icons/folders/folder.ico",
+      "upstream_git_blob": "89816c53391eebd0e086f4a69a622df6920c2e10",
+      "ico_sha256": "f0b281bb708302dc2c65e83aeca8d2133a0cae7413333a44ad43c33f792d5b3f",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "1f00b0e2c8dadf483896c91d19c69fd7c79f1f30f1b122eb1c548469b76ea07b",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_explorer",
+      "kinds": [
+        "file-explorer"
+      ],
+      "upstream_path": "Icons/folders/explorer.ico",
+      "upstream_git_blob": "58ba863451eee268975887f7e65fd61794818489",
+      "ico_sha256": "22b5065fcc484b22bd5822b308f26575ca25db0d2c8fe29ee0b61a3b6414ed4a",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "b6ee5a3c84d4564eac5e579ff57ce08826985700a2f606645b7e66a42d2fcff7",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_documents",
+      "kinds": [
+        "documents"
+      ],
+      "upstream_path": "Icons/folders/documents.ico",
+      "upstream_git_blob": "4722fc7c52eec9ff2cb91e098226b643de603aba",
+      "ico_sha256": "33b6b315e69cff78eab7f82f23d96b235eb460398e67173d490174ae09097d05",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "fc988d6b21ebe5433d82d17321fc1533683590a4de707e2c45743793a95d2d79",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_pictures",
+      "kinds": [
+        "pictures"
+      ],
+      "upstream_path": "Icons/folders/pictures.ico",
+      "upstream_git_blob": "ce590dce80032b067dd2db4ea352616f130cd9ca",
+      "ico_sha256": "727659961d7889267b30c9126a7161acb0998408ce6e0c68543d886080228201",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "1ba6c875495bd0cdb43e4ddc00be98af061632a11d6d9a6fbcdbb774b3844f3d",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_music",
+      "kinds": [
+        "music"
+      ],
+      "upstream_path": "Icons/folders/music.ico",
+      "upstream_git_blob": "27c33802bfd82619fbf354b1bcccda923f08ef0d",
+      "ico_sha256": "f8ec89dd7d07157d0d7f948eafb12a35e87b762c79a4acbedd7de68dc8fdea93",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "5d28564429c18853614238f8806a402d94f187db27a5c8811ff5cd73aab75ab6",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_videos",
+      "kinds": [
+        "videos"
+      ],
+      "upstream_path": "Icons/folders/videos.ico",
+      "upstream_git_blob": "c22ab0f2bdd9b90ed7cd9bfbba62fada9f3cb841",
+      "ico_sha256": "8202d241301c43d19f2bd6f87e59df7e283eb1c28805d9789891102186fce83a",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "e08b55466760c9705715d046f647dd4bb97e05b17907003722adcd3a6bf25c36",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_downloads",
+      "kinds": [
+        "downloads"
+      ],
+      "upstream_path": "Icons/folders/downloads.ico",
+      "upstream_git_blob": "913444231f93bf53d6782e694d8fe2a24919dd78",
+      "ico_sha256": "1d0c0057b4fd4570cb3cc4b4fe43f0f2d00c12aa356ab237f502e6305e45ce18",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "dbe17ed8be14f6bbcd98c4cecd74dc01ddae00852dfd3d3fbdc1312bac2b6aeb",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_desktop",
+      "kinds": [
+        "desktop"
+      ],
+      "upstream_path": "Icons/folders/desktop.ico",
+      "upstream_git_blob": "a5fa3886fb131e5a6f47d5eaa75ba5c0b9ada7d5",
+      "ico_sha256": "37b6dafc78c4a3722823b095a154e99d16610171a053fd87a7284b399d1ad23b",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "f97c3d84ea3a6ea0b545b079d85a66baaa20214d549d0119cd8a6ac767b89f1f",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_settings",
+      "kinds": [
+        "settings"
+      ],
+      "upstream_path": "Icons/applications/settings.ico",
+      "upstream_git_blob": "ab37d6ddb6236d338ce65c122b6b9c981267633d",
+      "ico_sha256": "96d84bf435fa925b4066e42e0dd8012248f52e5f46908f43f37a6bfabb1d1aea",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "67d0d18ad30405b95f6df6e468d41b589a8e3df175e73b96f4733102c7d7dd36",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_calculator",
+      "kinds": [
+        "calculator"
+      ],
+      "upstream_path": "Icons/applications/calculator.ico",
+      "upstream_git_blob": "0b5d530e82933f478d6dea4028c78cee53a7e354",
+      "ico_sha256": "736ec8caafcd003756d92c41c1e2d2b4fc6709cf606be09a548b07ee64860ad2",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "456866b1aeeddf073f6057aa9ef9196be4282cb6fee8fd9dc41a0d74eecc2f37",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_calendar",
+      "kinds": [
+        "calendar"
+      ],
+      "upstream_path": "Icons/applications/calendar.ico",
+      "upstream_git_blob": "8ae43d47c49f872accbc4f588029e28120b165a6",
+      "ico_sha256": "3ae0fde8ed2170644c49523485973f1b6298e1fa4bd340e56cb8605e39f9a25d",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "794dca05ed1b6c657be73f3bfa6930260cd0f888d79e9a4b82101f32896e26bf",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_photos",
+      "kinds": [
+        "pictures-app",
+        "photo",
+        "photos"
+      ],
+      "upstream_path": "Icons/applications/photos.ico",
+      "upstream_git_blob": "e14159656ff8ac943be7c01b6bad50fd60fe13d7",
+      "ico_sha256": "a744c3df0b8ab76e239468d5df232c175a7a11cb9d6b8a82201d3e965cc653a7",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "6b7d6cf069f2273be9d03ae7afb5b3d17d73f9e18683b6bf8684785eaccacf26",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_notepad",
+      "kinds": [
+        "notes",
+        "notepad"
+      ],
+      "upstream_path": "Icons/applications/notepad.ico",
+      "upstream_git_blob": "039b5acc5be5df773154fa561ef583b79c9c2a1e",
+      "ico_sha256": "998776a81e1fe20ff37623d2a6d2e9404fa085571afa35f212f11b2f40e70ca7",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "845a44f341708f7164600a9f6ed9e2957a474d15be8964f421ea3cd845635a7c",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_sticky",
+      "kinds": [
+        "sticky"
+      ],
+      "upstream_path": "Icons/applications/stickynotes.ico",
+      "upstream_git_blob": "9324e0138e0a29784488c51b13118b23bd962fee",
+      "ico_sha256": "9b0095b2263ba7420feb364f08e15309aed8738e068d78e1ada9d4d9c2cc328b",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "ef5964c286b622700713a8c599ebeba8e3521fe18d7329d2c4cf83e5b1c2bc5b",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_browser",
+      "kinds": [
+        "browser"
+      ],
+      "upstream_path": "Icons/applications/edge.ico",
+      "upstream_git_blob": "11bc8a42ba3f50b90a7fde323f5bf873c4e717f7",
+      "ico_sha256": "95f206fef46b894e0ae6526bb87dbe07485159bd5414643e3bc6332a654f7893",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "d6f64dd7731d04895f4b0a9dac25dda2942cbdd2939ec0a4970934944a91a2b8",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_taskmanager",
+      "kinds": [
+        "taskmanager",
+        "meters"
+      ],
+      "upstream_path": "Icons/applications/taskmanager.ico",
+      "upstream_git_blob": "7c63e00fe2e7409d362e535edfec1f87c23546fe",
+      "ico_sha256": "b0bc0e1912516fa18451ec0872dc811451491acfd91419d5be9e98b85fade010",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "5046ede6735686a78302e342c156f59f988c8a6794000c9dea493b26d7d50a12",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_widgets",
+      "kinds": [
+        "widgets",
+        "news"
+      ],
+      "upstream_path": "Icons/applications/widgets.ico",
+      "upstream_git_blob": "4cb7b2b0ae9b5203a639de4a4b86db6798bd4c35",
+      "ico_sha256": "bc91263df8005f9965bc8a9e312f6167a8c2b9a61253f8335edabe7b3c16f0e7",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "faa7942cf384b0fcecff42e2ca563f6b5276dc532cbc40b632012be5971b3853",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_news",
+      "kinds": [
+        "feeds"
+      ],
+      "upstream_path": "Icons/applications/news.ico",
+      "upstream_git_blob": "8355de0771c23c7eb8d5c61b628a27a9c063b0de",
+      "ico_sha256": "8f6a7b050f3a7b53a8ec35adb3eb837ea007b450e56afc09c867a6f33cf03fb6",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "34b447ee81c3f5423ed29d1c9e51f4fcc5cbd081c32c6247219e7c02aa3c4e26",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_run",
+      "kinds": [
+        "run"
+      ],
+      "upstream_path": "Icons/applications/run.ico",
+      "upstream_git_blob": "da6669d7bc62944a260440b82bd8c9d4f2927301",
+      "ico_sha256": "4bd0c80138ebc03f2ed8af1de87496daf7af2b3b375bce0d9868ae164fae8b79",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "0cc8dd9df97d3de638762b0c654621f125b68b1fe72eaa27639d0fa06e1ca89b",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_terminal",
+      "kinds": [
+        "terminal"
+      ],
+      "upstream_path": "Icons/applications/terminal.ico",
+      "upstream_git_blob": "00ec0984a6a221dfb503c573aaaa5a99b9395e33",
+      "ico_sha256": "d190f4d0b239e548bfa6b9bbaf13a8ae2bee2641dd49b2ba7b87666597b25de6",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "25186e7b1025dd5111dbb6283ff473c3fbeb8352305e73287e83b3d1f04918b5",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_computer",
+      "kinds": [
+        "computer",
+        "system",
+        "display"
+      ],
+      "upstream_path": "Icons/devices/monitors/monitor.ico",
+      "upstream_git_blob": "c6a84731361de15f62649fc8f6ebc27ce7a1c0c7",
+      "ico_sha256": "5ae34ce8e88fc88742c512bb3f7be2171d7872253c5ee51e90d2f9c36e1d6844",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "725458712075a423c3c562f4b2c69bf6ab351d4b9135fa840f6e81127f76e50a",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_drive",
+      "kinds": [
+        "drive",
+        "storage"
+      ],
+      "upstream_path": "Icons/devices/drives/drive.ico",
+      "upstream_git_blob": "d4a140e3ef052892404d5c8aeb5faba1651146f0",
+      "ico_sha256": "77857efc8cdb1dbe617f71aee375e862ffb55b495e1a91a9655ca1b821628190",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "78ee324660c48371c6618a547d160734416e23d2b999f9c55b0ad478807dd74c",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_network",
+      "kinds": [
+        "network"
+      ],
+      "upstream_path": "Icons/devices/monitors/network.ico",
+      "upstream_git_blob": "d0cca0a2340782db393b632f9bbf0b4f44f9e9c4",
+      "ico_sha256": "b65a9ac34082c708ed2c6bcee812b12c549444168ac1db68fa8292bbfa692ac6",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "e5bbfd057a24597fe01348c582dfa6b185af1b29b0ce7fb380e35a8e0434ff25",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_personalization",
+      "kinds": [
+        "appearance"
+      ],
+      "upstream_path": "Icons/devices/monitors/personalization.ico",
+      "upstream_git_blob": "21cf04f0c58ff39caa51ae4e1e8b5f690dfd57dc",
+      "ico_sha256": "38b420f37d75ab4b6cc40a83c9b3b73fec45849022222ac6f34eff55ae56de45",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "d1c33278e438dd8cea4997342f0ecf3c46c90f014d03a1309abba3ab796403e8",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_control",
+      "kinds": [
+        "control"
+      ],
+      "upstream_path": "Icons/applications/controlpanel.ico",
+      "upstream_git_blob": "dd10e417def982f0c3e2c6b923319bd0083ef3b8",
+      "ico_sha256": "9d991b7f493c3cb2bdfdca1bc11dc62447828d92fe09be66d9bf5ff84140464d",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "496c755ca3f70538ec57b851f4d2cf83ad1912b5447078615aaef4e978f7d6c3",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_accounts",
+      "kinds": [
+        "accounts"
+      ],
+      "upstream_path": "Icons/emblems/users.ico",
+      "upstream_git_blob": "78b61ce867b18eec75cd7cf7ced05cd8af5e44bd",
+      "ico_sha256": "e4741eac3bb2924a330be2ade95ed21a0cccfe230669aaaf3698949bc26f7c32",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "985a5baa7728c31ead2f219c02464b00de56343462e0ab0090551ed0903fb51f",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_security",
+      "kinds": [
+        "security"
+      ],
+      "upstream_path": "Icons/emblems/security.ico",
+      "upstream_git_blob": "241080778649771f7c22ec033520b07deafd770e",
+      "ico_sha256": "67d1cb061f8f44c8395a9c632167ebc5a08616f470a09339c1ffbb5c3fd64d22",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "447b677094bd8d89e32104c2ea7e6ba9bc8494e5e99d15a6e4af149b2f372705",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_accessibility",
+      "kinds": [
+        "accessibility"
+      ],
+      "upstream_path": "Icons/emblems/accessibility.ico",
+      "upstream_git_blob": "6fe19aa09ac54d26e2ee9fcc7997458f0103e4cb",
+      "ico_sha256": "7978f8e6a4e574041b996a49865e2bfad020e3ca451cd5eb22b54a54e016f6a2",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "cce206d4755eb16fad3ccee87ba4da6568c2a033d29b9eaa9fba96d4dc36c466",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_weather",
+      "kinds": [
+        "weather"
+      ],
+      "upstream_path": "Icons/applications/weather.ico",
+      "upstream_git_blob": "147e97ea9de7cac45dee54beb74b835d10964916",
+      "ico_sha256": "505bf7e99e9d018764580d2e624ae948f64e2b60af4e2ed19aca04a2e11e9d31",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "0ceda37d501737acf1298ce4d5f79674b51cc4a0133fa85ba87903d329934067",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_clock",
+      "kinds": [
+        "clock",
+        "timer",
+        "stopwatch",
+        "worldclock"
+      ],
+      "upstream_path": "Icons/applications/alarm.ico",
+      "upstream_git_blob": "1a6af29b0742ae898ccca38fb2046fb598bd6453",
+      "ico_sha256": "f8e7afe346bb5c895046d0a6d3b970387dd56bcbcdba25e03f1ebcdcac47ae6a",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "c9adf66214bb6a15af701466b1b1d4ef22c189e9b2f6cb8e6c92f36c90322a0d",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_programs",
+      "kinds": [
+        "programs",
+        "apps"
+      ],
+      "upstream_path": "Icons/applications/app.ico",
+      "upstream_git_blob": "fa6baff87dd56a863389bc9a6a8f69ac6d5a09ea",
+      "ico_sha256": "9cecae744886089db2118e674e5f148db45d415fa973ad8c528248f46f4fa3e5",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          192,
+          192
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "05a7b6a469f9f6eb7e0f284a5951303470e71865b31d778badbab2bc674ff5f6",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_document",
+      "kinds": [
+        "documentfile"
+      ],
+      "upstream_path": "Icons/files/document.ico",
+      "upstream_git_blob": "eb61fded57d730500797052d5aa83ad6eef92342",
+      "ico_sha256": "734c40c3aaf63c719d0d60cfd017d5024ade87c729f8c67c0277a403105d3045",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "7e8336b38f014c5d67cbb78fea6d736825eddf0c06dab6738d74c1574b03807d",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_image",
+      "kinds": [
+        "picturefile"
+      ],
+      "upstream_path": "Icons/files/image.ico",
+      "upstream_git_blob": "21a6ff8419cfd7392eaed620b50c69804d6836ad",
+      "ico_sha256": "54968823954887335b23a2b845b1c884559fcbe7bfdff90856dda43ffb37fae7",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "9febde2f4c2675f05a76b0e52bb54ecad6936b4e0cd0e4f5f1d959bfbca4bbae",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_audio",
+      "kinds": [
+        "musicfile"
+      ],
+      "upstream_path": "Icons/files/audio.ico",
+      "upstream_git_blob": "c774b091f53b72bfbf5f46f6c9b5ded63ad8e55d",
+      "ico_sha256": "57939c552d366943e4955b50e52b31cf98c8a01f9d3cb97db5717950f035e5bd",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "c509cec2af04dc20e9d460f985d762c899a65de0364ab18610e04fa532e9d082",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_video",
+      "kinds": [
+        "videofile"
+      ],
+      "upstream_path": "Icons/files/video.ico",
+      "upstream_git_blob": "4fbdbbf12877441a83c5926e57fa270af9dca93c",
+      "ico_sha256": "11b495766605798891d10701877afd8e2c1f6d20574e45b4b428e1142995cb58",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "b490c7618c9d9c51f727cfe1fd6080f24e82c2acb37102fae62f1c2dd4cdddc0",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_archive",
+      "kinds": [
+        "archivefile"
+      ],
+      "upstream_path": "Icons/folders/zip.ico",
+      "upstream_git_blob": "c5f484f8af28b7ac9125f3edca00969ebdf51a96",
+      "ico_sha256": "2c523c9a07ac78bee9096bee88015683a3116fb196926b298366bf504126cd8f",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "fe6680d9a8f5578c2476a3586fa4751452e0be980c20444bb7caabaa86ca0be0",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_font",
+      "kinds": [
+        "fonts"
+      ],
+      "upstream_path": "Icons/files/font.ico",
+      "upstream_git_blob": "635ccdd262bae47608721f1fc093562cfa3078d1",
+      "ico_sha256": "c72e11259b71d93c36c89e554e56932f3305850ae18f2b35e460fee983f24131",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "c6248d7f939f70096a65137a49c2baf6fcee77f549b4eca50adc512c31862016",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_copy",
+      "kinds": [
+        "copy"
+      ],
+      "upstream_path": "Icons/files/copy.ico",
+      "upstream_git_blob": "0cfdaccf5342fa8a7f5a4b1a73d8fd002cd983e8",
+      "ico_sha256": "9e4ab19c18e3e3d4fa71682b45ad146e0e90560d6a45e0341296c6e73f24fd25",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "853e5bf1d379e7d1928a89a76df6762d909f97c9c4a2a87aa302628504fe3dd2",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_paste",
+      "kinds": [
+        "paste"
+      ],
+      "upstream_path": "Icons/objects/clipboard.ico",
+      "upstream_git_blob": "c7bf81dfd2407086db43c96c52c5291975c03c18",
+      "ico_sha256": "584ff2115ba3bffb807b53870034c3b5e96b8c7417535d86718e1d67b84ed2a8",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "8072621025bbcdbb181ee0f7200edf4deb6d5ebb1eec584395d0d3509f915bd2",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_cut",
+      "kinds": [
+        "cut"
+      ],
+      "upstream_path": "Icons/objects/scissors.ico",
+      "upstream_git_blob": "4d7b24a7822d1aea5e734e7630623ff095323fd5",
+      "ico_sha256": "4f3b94822d3572022c0956125efaca54985307728e520e6a9ce9b1341e562069",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "f5b41fd48e30c3ae6ba8deb5262d35e7a361ac2a2360b437f3af79540ff5dbcf",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_delete",
+      "kinds": [
+        "delete"
+      ],
+      "upstream_path": "Icons/files/delete.ico",
+      "upstream_git_blob": "60e5619f3c4ea371398ffc86756ad924f15b3ae0",
+      "ico_sha256": "f78425801dd012cc2a8edbc1c2731075c23b43ba9aa56dd029f922d955c9fe68",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "831bc3f04acf3eb65b43217e0056f09e4cce278351cf423f98101aef25d6bff4",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_sound",
+      "kinds": [
+        "sound"
+      ],
+      "upstream_path": "Icons/devices/speaker.ico",
+      "upstream_git_blob": "51660a825ad0570a26e978c3985ef658a6c05693",
+      "ico_sha256": "b06d1415d6f40ce26797be2a2e72e2aa2520eea44b82faca3a7b2f2c00ad6aec",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "d575990800e86d158bd6986a5c36f4ac8784504a267882843cc631247c347232",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_recycle_empty",
+      "kinds": [
+        "recycle"
+      ],
+      "upstream_path": "Icons/objects/recyclebinempty.ico",
+      "upstream_git_blob": "f8cdad1e0e4f59f0df0734eaa0ea8656c229206d",
+      "ico_sha256": "05c27e76daf5f938724b2f2bdc7338f4aa5c8ce4bf6ba3f238f5d1c3066fd9d5",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "bc2ce168b667186536e9a99f217239e55fffa390a15f0a8e98133b2ba0d8f784",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_recycle_full",
+      "kinds": [
+        "recycle-full"
+      ],
+      "upstream_path": "Icons/objects/recyclebinfull.ico",
+      "upstream_git_blob": "4eec061e69a646550b3f465b910fe4500c2db4a1",
+      "ico_sha256": "a28daa110b014a519bf3687076b06af52fd89ce8190c58c9ef32b3ed20ef2be2",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          20,
+          20
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          40,
+          40
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "f3dcf7f8c37bf721a213391ae8d13b090b0fe108c15d5a83fe78f91d770ef839",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_taskview_light",
+      "kinds": [],
+      "upstream_path": "Icons/applications/taskview.ico",
+      "upstream_git_blob": "b7c9e6f4ec3d0914bcc6096f8a9eb0d2b6ce11ee",
+      "ico_sha256": "da09a5307b784d39bfc9ee61c7fad0d1b59da81dec0632702d47b81ee165a2ac",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "3ef7f6b654b366a17f9e056bad8ba0c46e25cfc2383bb4cf776c22a9fa1ec647",
+      "pixels_preserved": true
+    },
+    {
+      "resource": "win11_taskview_dark",
+      "kinds": [],
+      "upstream_path": "Icons/applications/taskview2.ico",
+      "upstream_git_blob": "356699c422a6c8669b341437836df9a9bfe3feee",
+      "ico_sha256": "a77db7390b24ef0c5afffb7977dc350a91436e7d4a6acc4fe566117055d98bae",
+      "available_frames": [
+        [
+          16,
+          16
+        ],
+        [
+          24,
+          24
+        ],
+        [
+          32,
+          32
+        ],
+        [
+          48,
+          48
+        ],
+        [
+          64,
+          64
+        ],
+        [
+          96,
+          96
+        ],
+        [
+          128,
+          128
+        ],
+        [
+          256,
+          256
+        ]
+      ],
+      "selected_frame": [
+        256,
+        256
+      ],
+      "png_sha256": "83043f92469b42aab2cc2fb0e781c91296c2fbbe3d1321c9e5657f2fcd04d770",
+      "pixels_preserved": true
+    }
+  ]
+}

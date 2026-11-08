@@ -43,3 +43,11 @@ The black glass N¹⁰ mark in `app/src/main/res/drawable-nodpi/nth_ten_mark.png
 ## Eleven 0.1 identity and wallpaper
 
 `eleven_brand.xml` is original code-native N11 artwork. All launcher/adaptive/monochrome resources use the new identity. The old Ten mark is retained only as an unused source-lineage asset. The Eleven blue ribbon backgrounds are original Android Canvas paths in `AeroWallpaper.java`, rendered at the display resolution. No new Windows imagery, sounds or fonts were imported. Existing inherited assets retain their prior provenance below.
+
+## Eleven 0.2.1 pristine icon pack
+
+The Windows 11 shell assets in `drawable-nodpi/win11_*.png` are pixel-preserving exports from [HaydenReeve/WindowsIcons](https://github.com/HaydenReeve/WindowsIcons), pinned to commit `9442e3ef014520d4337409a24be10b970a36d66b`. Each PNG contains the largest supplied ICO frame (typically 256 × 256), without resizing, recoloring, cropping, background flattening or sharpening. All exported RGBA pixels were compared with the decoded source frame. Android scales these originals with bitmap filtering at the requested icon size.
+
+`docs/ELEVEN_ICON_ASSETS.json` records each path, source blob and SHA-256, available frames, selected size, PNG hash and UI kinds. The upstream README is retained in `third_party/windows-icons/README.upstream.md`. That README describes direct icon usage and identifies Windows/Microsoft and other original sources. No standalone LICENSE or COPYING file is present in the pinned repository; this project does not describe the pack as public domain or invent a permissive license. Original ownership remains with the corresponding rights holders.
+
+Pristine assets take precedence in AeroIcon, including desktop shortcuts, Start, Explorer navigation/file types, caption icons and menus. Task View uses its supplied light/dark variants; Widgets uses the supplied Windows 11 panel icon. Nth launcher/adaptive/monochrome branding, Nota and installed Android app icons are unchanged. Monochrome action glyphs and original fallbacks remain for controls without an appropriate supplied icon.
