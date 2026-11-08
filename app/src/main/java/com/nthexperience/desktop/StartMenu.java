@@ -23,7 +23,7 @@ final class StartMenu extends LinearLayout {
 
     StartMenu(Context c,Actions actions,DesktopStore store,AeroWallpaper wallpaper) {
         super(c);this.actions=actions;this.store=store;data=new TenStartData(store);
-        setOrientation(VERTICAL);setElevation(dp(28));setPadding(dp(20),dp(22),dp(20),dp(10));
+        setOrientation(VERTICAL);setClickable(true);setElevation(dp(28));setPadding(dp(20),dp(22),dp(20),dp(10));
         setBackground(new AeroGlass(wallpaper,AeroGlass.START));setContentDescription("Windows 11 style Start menu");
         setClipToOutline(true);setOutlineProvider(new ViewOutlineProvider(){public void getOutline(View v,android.graphics.Outline o){o.setRoundRect(0,0,v.getWidth(),v.getHeight(),dp(8));}});
         search=new EditText(c);search.setSingleLine();search.setTextSize(14);search.setTypeface(Aero.face(c));

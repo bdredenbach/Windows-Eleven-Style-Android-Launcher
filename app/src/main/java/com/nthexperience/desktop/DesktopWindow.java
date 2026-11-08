@@ -66,7 +66,7 @@ final class DesktopWindow extends LinearLayout {
         snapMinHeight=Aero.dp(context,WindowArrangement.MIN_STACK_HEIGHT_DP);
         snapOutline.setColor(0x3396d9ff);
         snapOutline.setStroke(Aero.dp(context,2),0xffb6e8ff);
-        setOrientation(VERTICAL); setElevation(Aero.dp(context,16));
+        setOrientation(VERTICAL);setClickable(true); setElevation(Aero.dp(context,16));
         setClipToOutline(true);setOutlineProvider(new android.view.ViewOutlineProvider(){public void getOutline(View v,android.graphics.Outline outline){float radius=effectivePlacement()==Placement.FLOATING?Aero.dp(context,8):0;outline.setRoundRect(0,0,v.getWidth(),v.getHeight(),radius);}});
         glass=new AeroGlass(wallpaper,AeroGlass.WINDOW);setBackground(glass);
         setPadding(Aero.dp(context,1),Aero.dp(context,1),Aero.dp(context,1),Aero.dp(context,1));
