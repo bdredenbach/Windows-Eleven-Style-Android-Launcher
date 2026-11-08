@@ -17,7 +17,7 @@ for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(e
 done
 }
 trap collect EXIT
-for runner in ElevenSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke; do
+for runner in ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke; do
  adb shell am force-stop "$launcher"
  timeout 240s adb shell am instrument -w "$launcher.test/com.nthexperience.desktop.$runner" | tee "eleven-$runner.txt"
  grep -q 'PASS' "eleven-$runner.txt"
