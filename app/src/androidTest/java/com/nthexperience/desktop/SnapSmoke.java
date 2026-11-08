@@ -190,8 +190,8 @@ public final class SnapSmoke extends Instrumentation {
                     && bounds(left).bottom == workspace.getHeight(), "Top snap works in portrait; actual="+bounds(left)+", geometry="+left.geometry());
             shake(left);
             check(left.isShown()&&!right.isShown(),"Aero Shake minimizes the other visible window");
-            shake(left);
-            check(left.isShown()&&right.isShown(),"The second Aero Shake restores the same window");
+            shakeBatched(left);
+            check(left.isShown()&&right.isShown(),"A batched second Aero Shake restores the same window");
             runOnMainSync(()->left.restore());
             runOnMainSync(()->home.dispatchKeyEvent(new KeyEvent(0,0,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_RIGHT,0,KeyEvent.META_META_ON)));
             settle();
@@ -258,6 +258,14 @@ public final class SnapSmoke extends Instrumentation {
         }
         inputAt(MotionEvent.ACTION_UP,left,y,gestureTime+1);
         settle();
+    }
+
+    private void shakeBatched(DesktopWindow window)throws Exception{
+        begin(window,false);int start=pointerX,y=pointerY,right=start+dp(49),left=start-dp(49);int[] origin=new int[2];workspace.getLocationOnScreen(origin);
+        Thread.sleep(150);
+        MotionEvent batch=MotionEvent.obtain(down,down+35,MotionEvent.ACTION_MOVE,origin[0]+right,origin[1]+y,0);
+        try{batch.setSource(InputDevice.SOURCE_TOUCHSCREEN);batch.addBatch(down+70,origin[0]+left,origin[1]+y,1,1,0);batch.addBatch(down+105,origin[0]+right,origin[1]+y,1,1,0);batch.addBatch(down+140,origin[0]+left,origin[1]+y,1,1,0);check(batch.getHistorySize()==3,"Shake carries three historical turns");check(getUiAutomation().injectInputEvent(batch,true),"Batched Shake was injected");}finally{batch.recycle();}
+        inputAt(MotionEvent.ACTION_UP,left,y,down+141);settle();
     }
 
     private void moveTo(int x, int y) throws Exception {

@@ -362,7 +362,7 @@ final class DesktopWindow extends LinearLayout {
     private void moveCaption(MotionEvent e){
         host.getLocationOnScreen(hostLocation);
         float x=e.getRawX()-hostLocation[0],y=e.getRawY()-hostLocation[1];
-        if(e.getActionMasked()==MotionEvent.ACTION_MOVE&&detectShake(x,y,e.getEventTime())){
+        if(e.getActionMasked()==MotionEvent.ACTION_MOVE&&detectShake(e,x,y)){
             cancelCaptionDrag();
             shake.run();
             return;
@@ -389,6 +389,13 @@ final class DesktopWindow extends LinearLayout {
         showSnapPreview(target);
     }
 
+    private boolean detectShake(MotionEvent event,float x,float y){
+        // Android batches motion samples while a window is busy. They carry the
+        // same view-to-screen transform as the current sample; retain each turn.
+        float offsetX=x-event.getX(),offsetY=y-event.getY();
+        for(int i=0;i<event.getHistorySize();i++)if(detectShake(event.getHistoricalX(i)+offsetX,event.getHistoricalY(i)+offsetY,event.getHistoricalEventTime(i)))return true;
+        return detectShake(x,y,event.getEventTime());
+    }
     private boolean detectShake(float x,float y,long time){
         if(time-shakeTime>1200||Math.abs(y-downY)>Aero.dp(getContext(),96)){
             shakeX=x;shakeTime=time;shakeDirection=0;shakeStrokes=0;return false;
