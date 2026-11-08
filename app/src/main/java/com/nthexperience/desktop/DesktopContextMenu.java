@@ -17,7 +17,7 @@ final class DesktopContextMenu {
     private final android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());
     static boolean openingSubmenu(){return openingParent!=null;}
     private final int rowHeight,menuWidth;
-    private final boolean plain;
+    private final boolean plain;private boolean hasSubmenus;
     private final View.OnLayoutChangeListener bounds=(v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol||b-t!=ob-ot)dismiss();};
     private final View.OnAttachStateChangeListener lifetime=new View.OnAttachStateChangeListener(){public void onViewAttachedToWindow(View v){}public void onViewDetachedFromWindow(View v){dismiss();}};
     DesktopContextMenu(Context context){this(context,"Desktop context menu");}
@@ -46,6 +46,7 @@ final class DesktopContextMenu {
     }
     void checked(String title,boolean checked,Runnable action){item(title,checked?"checked":"empty",action);}
     void submenu(String title,String icon,Runnable action){
+        hasSubmenus=true;
         item(plain?title+"   ›":title,icon,action);View row=items.getChildAt(items.getChildCount()-1);row.setContentDescription(title);
         if(!plain){TextView arrow=Aero.text(context,"›",18,0xff476277);((LinearLayout)row).addView(arrow,new LinearLayout.LayoutParams(dp(20),-1));}
         Runnable open=()->{if(!showing())return;if(child!=null&&child.parentRow==row&&child.showing())return;if(child!=null)child.closeBranch();openingParent=this;openingRow=row;try{action.run();}finally{openingParent=null;openingRow=null;}if(child==null)dismiss();};
@@ -56,9 +57,15 @@ final class DesktopContextMenu {
     void separator(){LinearLayout row=new LinearLayout(context);row.setPadding(dp(plain?10:34),dp(3),dp(10),dp(3));View line=new View(context);line.setBackgroundColor(plain?0xff696969:0xffc6cbcf);row.addView(line,new LinearLayout.LayoutParams(-1,dp(1)));items.addView(row,new LinearLayout.LayoutParams(-1,dp(7)));}
     void show(View root,float screenX,float screenY,int leftInset,int topInset,int rightInset,int bottomInset){
         if(owner!=null){owner.removeOnAttachStateChangeListener(lifetime);owner.removeOnLayoutChangeListener(bounds);}owner=root;root.addOnAttachStateChangeListener(lifetime);root.addOnLayoutChangeListener(bounds);int[] location=new int[2];root.getLocationOnScreen(location);int left=location[0]+leftInset+dp(3),top=location[1]+topInset+dp(3),right=location[0]+root.getWidth()-rightInset-dp(3),bottom=location[1]+root.getHeight()-bottomInset-dp(3);
-        int width=Math.min(dp(menuWidth),Math.max(1,right-left));popup.getContentView().measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(Math.max(1,bottom-top),View.MeasureSpec.AT_MOST));int height=Math.min(popup.getContentView().getMeasuredHeight(),Math.max(1,bottom-top));popup.setWidth(width);popup.setHeight(height);
+        boolean cascading=openingParent!=null&&openingParent.showing()&&openingRow!=null;
+        android.graphics.Rect anchor=null;
+        if(cascading){parent=openingParent;parentRow=openingRow;parent.child=this;int[] at=new int[2];parentRow.getLocationOnScreen(at);anchor=new android.graphics.Rect(at[0],at[1],at[0]+parentRow.getWidth(),at[1]+parentRow.getHeight());}
+        int width=Math.min(dp(menuWidth),Math.max(1,right-left));
+        if(anchor!=null)width=Math.min(width,Math.max(1,Math.max(anchor.left-left,right-anchor.right)+dp(3)));
+        else if(hasSubmenus)width=Math.min(width,Math.max(1,(right-left)/2));
+        popup.getContentView().measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(Math.max(1,bottom-top),View.MeasureSpec.AT_MOST));int height=Math.min(popup.getContentView().getMeasuredHeight(),Math.max(1,bottom-top));popup.setWidth(width);popup.setHeight(height);
         int x=Math.max(left,Math.min(Math.round(screenX),right-width)),y=Math.max(top,Math.min(Math.round(screenY),bottom-height));
-        if(openingParent!=null&&openingParent.showing()&&openingRow!=null){parent=openingParent;parentRow=openingRow;parent.child=this;int[] at=new int[2];parentRow.getLocationOnScreen(at);android.graphics.Rect anchor=new android.graphics.Rect(at[0],at[1],at[0]+parentRow.getWidth(),at[1]+parentRow.getHeight());x=anchor.right+width<=right?anchor.right-dp(3):Math.max(left,anchor.left-width+dp(3));y=Math.max(top,Math.min(anchor.top,bottom-height));}
+        if(anchor!=null){int rightSpace=right-anchor.right,leftSpace=anchor.left-left;x=rightSpace>=leftSpace?anchor.right-dp(3):anchor.left-width+dp(3);x=Math.max(left,Math.min(x,right-width));y=Math.max(top,Math.min(anchor.top,bottom-height));}
         popup.showAtLocation(root,Gravity.TOP|Gravity.LEFT,x,y);
         if(!root.isInTouchMode())for(int i=0;i<items.getChildCount();i++){View row=items.getChildAt(i);if(row.isEnabled()&&row.isFocusable()&&row.requestFocus())break;}
     }
