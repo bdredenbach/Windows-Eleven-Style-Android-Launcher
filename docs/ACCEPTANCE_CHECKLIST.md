@@ -1,6 +1,6 @@
 # Eleven acceptance checklist
 
-All entries are pending implementation. Test portrait and landscape, light and dark, standard and large text, and both Android navigation styles where available.
+Roadmap and acceptance targets. Checked entries have specific Eleven evidence in `ELEVEN_0_1_VALIDATION.md`; unchecked entries still need implementation or broader verification. The first preview does not claim the whole roadmap. Test portrait and landscape, light and dark, standard and large text, and both Android navigation styles where available.
 
 ## Identity and startup
 
@@ -22,8 +22,8 @@ All entries are pending implementation. Test portrait and landscape, light and d
 
 ## Panels
 
-- [ ] Quick Settings and notification/calendar use separate taskbar destinations.
-- [ ] Opening one incompatible shell panel dismisses the other; repeat taps do not stack copies.
+- [x] Quick Settings and notification/calendar use separate taskbar destinations.
+- [x] Opening one incompatible shell panel dismisses the other; repeat taps do not stack copies.
 - [ ] Volume/brightness work and restricted controls route to the correct Android page.
 - [ ] Notification denial/revocation empties protected data and shows the correct setup route.
 - [ ] Lock-screen content remains redacted according to the user's choice.
@@ -53,12 +53,12 @@ All entries are pending implementation. Test portrait and landscape, light and d
 
 ## Nota, appearance and release
 
-- [ ] Clear app commands work; ambiguous names show actual app choices.
-- [ ] Page selections and model replies stay data and cannot execute desktop commands.
+- [x] Clear app commands work; ambiguous names show actual app choices.
+- [x] Page selections and model replies stay data and cannot execute desktop commands.
 - [ ] Browser has the intended single Nota toolbar entry; closing it clears taskbar state.
 - [ ] Every accent, including black/white, keeps labels, hints, selections and disabled text readable.
 - [ ] Backgrounds, surface layers and title bars remain consistent in every built-in tool.
 - [ ] Reduced motion and transparency fallback are usable.
 - [ ] File pickers, browser selection, media and backups retain engine behavior.
-- [ ] CI evidence identifies commit, OS/API, orientation, checks run and failures.
-- [ ] Installable APK and optional ZIP are published only after the actual build is verified.
+- [x] CI evidence identifies commit, OS/API, orientation, checks run and failures.
+- [x] Installable APK and optional ZIP are published only after the actual build is verified.
