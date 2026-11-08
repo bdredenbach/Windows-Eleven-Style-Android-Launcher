@@ -1,6 +1,6 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.1.1**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.2.0**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
@@ -20,7 +20,7 @@ Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten,
 
 Use Java 17, Android SDK 36 and `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`. Native and shared-engine checks run with `bash checks/run-eleven-checks.sh` on a connected test device. GitHub Actions covers Android 11 and 16. The Eleven suite checks identity, Start/search/reorder/state, the split panels, Settings and retained tool routes across orientations and light/dark modes.
 
-See [0.1.1 Nota validation](docs/ELEVEN_0_1_1_NOTA.md) and [0.1.0 shell validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
+See [0.2.0 recording reference and Android mappings](docs/ELEVEN_0_2_RECORDINGS.md), [0.1.1 Nota validation](docs/ELEVEN_0_1_1_NOTA.md) and [0.1.0 shell validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
 
 ## Scope
 

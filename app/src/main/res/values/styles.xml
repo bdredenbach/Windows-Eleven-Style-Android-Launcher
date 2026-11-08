@@ -8,12 +8,12 @@
         <item name="android:windowActionModeOverlay">true</item>
         <item name="android:windowBackground">#02070D</item>
         <item name="android:popupMenuStyle">@style/AeroPopupMenu</item>
-        <item name="android:scrollbarThumbVertical">@drawable/aero_scroll_thumb</item>
-        <item name="android:scrollbarTrackVertical">@drawable/aero_scroll_track</item>
-        <item name="android:scrollbarSize">9dp</item>
+        <item name="android:scrollbarThumbVertical">@drawable/eleven_scroll_thumb</item>
+        <item name="android:scrollbarTrackVertical">@android:color/transparent</item>
+        <item name="android:scrollbarSize">3dp</item>
     </style>
     <style name="AppTheme" parent="BaseAppTheme" />
     <style name="AeroPopupMenu" parent="android:style/Widget.Material.Light.PopupMenu">
-        <item name="android:popupBackground">@drawable/aero_popup</item>
+        <item name="android:popupBackground">@drawable/eleven_popup</item>
     </style>
 </resources>
