@@ -86,8 +86,8 @@ final class StartMenu extends LinearLayout {
         View icon;if(item.icon!=null){ImageView image=new ImageView(getContext());image.setImageDrawable(item.icon);icon=image;}else icon=item.id.equals("@nota")?new TenStyle.Glyph(getContext(),"nota",TenAccent.readableOn(TenStyle.accent(getContext()),TenStyle.surface(getContext()))):new AeroIcon(getContext(),item.kind);
         row.addView(icon,new LayoutParams(dp(pin?32:28),dp(pin?32:28)));
         TextView text=Aero.text(getContext(),item.title,12,TenStyle.text(getContext()));text.setMaxLines(2);text.setEllipsize(TextUtils.TruncateAt.END);text.setGravity(pin?Gravity.CENTER:Gravity.CENTER_VERTICAL);text.setPadding(pin?0:dp(12),pin?dp(6):0,0,0);
-        row.addView(text,new LayoutParams(pin?-1:0,pin?-2:-1,pin?0:1));row.setFocusable(true);row.setContentDescription("Open "+item.title);row.setOnClickListener(v->actions.open(item.id));ContextMenus.bind(row,(x,y)->options(row,item));
-        row.setOnKeyListener((v,key,event)->{if(pin&&event.getAction()==KeyEvent.ACTION_DOWN&&event.isCtrlPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)){move(item.id,key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return false;});
+        row.addView(text,new LayoutParams(pin?-1:0,pin?-2:-1,pin?0:1));row.setFocusableInTouchMode(true);row.setContentDescription("Open "+item.title);row.setOnClickListener(v->actions.open(item.id));ContextMenus.bind(row,(x,y)->options(row,item));
+        row.setOnKeyListener((v,key,event)->{if(event.getAction()==KeyEvent.ACTION_DOWN&&key==KeyEvent.KEYCODE_MENU){options(row,item);return true;}if(pin&&event.getAction()==KeyEvent.ACTION_DOWN&&event.isCtrlPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)){move(item.id,key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return false;});
         return row;
     }
     private void move(String id,int direction){List<String> pins=new ArrayList<>(store.startPins());int from=pins.indexOf(id),to=from+direction;if(from<0||to<0||to>=pins.size())return;Collections.swap(pins,from,to);store.startPins(pins);renderPins();View p=tileViews.get(id);if(p!=null)p.requestFocus();}
