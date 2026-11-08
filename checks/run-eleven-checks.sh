@@ -8,6 +8,8 @@ adb install -r installprobe/build/outputs/apk/debug/installprobe-debug.apk
 mkdir -p screenshots
 collect() {
 adb logcat -d -s AndroidRuntime:E > eleven-android-runtime.txt
+adb exec-out screencap -p > screenshots/eleven-at-exit.png
+adb shell dumpsys activity top > eleven-activity-top.txt
 adb shell dumpsys activity lastanr > eleven-last-anr.txt
 adb shell dumpsys input_method > eleven-input-method.txt
 for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\).*\.png$/p'); do

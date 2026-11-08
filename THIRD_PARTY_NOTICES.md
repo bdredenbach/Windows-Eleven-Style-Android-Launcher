@@ -4,7 +4,7 @@ The Gradle wrapper scripts and `gradle/wrapper/gradle-wrapper.jar` come from the
 
 Android SDK/build tools and the Android Gradle Plugin are downloaded as development dependencies under their respective licenses; they are not source assets from the inspiration project. The Internet browser uses AndroidX WebKit 1.13.0 and its transitive AndroidX support/annotation dependencies, distributed under the Apache License, Version 2.0. The license is included in `third_party/androidx/LICENSE.txt`. Source: https://android.googlesource.com/platform/frameworks/support/ . WebKit supplies compatibility APIs; the installed Android WebView provider supplies its own Chromium engine under its provider licenses.
 
-The Nth Desktop code, wallpaper and vector/primitives icon artwork were created for this project. No Microsoft assets or jovanovski/windowslauncher code are included. Android app icons and labels shown at runtime come from apps installed on the user's device.
+The Nth Desktop code, wallpaper and vector/primitives icon artwork were created for this project. The inherited `win10_*.png` assets were supplied in the Desktop Ten base by the project owner; they are retained as historical fallbacks. New Eleven folder, Explorer, device, Settings, calendar, calculator and Recycle Bin artwork is drawn from original primitives in `ElevenIcons.java`. No Microsoft assets were extracted from the laptop recordings for this revision, and no jovanovski/windowslauncher code is included. Android app icons and labels shown at runtime come from apps installed on the user's device.
 
 ## Selawik typeface
 

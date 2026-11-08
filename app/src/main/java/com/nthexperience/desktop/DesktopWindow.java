@@ -78,6 +78,7 @@ final class DesktopWindow extends LinearLayout {
         TextView minimize=chrome("—",this::minimize);minimizeButton=minimize;
         maximizeButton=chrome("□",this::toggleMaximize);
         maximizeButton.setOnLongClickListener(v->{showElevenSnap();return true;});
+        maximizeButton.setOnHoverListener((v,e)->{if(e.getActionMasked()==MotionEvent.ACTION_HOVER_ENTER)v.postDelayed(hoverSnap,450);else if(e.getActionMasked()==MotionEvent.ACTION_HOVER_EXIT)v.removeCallbacks(hoverSnap);return false;});
         TextView close=chrome("×",this::closeWindow);closeButton=close;
         close.setTextColor(Aero.INK);
         bar.addView(minimize); bar.addView(maximizeButton); bar.addView(close);
@@ -140,24 +141,31 @@ final class DesktopWindow extends LinearLayout {
     }
     void onShake(Runnable action){shake=action;}
     void onPlacement(java.util.function.Consumer<String> action){placementChanged=action;}
-    private void showElevenSnap(){
-        android.widget.PopupMenu menu=new android.widget.PopupMenu(getContext(),maximizeButton);menu.getMenu().add("Maximize").setOnMenuItemClickListener(i->{maximize();return true;});
-        if(canSplit()){menu.getMenu().add("Snap left half").setOnMenuItemClickListener(i->{restore();snap(Placement.LEFT);return true;});menu.getMenu().add("Snap right half").setOnMenuItemClickListener(i->{restore();snap(Placement.RIGHT);return true;});}
-        menu.getMenu().add("Restore floating window").setOnMenuItemClickListener(i->{restoreDown();return true;});menu.show();
+    private android.widget.PopupWindow snapMenu;
+    private final Runnable hoverSnap=this::showElevenSnap;
+    void showElevenSnap(){
+        if(snapMenu!=null&&snapMenu.isShowing())return;
+        LinearLayout panel=Aero.column(getContext());panel.setPadding(dp(12),dp(10),dp(12),dp(10));panel.setBackground(ElevenSurface.round(getContext(),TenStyle.surface(getContext()),8));panel.setContentDescription("Snap layouts");
+        TextView heading=Aero.text(getContext(),"Snap layouts",13,TenStyle.text(getContext()));panel.addView(heading,new LinearLayout.LayoutParams(-1,dp(32)));
+        android.widget.GridLayout choices=new android.widget.GridLayout(getContext());choices.setColumnCount(2);Placement[][] groups={{Placement.LEFT,Placement.RIGHT},{Placement.TWO_THIRDS_LEFT,Placement.THIRD_RIGHT},{Placement.THIRD_LEFT,Placement.THIRD_MIDDLE,Placement.THIRD_RIGHT},{Placement.TOP_LEFT,Placement.TOP_RIGHT,Placement.BOTTOM_LEFT,Placement.BOTTOM_RIGHT}};
+        for(int n=0;n<groups.length;n++){FrameLayout diagram=new FrameLayout(getContext());diagram.setContentDescription("Snap layout "+(n+1));int w=100,h=64;for(Placement target:groups[n]){int[] r=AeroSnap.bounds(target,w,h);TextView zone=new TextView(getContext());zone.setContentDescription("Snap "+target.name().toLowerCase(java.util.Locale.ROOT).replace('_',' '));zone.setFocusable(true);boolean allowed=store.prefs.getBoolean("ten_snap",true)&&AeroSnap.canPlace(target,hostWidth(),workHeight(),snapMinWidth,snapMinHeight);zone.setEnabled(allowed);zone.setAlpha(allowed?1:.25f);zone.setBackground(TenStyle.hover(getContext(),TenStyle.light(getContext())?0xffc7d0e0:0xff657087));FrameLayout.LayoutParams zp=new FrameLayout.LayoutParams(dp(Math.max(1,r[2]-3)),dp(Math.max(1,r[3]-3)));zp.leftMargin=dp(r[0]+1);zp.topMargin=dp(r[1]+1);diagram.addView(zone,zp);zone.setOnClickListener(v->{snapMenu.dismiss();restore();snap(target);});}android.widget.GridLayout.LayoutParams gp=new android.widget.GridLayout.LayoutParams(android.widget.GridLayout.spec(n/2),android.widget.GridLayout.spec(n%2));gp.width=dp(w);gp.height=dp(h);gp.setMargins(dp(4),dp(4),dp(4),dp(4));choices.addView(diagram,gp);}panel.addView(choices);
+        panel.addView(TenStyle.command(getContext(),"Maximize",()->{snapMenu.dismiss();maximize();}));panel.addView(TenStyle.command(getContext(),"Restore",()->{snapMenu.dismiss();restoreDown();}));
+        snapMenu=new android.widget.PopupWindow(panel,dp(240),-2,true);snapMenu.setBackgroundDrawable(ElevenSurface.round(getContext(),TenStyle.surface(getContext()),8));snapMenu.setOutsideTouchable(true);snapMenu.setElevation(dp(20));snapMenu.setInputMethodMode(android.widget.PopupWindow.INPUT_METHOD_NOT_NEEDED);snapMenu.showAsDropDown(maximizeButton,-dp(176),0);
     }
+    private int dp(int n){return Aero.dp(getContext(),n);}
     boolean snap(Placement target){
-        if((target==Placement.LEFT||target==Placement.RIGHT)&&!canSplit())return false;
+        if(!AeroSnap.canPlace(target,hostWidth(),workHeight(),snapMinWidth,snapMinHeight))return false;
         cancelCaptionDrag();
         place(target);
         return true;
     }
     private boolean canSplit(){return AeroSnap.canSplit(hostWidth(),workHeight(),snapMinWidth,snapMinHeight);}
-    boolean snapped(){return placement==Placement.LEFT||placement==Placement.RIGHT;}
+    boolean snapped(){return AeroSnap.side(placement);}
     boolean maximized(){return placement==Placement.MAXIMIZED;}
     private boolean fitted(){return effectivePlacement()!=Placement.FLOATING;}
     void maximize(){if(!maximized())place(Placement.MAXIMIZED);restore();}
     void restoreDown(){settle();setVisibility(VISIBLE);bringToFront();place(Placement.FLOATING);}
-    void closeWindow(){if(getParent()==null)return;dismissSystemMenu();settle();hideKeyboard();if(!(body instanceof BrowserPanel)||!((BrowserPanel)body).hasPrivateTabs())TenWindowMotion.closing(this,host);if(body instanceof VistaShell)((VistaShell)body).close();if(body instanceof WeatherPanel)((WeatherPanel)body).close();if(body instanceof BrowserPanel)((BrowserPanel)body).close();if(body instanceof PhotoGallery)((PhotoGallery)body).close();if(body instanceof TaskManagerPanel)((TaskManagerPanel)body).close();if(body instanceof RecyclePanel)((RecyclePanel)body).close();host.removeView(this);changed.run();}
+    void closeWindow(){maximizeButton.removeCallbacks(hoverSnap);if(snapMenu!=null)snapMenu.dismiss();if(getParent()==null)return;dismissSystemMenu();settle();hideKeyboard();if(!(body instanceof BrowserPanel)||!((BrowserPanel)body).hasPrivateTabs())TenWindowMotion.closing(this,host);if(body instanceof VistaShell)((VistaShell)body).close();if(body instanceof WeatherPanel)((WeatherPanel)body).close();if(body instanceof BrowserPanel)((BrowserPanel)body).close();if(body instanceof PhotoGallery)((PhotoGallery)body).close();if(body instanceof TaskManagerPanel)((TaskManagerPanel)body).close();if(body instanceof RecyclePanel)((RecyclePanel)body).close();host.removeView(this);changed.run();}
     void showSystemMenu(View anchor,float x,float y){dismissSystemMenu();systemMenu=new DesktopContextMenu(getContext(),"Window commands");systemMenu.item("Restore","empty",fitted()||getVisibility()!=VISIBLE||minimizing,()->{if(getVisibility()!=VISIBLE||minimizing)restore();else if(fitted())restoreDown();});systemMenu.item("Minimize","empty",getVisibility()==VISIBLE&&!minimizing,this::minimize);systemMenu.item("Maximize","empty",!maximized(),this::maximize);systemMenu.item("Snap left","empty",canSplit(),()->{restore();snap(Placement.LEFT);});
         systemMenu.item("Snap right","empty",canSplit(),()->{restore();snap(Placement.RIGHT);});
         systemMenu.item("Minimize or restore other windows","empty",shake);
@@ -335,7 +343,7 @@ final class DesktopWindow extends LinearLayout {
     private void pivotToTask(){android.graphics.PointF point=taskAnchor.get();setPivotX((point.x-getX()-.1f*getWidth()/2f)/.9f);setPivotY((point.y-getY()-.1f*getHeight()/2f)/.9f);}
     void minimize(){dismissSystemMenu();hideKeyboard();settle();if(!Aero.motion(getContext())){setVisibility(GONE);changed.run();return;}minimizing=true;int token=++transition;pivotToTask();changed.run();animate().scaleX(.1f).scaleY(.1f).alpha(0).setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator()).setDuration(180).withEndAction(()->{if(token!=transition)return;setVisibility(GONE);settle();changed.run();}).start();}
     void restore(){boolean hidden=getVisibility()!=VISIBLE||minimizing;settle();setVisibility(VISIBLE);bringToFront();changed.run();if(hidden&&Aero.motion(getContext())){int token=++transition;pivotToTask();setScaleX(.1f);setScaleY(.1f);setAlpha(0);animate().scaleX(1).scaleY(1).alpha(1).setInterpolator(new android.view.animation.DecelerateInterpolator()).setDuration(190).withEndAction(()->{if(token==transition)settle();}).start();}}
-    @Override protected void onDetachedFromWindow(){dismissSystemMenu();settle();super.onDetachedFromWindow();}
+    @Override protected void onDetachedFromWindow(){maximizeButton.removeCallbacks(hoverSnap);if(snapMenu!=null)snapMenu.dismiss();dismissSystemMenu();settle();super.onDetachedFromWindow();}
     private void beginCaptionDrag(MotionEvent e){
         captionTracking=true;
         dragStartPlacement=placement;
@@ -432,15 +440,12 @@ final class DesktopWindow extends LinearLayout {
     void safeTop(int inset){safeTop=Math.max(0,inset);fitToHost();}
 
     private Placement effectivePlacement(){
-        if((placement==Placement.LEFT||placement==Placement.RIGHT)
-                &&!AeroSnap.canSplit(hostWidth(),workHeight(),snapMinWidth,snapMinHeight))return Placement.FLOATING;
+        if(!AeroSnap.canPlace(placement,hostWidth(),workHeight(),snapMinWidth,snapMinHeight))return Placement.FLOATING;
         return placement;
     }
 
     private Rect fittedBounds(Placement target){
-        int width=hostWidth(),split=width/2;
-        return new Rect(target==Placement.RIGHT?split:0,safeTop,
-                target==Placement.LEFT?split:width,safeTop+workHeight());
+        int[] b=AeroSnap.bounds(target,hostWidth(),workHeight());return new Rect(b[0],safeTop+b[1],b[0]+b[2],safeTop+b[1]+b[3]);
     }
 
     void fitToHost(){
@@ -496,7 +501,7 @@ final class DesktopWindow extends LinearLayout {
     JSONObject geometry(){
         JSONObject result=new JSONObject();float density=getResources().getDisplayMetrics().density;
         GadgetLayout.put(result,"x",positionX);GadgetLayout.put(result,"y",positionY);GadgetLayout.put(result,"w",normalW/density);GadgetLayout.put(result,"h",normalH/density);GadgetLayout.put(result,"maximized",maximized());
-        if(placement==Placement.LEFT||placement==Placement.RIGHT)GadgetLayout.put(result,"snap",placement.name());
+        if(AeroSnap.side(placement))GadgetLayout.put(result,"snap",placement.name());
         return result;
     }
     void saveGeometry(){store.prefs.edit().putString(geometryKey,geometry().toString()).apply();}
@@ -510,11 +515,7 @@ final class DesktopWindow extends LinearLayout {
     void restoreGeometry(JSONObject value){if(value!=null)applyGeometry(value,readPlacement(value));}
     private static Placement readPlacement(JSONObject value){
         if(value.optBoolean("maximized"))return Placement.MAXIMIZED;
-        switch(value.optString("snap")){
-            case "LEFT": return Placement.LEFT;
-            case "RIGHT": return Placement.RIGHT;
-            default: return Placement.FLOATING;
-        }
+        try{return Placement.valueOf(value.optString("snap","FLOATING"));}catch(IllegalArgumentException ex){return Placement.FLOATING;}
     }
     private void applyGeometry(JSONObject value,Placement target){
         positionX=DesktopGeometry.clamp((float)value.optDouble("x",.5),0,1);positionY=DesktopGeometry.clamp((float)value.optDouble("y",.33),0,1);

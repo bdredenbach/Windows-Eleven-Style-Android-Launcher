@@ -1,18 +1,18 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.1.1**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current preview: **0.2.0**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
-## First preview
+## Recording-based update
 
-- Centered taskbar composition with a scrolling app strip, original N11 identity and blue folded-ribbon wallpaper.
-- Start search above uniform app pins, real recommendations, All apps, profile, Settings and Power. Pin/unpin and reorder through a pin's menu or Ctrl+Left/Right.
-- Separate Quick Settings and notification/calendar destinations. Quick Settings has volume and brightness; clock/bell opens notifications and a month calendar.
-- Rounded floating windows and flush maximized/snapped windows. Hold maximize for viable half-screen placement options.
-- Compact Explorer command bar over the inherited real file operations, linked-folder access and recovery.
-- Settings category navigation, rounded cards and updated Eleven Start instructions.
-- Ten's resizable windows, virtual desktops, browser, notes, media and backups.
+- Left or centered taskbar, scrolling app strip, original N11 identity and blue folded-ribbon wallpaper.
+- Unified Start with Pinned and All in one scroll surface, alphabetical List/Grid views, search, profile, configurable folder shortcuts and Power. Pin/unpin and reorder through a pin's menu or Ctrl+Left/Right.
+- Separate Quick Settings and notification/calendar destinations. Quick Settings has scrolling action tiles, brightness above volume and a battery/settings footer; clock/bell opens notifications and a month calendar.
+- Rounded floating windows and flush maximized/snapped windows. Hold or hover over maximize for viable halves, thirds, two-thirds and quadrant layouts.
+- Six independent Explorer tabs with history/query/selection/scroll restoration; a compact command bar below the address row; real file operations, linked-folder access and recovery.
+- Persistent Settings sidebar, category landing cards and breadcrumb details, updated icons/menus/scrollbars and themed Calculator.
+- Resizable windows, Task View with a bottom desktop strip, Widgets/Discover rail, browser, notes, media and backups.
 - Nth Nota category summaries, instructions and composer hints, separate real replies, and a compact New command control.
 - Full ordinary Nota drafts, task/origin/reply state and private restoration placeholders scoped to each virtual desktop.
 
@@ -20,11 +20,11 @@ Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten,
 
 Use Java 17, Android SDK 36 and `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`. Native and shared-engine checks run with `bash checks/run-eleven-checks.sh` on a connected test device. GitHub Actions covers Android 11 and 16. The Eleven suite checks identity, Start/search/reorder/state, the split panels, Settings and retained tool routes across orientations and light/dark modes.
 
-See [0.1.1 Nota validation](docs/ELEVEN_0_1_1_NOTA.md) and [0.1.0 shell validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
+See [0.2.0 recording reference and Android mappings](docs/ELEVEN_0_2_RECORDINGS.md), [0.1.1 Nota validation](docs/ELEVEN_0_1_1_NOTA.md) and [0.1.0 shell validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
 
 ## Scope
 
-This is the first shell preview. Start folders, Explorer tabs, a graphical multi-zone Snap picker/Assist/groups, newer Start variants and additional utilities are later stages. The maximize hold menu currently offers the engine's viable left/right halves, maximize and restore; it is not a full Windows Snap implementation.
+The supplied Windows 11 laptop recordings are the design reference. Touch targets and layouts adapt to Android density and portrait/landscape space. Android owns privileged device controls, lock screens, accounts and updates. The app uses Nth artwork and does not claim a numerical pixel-match percentage. Pinned-app folders and automatic Snap Assist/groups remain outside the implemented window layouts.
 
 Built-in Nth tools use launcher windows. Installed Android apps use Android tasks. No Windows VM or Windows executable support is bundled.
 

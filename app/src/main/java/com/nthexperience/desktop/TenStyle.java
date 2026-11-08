@@ -23,9 +23,11 @@ final class TenStyle {
         Glyph(Context c,String kind,int color,boolean accentRole){super(c);this.kind=kind;this.color=color;this.accentRole=accentRole;setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);}
         @Override protected void onDraw(Canvas canvas){super.onDraw(canvas);int save=canvas.save();float s=Math.min(getWidth()-getPaddingLeft()-getPaddingRight(),getHeight()-getPaddingTop()-getPaddingBottom())/32f;canvas.translate(getPaddingLeft()+(getWidth()-getPaddingLeft()-getPaddingRight()-32*s)/2,getPaddingTop()+(getHeight()-getPaddingTop()-getPaddingBottom()-32*s)/2);canvas.scale(s,s);p.setColor(appThemed?(accentRole?TenAppearance.accent(getContext()):TenAppearance.foreground(getContext(),color)):accentRole?TenAccent.readableOn(TenStyle.accent(getContext()),TenStyle.surface(getContext())):color);p.setStyle(Paint.Style.STROKE);p.setStrokeWidth(1.6f);
             switch(kind){
+                case "airplane":path.reset();path.moveTo(16,3);path.lineTo(18,14);path.lineTo(29,20);path.lineTo(29,23);path.lineTo(18,20);path.lineTo(18,27);path.lineTo(22,29);path.lineTo(10,29);path.lineTo(14,27);path.lineTo(14,20);path.lineTo(3,23);path.lineTo(3,20);path.lineTo(14,14);path.close();canvas.drawPath(path,p);break;
+                case "home":path.reset();path.moveTo(3,15);path.lineTo(16,4);path.lineTo(29,15);path.moveTo(7,12);path.lineTo(7,28);path.lineTo(25,28);path.lineTo(25,12);path.moveTo(13,28);path.lineTo(13,19);path.lineTo(19,19);path.lineTo(19,28);canvas.drawPath(path,p);break;
                 case "start":android.graphics.drawable.Drawable logo=getContext().getDrawable(R.drawable.ic_launcher);logo.setBounds(0,0,32,32);logo.draw(canvas);break;
                 case "search":canvas.drawCircle(14,13,7,p);canvas.drawLine(19,19,26,26,p);break;
-                case "taskview":canvas.drawRect(8,7,24,25,p);canvas.drawLine(3,11,3,21,p);canvas.drawLine(29,11,29,21,p);break;
+                case "taskview":p.setStyle(Paint.Style.FILL);p.setColor(0xff868d99);canvas.drawRoundRect(3,10,22,28,2,2,p);p.setShader(new LinearGradient(9,4,29,23,0xffedf0f6,0xffaeb9c9,Shader.TileMode.CLAMP));canvas.drawRoundRect(9,4,29,23,2,2,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);break;
                 case "nota":canvas.drawRoundRect(5,5,27,25,2,2,p);canvas.drawLine(10,25,10,29,p);canvas.drawLine(10,29,16,25,p);canvas.drawLine(10,12,22,12,p);canvas.drawLine(10,18,18,18,p);break;
                 case "actions":canvas.drawRect(6,6,26,24,p);canvas.drawLine(6,24,6,28,p);canvas.drawLine(6,28,12,24,p);canvas.drawLine(10,11,22,11,p);canvas.drawLine(10,16,22,16,p);break;
                 case "news":canvas.drawRoundRect(3,5,29,27,2,2,p);canvas.drawRect(7,10,15,17,p);canvas.drawLine(19,10,25,10,p);canvas.drawLine(19,15,25,15,p);canvas.drawLine(7,22,25,22,p);break;
@@ -47,6 +49,9 @@ final class TenStyle {
                 case "update":canvas.drawArc(5,5,27,27,25,285,false,p);canvas.drawLine(26,7,26,15,p);canvas.drawLine(26,15,19,12,p);break;
                 case "gaming":canvas.drawRoundRect(3,8,29,25,5,5,p);canvas.drawLine(8,13,8,21,p);canvas.drawLine(4,17,12,17,p);canvas.drawCircle(22,14,1,p);canvas.drawCircle(25,19,1,p);break;
                 case "accessibility":canvas.drawCircle(16,5,3,p);canvas.drawLine(4,11,28,11,p);canvas.drawLine(16,9,16,20,p);canvas.drawLine(16,20,8,29,p);canvas.drawLine(16,20,24,29,p);break;
+                case "more":p.setStyle(Paint.Style.FILL);for(int x=7;x<=25;x+=9)canvas.drawCircle(x,16,1.6f,p);p.setStyle(Paint.Style.STROKE);break;
+                case "rename":canvas.drawLine(5,7,5,25,p);canvas.drawLine(3,7,8,7,p);canvas.drawLine(3,25,8,25,p);canvas.drawRect(11,8,28,24,p);canvas.drawLine(15,20,20,12,p);canvas.drawLine(20,12,25,20,p);canvas.drawLine(17,17,23,17,p);break;
+                case "sort":canvas.drawLine(9,5,9,27,p);canvas.drawLine(5,10,9,5,p);canvas.drawLine(9,5,13,10,p);canvas.drawLine(22,5,22,27,p);canvas.drawLine(18,22,22,27,p);canvas.drawLine(22,27,26,22,p);break;
                 case "copy":canvas.drawRect(6,6,20,23,p);canvas.drawRect(12,11,26,28,p);break;
                 case "cut":canvas.drawCircle(9,23,4,p);canvas.drawCircle(23,23,4,p);canvas.drawLine(11,20,24,4,p);canvas.drawLine(21,20,8,4,p);break;
                 case "paste":canvas.drawRect(7,7,25,28,p);canvas.drawRect(12,4,20,10,p);break;
