@@ -245,14 +245,16 @@ public final class SnapSmoke extends Instrumentation {
     }
 
     private void shake(DesktopWindow window)throws Exception{
-        begin(window);
+        // As with tap(), queue the gesture before a synchronous delivery can
+        // turn its initial DOWN into the separate title-bar long-press action.
+        begin(window,false);
         int start=pointerX,y=pointerY;
         int right=start+dp(49),left=start-dp(49);
         long gestureTime=down;
         for(int x:new int[]{right,left,right,left}){
             // Preserve the user's gesture cadence when synchronous emulator delivery is slow.
             Thread.sleep(35);gestureTime+=35;
-            inputAt(MotionEvent.ACTION_MOVE,x,y,gestureTime);
+            inputAt(MotionEvent.ACTION_MOVE,x,y,gestureTime,false);
         }
         inputAt(MotionEvent.ACTION_UP,left,y,gestureTime+1);
         settle();
@@ -268,13 +270,14 @@ public final class SnapSmoke extends Instrumentation {
         input(MotionEvent.ACTION_MOVE, x, y);
     }
 
-    private void begin(DesktopWindow window) throws Exception {
+    private void begin(DesktopWindow window) throws Exception {begin(window,true);}
+    private void begin(DesktopWindow window,boolean synchronous) throws Exception {
         Thread.sleep(320);
         Rect rect = screenBounds(title(window));
         int[] origin = new int[2];
         workspace.getLocationOnScreen(origin);
         down = SystemClock.uptimeMillis();
-        input(MotionEvent.ACTION_DOWN, rect.centerX() - origin[0], rect.centerY() - origin[1]);
+        inputAt(MotionEvent.ACTION_DOWN, rect.centerX() - origin[0], rect.centerY() - origin[1],down,synchronous);
     }
 
     private void tap(View view) throws Exception {
@@ -305,14 +308,15 @@ public final class SnapSmoke extends Instrumentation {
     }
 
     private void input(int action, int x, int y) {inputAt(action,x,y,SystemClock.uptimeMillis());}
-    private void inputAt(int action,int x,int y,long eventTime){
+    private void inputAt(int action,int x,int y,long eventTime){inputAt(action,x,y,eventTime,true);}
+    private void inputAt(int action,int x,int y,long eventTime,boolean synchronous){
         int[] origin = new int[2];
         workspace.getLocationOnScreen(origin);
         MotionEvent event = MotionEvent.obtain(down, eventTime, action,
                 origin[0] + x, origin[1] + y, 0);
         try {
             event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-            check(getUiAutomation().injectInputEvent(event, true), "Touch event " + action + " was injected");
+            check(getUiAutomation().injectInputEvent(event, synchronous), "Touch event " + action + " was injected");
             pointerX = x;
             pointerY = y;
             pointerDown = action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE;
