@@ -9,6 +9,7 @@ mkdir -p screenshots
 collect() {
 adb logcat -d -s AndroidRuntime:E > eleven-android-runtime.txt
 adb shell dumpsys activity lastanr > eleven-last-anr.txt
+adb shell dumpsys input_method > eleven-input-method.txt
 for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\).*\.png$/p'); do
  adb exec-out run-as "$launcher" cat "files/$file" > "screenshots/$file"
 done
