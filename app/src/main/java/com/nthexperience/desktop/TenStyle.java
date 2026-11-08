@@ -27,7 +27,7 @@ final class TenStyle {
                 case "home":path.reset();path.moveTo(3,15);path.lineTo(16,4);path.lineTo(29,15);path.moveTo(7,12);path.lineTo(7,28);path.lineTo(25,28);path.lineTo(25,12);path.moveTo(13,28);path.lineTo(13,19);path.lineTo(19,19);path.lineTo(19,28);canvas.drawPath(path,p);break;
                 case "start":android.graphics.drawable.Drawable logo=getContext().getDrawable(R.drawable.ic_launcher);logo.setBounds(0,0,32,32);logo.draw(canvas);break;
                 case "search":canvas.drawCircle(14,13,7,p);canvas.drawLine(19,19,26,26,p);break;
-                case "taskview":canvas.drawRect(8,7,24,25,p);canvas.drawLine(3,11,3,21,p);canvas.drawLine(29,11,29,21,p);break;
+                case "taskview":p.setStyle(Paint.Style.FILL);p.setColor(0xff868d99);canvas.drawRoundRect(3,10,22,28,2,2,p);p.setShader(new LinearGradient(9,4,29,23,0xffedf0f6,0xffaeb9c9,Shader.TileMode.CLAMP));canvas.drawRoundRect(9,4,29,23,2,2,p);p.setShader(null);p.setStyle(Paint.Style.STROKE);break;
                 case "nota":canvas.drawRoundRect(5,5,27,25,2,2,p);canvas.drawLine(10,25,10,29,p);canvas.drawLine(10,29,16,25,p);canvas.drawLine(10,12,22,12,p);canvas.drawLine(10,18,18,18,p);break;
                 case "actions":canvas.drawRect(6,6,26,24,p);canvas.drawLine(6,24,6,28,p);canvas.drawLine(6,28,12,24,p);canvas.drawLine(10,11,22,11,p);canvas.drawLine(10,16,22,16,p);break;
                 case "news":canvas.drawRoundRect(3,5,29,27,2,2,p);canvas.drawRect(7,10,15,17,p);canvas.drawLine(19,10,25,10,p);canvas.drawLine(19,15,25,15,p);canvas.drawLine(7,22,25,22,p);break;

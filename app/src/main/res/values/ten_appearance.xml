@@ -21,7 +21,7 @@
         <item name="android:popupMenuStyle">@style/AeroPopupMenu</item>
     </style>
     <style name="TenDarkPopupMenu" parent="android:style/Widget.Material.PopupMenu">
-        <item name="android:popupBackground">#292929</item>
+        <item name="android:popupBackground">@drawable/eleven_popup_dark</item>
     </style>
     <item type="id" name="ten_appearance_accent"/>
 </resources>

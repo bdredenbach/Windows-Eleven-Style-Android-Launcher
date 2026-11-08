@@ -40,10 +40,10 @@ final class ProfilePortrait {
         try{byte[] bytes=Base64.decode(text,Base64.NO_WRAP);BitmapFactory.Options bounds=new BitmapFactory.Options();bounds.inJustDecodeBounds=true;BitmapFactory.decodeByteArray(bytes,0,bytes.length,bounds);return bounds.outWidth==SIZE&&bounds.outHeight==SIZE;}catch(IllegalArgumentException ex){return false;}
     }
     static View view(Context c,DesktopStore store){
-        FrameLayout frame=new FrameLayout(c);frame.setBackground(Aero.panel(c,0xff232323,0xff111111,4,0xff555555));int pad=Aero.dp(c,3);frame.setPadding(pad,pad,pad,pad);
+        FrameLayout frame=new FrameLayout(c);frame.setClipToOutline(true);frame.setOutlineProvider(new android.view.ViewOutlineProvider(){public void getOutline(View view,Outline outline){outline.setOval(0,0,view.getWidth(),view.getHeight());}});
         String value=store.prefs.getString("profile_portrait","");Bitmap bitmap=null;
         if(!value.isEmpty()&&valid(value))try{byte[] bytes=Base64.decode(value,Base64.NO_WRAP);bitmap=BitmapFactory.decodeByteArray(bytes,0,bytes.length);}catch(IllegalArgumentException ignored){}
-        View image;if(bitmap==null)image=new AeroIcon(c,"orb");else{ImageView photo=new ImageView(c);photo.setImageBitmap(bitmap);photo.setScaleType(ImageView.ScaleType.CENTER_CROP);image=photo;}
+        View image;if(bitmap==null)image=new View(c){final Paint p=new Paint(3);protected void onDraw(Canvas canvas){float size=Math.min(getWidth(),getHeight()),cx=getWidth()/2f,cy=getHeight()/2f;p.setColor(0xfff3f4f6);canvas.drawCircle(cx,cy,size/2,p);p.setColor(0xff92959d);canvas.drawCircle(cx,cy-size*.14f,size*.15f,p);canvas.drawRoundRect(cx-size*.28f,cy+size*.08f,cx+size*.28f,cy+size*.35f,size*.09f,size*.09f,p);}};else{ImageView photo=new ImageView(c);photo.setImageBitmap(bitmap);photo.setScaleType(ImageView.ScaleType.CENTER_CROP);image=photo;}
         frame.addView(image,new FrameLayout.LayoutParams(-1,-1));frame.setContentDescription("Profile picture");return frame;
     }
 }

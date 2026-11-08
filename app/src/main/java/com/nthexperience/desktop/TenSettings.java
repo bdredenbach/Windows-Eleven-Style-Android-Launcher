@@ -79,7 +79,7 @@ final class TenSettings extends LinearLayout {
  }
  private void navRow(String title,String kind,boolean selected,Runnable action){
   LinearLayout row=new LinearLayout(getContext());row.setGravity(Gravity.CENTER_VERTICAL);row.setPadding(dp(6),0,dp(4),0);row.setFocusable(true);row.setContentDescription("Settings category "+title);row.setOnClickListener(v->action.run());row.setBackground(TenStyle.hover(getContext(),selected?(dark()?0xff30313e:0xffe3e4ee):Color.TRANSPARENT));
-  View stripe=new View(getContext());stripe.setBackground(ElevenSurface.round(getContext(),selected?TenAppearance.accent(getContext()):Color.TRANSPARENT,2));row.addView(stripe,new LayoutParams(dp(3),dp(18)));
+  View stripe=new View(getContext());stripe.setBackground(ElevenSurface.round(getContext(),selected?TenAppearance.accent(getContext()):Color.TRANSPARENT,2));stripe.setVisibility(selected?VISIBLE:INVISIBLE);row.addView(stripe,new LayoutParams(dp(3),dp(18)));
   if(width>=dp(580)){View icon=new TenStyle.Glyph(getContext(),kind,categoryColor(kind));LayoutParams ip=new LayoutParams(dp(20),dp(20));ip.setMargins(dp(9),0,dp(10),0);row.addView(icon,ip);}
   TextView text=Aero.text(getContext(),title,width<dp(580)?11:13,TenAppearance.ink(getContext()));text.setPadding(dp(width<dp(580)?6:0),dp(7),0,dp(7));text.setMaxLines(3);row.addView(text,new LayoutParams(0,-2,1));LayoutParams rp=new LayoutParams(-1,-2);rp.setMargins(dp(6),dp(2),dp(6),dp(2));row.setMinimumHeight(dp(40));side.addView(row,rp);
  }

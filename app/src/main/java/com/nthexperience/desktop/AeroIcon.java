@@ -20,6 +20,7 @@ final class AeroIcon extends View {
         float s = Math.min(getWidth()-getPaddingLeft()-getPaddingRight(),getHeight()-getPaddingTop()-getPaddingBottom())/64f;
         canvas.save(); canvas.translate((getWidth()-64*s)/2,(getHeight()-64*s)/2); canvas.scale(s,s);
         p.setShader(null); p.setStyle(Paint.Style.FILL); p.setAlpha(255);
+        if(ElevenIcons.draw(canvas,kind)){canvas.restore();return;}
         if (artwork != null) { artwork.draw(canvas); canvas.restore(); return; }
         if(TenIcons.draw(canvas,kind)){canvas.restore();return;}
         if (orb != null) {
