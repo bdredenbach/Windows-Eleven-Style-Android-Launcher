@@ -14,9 +14,9 @@ final class ElevenFolderOptions {
         context=c;this.store=store;this.apply=apply;draft=new ElevenExplorerOptions(store.prefs.getAll());
         LinearLayout root=Aero.column(c);root.setPadding(dp(12),dp(4),dp(12),dp(4));tabs=new LinearLayout(c);root.addView(tabs,new LinearLayout.LayoutParams(-1,dp(44)));ScrollView scroll=new ScrollView(c);pages=Aero.column(c);scroll.addView(pages);root.addView(scroll,new LinearLayout.LayoutParams(-1,dp(Math.max(140,Math.min(360,(int)(c.getResources().getDisplayMetrics().heightPixels/c.getResources().getDisplayMetrics().density)-190)))));
         dialog=Aero.dialog(c).setTitle("Folder Options").setView(root).setPositiveButton("OK",null).setNegativeButton("Cancel",null).setNeutralButton("Apply",null).create();
-        dialog.setOnShowListener(d->{dialog.getButton(-1).setOnClickListener(v->{commit();dialog.dismiss();});dialog.getButton(-3).setOnClickListener(v->commit());});render();
+        render();
     }
-    void show(){dialog.show();}
+    void show(){dialog.show();dialog.getButton(-1).setOnClickListener(v->{commit();dialog.dismiss();});dialog.getButton(-3).setOnClickListener(v->commit());}
     private int dp(int n){return Aero.dp(context,n);}
     private void commit(){apply.accept(draft);draft=new ElevenExplorerOptions(store.prefs.getAll());render();}
     private void render(){
