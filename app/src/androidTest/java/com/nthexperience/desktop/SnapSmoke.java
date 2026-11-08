@@ -140,6 +140,11 @@ public final class SnapSmoke extends Instrumentation {
                     "Dragging a maximized window restores its floating size");
             input(MotionEvent.ACTION_CANCEL, work.centerX(), edgeY);
             settle();
+            // A drag starting at a maximized caption can reveal Android's transient
+            // status bar. Let System UI hide it before targeting the caption again.
+            progress("waiting for system chrome after cancelled top-edge drag; workspace="+workspace.getWidth()+"x"+workspace.getHeight());
+            Thread.sleep(3500);
+            settle();
             check(left.maximized() && work.equals(bounds(left)), "Cancel restores the maximized placement");
             View restoreControl=find(left, v -> "Maximize or restore window".equals(v.getContentDescription()));
             Rect rootRect=new Rect();restoreControl.getGlobalVisibleRect(rootRect);
@@ -281,7 +286,7 @@ public final class SnapSmoke extends Instrumentation {
         down=SystemClock.uptimeMillis()-50;
         for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){
             MotionEvent event=MotionEvent.obtain(down,action==MotionEvent.ACTION_DOWN?down:down+40,action,origin[0]+x,origin[1]+y,0);
-            try{event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,false),"Short tap edge was injected");}finally{event.recycle();}
+            try{event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,action==MotionEvent.ACTION_UP),"Short tap edge was injected");}finally{event.recycle();}
         }
         pointerX=x;pointerY=y;pointerDown=false;Thread.sleep(80);settle();
     }
@@ -327,9 +332,11 @@ public final class SnapSmoke extends Instrumentation {
 
     private void saveScreenshot(String name) throws Exception {
         if (root == null || root.getWidth() < 1 || root.getHeight() < 1) return;
-        Bitmap image = Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap capture=getUiAutomation().takeScreenshot();
+        boolean fallback=capture==null;
+        Bitmap image=fallback?Bitmap.createBitmap(root.getWidth(), root.getHeight(), Bitmap.Config.ARGB_8888):capture;
         try {
-            runOnMainSync(() -> root.draw(new Canvas(image)));
+            if(fallback)runOnMainSync(() -> root.draw(new Canvas(image)));
             try (FileOutputStream out = getTargetContext().openFileOutput(name + ".png", Context.MODE_PRIVATE)) {
                 image.compress(Bitmap.CompressFormat.PNG, 100, out);
             }
