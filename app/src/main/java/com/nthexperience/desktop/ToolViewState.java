@@ -6,9 +6,10 @@ import org.json.*;
 
 /** Small transient UI state. Note contents already live in SharedPreferences. */
 final class ToolViewState {
-    static JSONObject capture(View root){JSONObject result=new JSONObject();capture(root,"",result);return result;}
+    static JSONObject capture(View root){JSONObject result=new JSONObject();if(root instanceof DesktopWindow&&((DesktopWindow)root).body instanceof TenNotaPanel){GadgetLayout.put(result,"nota",((TenNotaPanel)((DesktopWindow)root).body).state());return result;}if(root instanceof TenNotaPanel){GadgetLayout.put(result,"nota",((TenNotaPanel)root).state());return result;}capture(root,"",result);return result;}
     private static void capture(View view,String path,JSONObject result){
-        if(view instanceof BrowserPanel)return;
+        // Nota restores full ordinary drafts itself; generic snapshots must not copy private passages.
+        if(view instanceof BrowserPanel||view instanceof TenNotaPanel)return;
         JSONObject item=new JSONObject();
         if(view instanceof TaskManagerPanel){GadgetLayout.put(item,"taskmanager",((TaskManagerPanel)view).state());GadgetLayout.put(result,path,item);return;}
         if(view instanceof PhotoGallery){GadgetLayout.put(item,"photo",((PhotoGallery)view).state());GadgetLayout.put(result,path,item);return;}
@@ -22,9 +23,10 @@ final class ToolViewState {
         if(item.length()>0)GadgetLayout.put(result,path,item);
         if(view instanceof ViewGroup){ViewGroup group=(ViewGroup)view;for(int i=0;i<group.getChildCount();i++)capture(group.getChildAt(i),path+"/"+i,result);}
     }
-    static void restore(View root,JSONObject state){if(state!=null)restore(root,"",state);}
+    static void restore(View root,JSONObject state){TenNotaPanel nota=root instanceof TenNotaPanel?(TenNotaPanel)root:root instanceof DesktopWindow&&((DesktopWindow)root).body instanceof TenNotaPanel?(TenNotaPanel)((DesktopWindow)root).body:null;if(nota!=null){if(state!=null&&state.optJSONObject("nota")!=null)nota.restoreState(state.optJSONObject("nota"));return;}if(state!=null)restore(root,"",state);}
     private static void restore(View view,String path,JSONObject state){
-        if(view instanceof BrowserPanel)return;
+        // Nota restores full ordinary drafts itself; generic snapshots must not copy private passages.
+        if(view instanceof BrowserPanel||view instanceof TenNotaPanel)return;
         JSONObject item=state.optJSONObject(path);
         if(item!=null){
             if(view instanceof TaskManagerPanel){((TaskManagerPanel)view).restore(item.optJSONObject("taskmanager"));return;}
