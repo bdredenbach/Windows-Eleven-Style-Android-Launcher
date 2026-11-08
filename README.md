@@ -1,25 +1,33 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher project by **An Nth Experience**.
+A Windows 11 inspired Android launcher by **An Nth Experience**. First preview: **0.1.0**. Android 8.0+; targets Android 16.
 
-## Current checkpoint: research and build blueprint
+Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
-The Windows 11 design investigation and a read-only audit of Nth Desktop Ten are complete for this checkpoint. This repository does **not yet contain an Android app or APK**. No Windows VM was booted during the research. The work uses primary documentation and official UI reference images; it does not claim hands-on Windows testing.
+## First preview
 
-The proposed base is [Nth Desktop Ten](https://github.com/bdredenbach/Windows-Ten-Style-Android-Launcher) **0.19.0**, pinned to commit `e31109dd202b88d1476c4ba35b35d49cca1a7f62`. Ten has not been modified or imported into this repository.
+- Centered taskbar composition with a scrolling app strip, original N11 identity and blue folded-ribbon wallpaper.
+- Start search above uniform app pins, real recommendations, All apps, profile, Settings and Power. Pin/unpin and reorder through a pin's menu or Ctrl+Left/Right.
+- Separate Quick Settings and notification/calendar destinations. Quick Settings has volume and brightness; clock/bell opens notifications and a month calendar.
+- Rounded floating windows and flush maximized/snapped windows. Hold maximize for viable half-screen placement options.
+- Compact Explorer command bar over the inherited real file operations, linked-folder access and recovery.
+- Settings category navigation, rounded cards and updated Eleven Start instructions.
+- Ten's resizable windows, virtual desktops, browser, notes, media, backups and Nth Nota command/writing engines.
 
-- [Windows 11 design findings](docs/WINDOWS_11_RESEARCH.md)
-- [Ten reuse and implementation plan](docs/IMPLEMENTATION_PLAN.md)
-- [Interaction and validation checklist](docs/ACCEPTANCE_CHECKLIST.md)
-- [Primary references](research/SOURCES.md)
-- [Machine-readable source baseline](research/ten-baseline.json)
+## Build and validation
 
-## Design direction
+Use Java 17, Android SDK 36 and `./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest`. Native and shared-engine checks run with `bash checks/run-eleven-checks.sh` on a connected test device. GitHub Actions covers Android 11 and 16. The Eleven suite checks identity, Start/search/reorder/state, the split panels, Settings and retained tool routes across orientations and light/dark modes.
 
-Rebuild the visible shell around centered Start/taskbar composition, a pinned-app Start grid, separate Quick Settings and notification/calendar panels, rounded floating windows, restrained materials, a compact Explorer command bar, card-based Settings, and Snap layouts. Reuse Ten's working file, window, setup, media and Nota engines.
+See [0.1.0 validation](docs/ELEVEN_0_1_VALIDATION.md) for actual completed checks and limits. Historical Ten test drivers and documents remain as lineage; their appearance-specific assertions are not the Eleven regression contract.
 
-The proposed initial visual target is the familiar Windows 11 pinned-app layout. Newer scrollable Start layouts and release-dependent taskbar options are documented separately so later work can offer them deliberately.
+## Scope
 
-This is an Android launcher. Built-in Nth tools can live in resizable launcher windows; installed Android apps continue to use Android tasks. Windows executables are outside the launcher scope.
+This is the first shell preview. Start folders, Explorer tabs, a graphical multi-zone Snap picker/Assist/groups, newer Start variants and additional utilities are later stages. The maximize hold menu currently offers the engine's viable left/right halves, maximize and restore; it is not a full Windows Snap implementation.
 
-Independent Nth project; not affiliated with Microsoft. Windows is a Microsoft trademark. Official UI images linked in the research are design references, not licensed application assets. Preserve the base project's attribution and asset notices when importing its code.
+Built-in Nth tools use launcher windows. Installed Android apps use Android tasks. No Windows VM or Windows executable support is bundled.
+
+## Research and lineage
+
+Based on [Ten 0.19.0](https://github.com/bdredenbach/Windows-Ten-Style-Android-Launcher/tree/e31109dd202b88d1476c4ba35b35d49cca1a7f62). See [Windows 11 research](docs/WINDOWS_11_RESEARCH.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md), [acceptance checklist](docs/ACCEPTANCE_CHECKLIST.md), [references](research/SOURCES.md), [notices](THIRD_PARTY_NOTICES.md) and [asset provenance](ASSETS.md).
+
+Independent Nth project; not affiliated with Microsoft. Windows is a Microsoft trademark.

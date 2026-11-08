@@ -1,5 +1,7 @@
 # Windows 11 design research
 
+This is the initial research snapshot, prepared before implementation. For current app/build status see [the project README](../README.md) and [Eleven validation](ELEVEN_0_1_VALIDATION.md).
+
 Checked November 8, 2026. Source IDs resolve in [SOURCES.md](../research/SOURCES.md).
 
 ## Evidence and limits
