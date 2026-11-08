@@ -18,7 +18,7 @@ final class ElevenFocus {
         boolean running=remaining(s.getContext())>0;
         ElevenSettingsCard card=s.group("Focus",running?"Session in progress":"Choose your session duration","focus",true);
         TextView action=TenStyle.command(s.getContext(),running?"Stop focus session":"▶  Start focus session",()->{
-            if(remaining(s.getContext())>0)stop(s.getContext());else{
+            if(running)stop(s.getContext());else{
                 if(!start(s.getContext(),s.store.prefs.getInt("eleven_focus_minutes",30))){Toast.makeText(s.getContext(),"A session cannot start until Android reports this phone's boot state.",Toast.LENGTH_LONG).show();return;}
                 if(s.store.prefs.getBoolean("eleven_focus_show_timer",true))s.open.accept("@focus-timer");
             }s.refreshAppearance();
