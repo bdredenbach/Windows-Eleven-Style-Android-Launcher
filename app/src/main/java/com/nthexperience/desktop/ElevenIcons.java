@@ -7,6 +7,7 @@ final class ElevenIcons {
     static boolean draw(Canvas canvas,String kind){
         Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);Path path=new Path();
         switch(kind){
+            case "home":paint.setColor(0xfff5a755);path.moveTo(4,28);path.lineTo(32,5);path.lineTo(60,28);path.lineTo(55,34);path.lineTo(32,15);path.lineTo(9,34);path.close();canvas.drawPath(path,paint);paint.setColor(0xffdcecf6);canvas.drawRoundRect(13,27,51,57,2,2,paint);paint.setColor(0xff5daed8);canvas.drawRect(27,36,38,57,paint);return true;
             case "files":case "folderapps":case "file-explorer":
                 folder(canvas,paint,path,kind.equals("file-explorer"));return true;
             case "documents":case "pictures":case "music":case "videos":case "downloads":
