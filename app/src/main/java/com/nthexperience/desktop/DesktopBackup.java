@@ -137,7 +137,7 @@ final class DesktopBackup {
     static void discard(Context context,String name){new AtomicFile(file(context,name)).delete();}
     static void apply(Context context,DesktopStore store,Plan plan,boolean undo)throws IOException,JSONException{
         Map<String,?> old=new LinkedHashMap<>(store.prefs.getAll());if(!undo)stage(context,UNDO,snapshot(store).toString());
-        SharedPreferences.Editor edit=store.prefs.edit().clear();for(Map.Entry<String,Object> e:plan.values.entrySet())put(edit,e.getKey(),e.getValue());edit.putBoolean("desktop_v41",true).putBoolean("eleven_initialized","eleven_custom_mode",true);
+        SharedPreferences.Editor edit=store.prefs.edit().clear();for(Map.Entry<String,Object> e:plan.values.entrySet())put(edit,e.getKey(),e.getValue());edit.putBoolean("desktop_v41",true).putBoolean("eleven_initialized",true);
         if(!edit.commit()){SharedPreferences.Editor rollback=store.prefs.edit().clear();for(Map.Entry<String,?> e:old.entrySet())put(rollback,e.getKey(),e.getValue());rollback.commit();throw new IOException("The desktop could not be saved. Your previous setup was kept.");}
         discard(context,PENDING);if(undo)discard(context,UNDO);
     }
