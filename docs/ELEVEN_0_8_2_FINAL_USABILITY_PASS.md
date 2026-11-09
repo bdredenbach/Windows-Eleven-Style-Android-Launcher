@@ -4,6 +4,8 @@ Expanded-taskbar desktop tiles now reserve their actual measured two-line label 
 
 Desktop and Start shortcuts plus taskbar buttons consistently accept Menu or Shift+F10. Escape closes an entire menu cascade; Left returns from a submenu to its parent. Long labels receive measured menu row heights. Start app options now use the shared themed menu, including Open, pin/unpin, reorder and More options. Non-shortcut results retain their original pin eligibility.
 
+Backup restore also marks the restored desktop initialized. Previously its cleared migration markers allowed the next Activity launch to overwrite restored wallpaper, Start pins, taskbar fitting/grouping or add default shortcuts. Restore/undo now retain those imported choices through restart.
+
 ## Recording audit status
 
 The original audit documents preserve historical findings, rather than listing current unfinished features. This table points to the implementations retained in this release.
@@ -24,7 +26,7 @@ Validation is in progress. The CI matrix runs Android 11/API30 and Android 16/AP
 
 The new final-pass suite uses actual launcher views, injected lowest-folder taps and touch long presses, real keyboard menu paths, edge-positioned light/dark menus, cascade dismissal, and portrait/landscape layouts at normal and 1.6x in-process resource font scale. Resource font scaling is test configuration, not a physical device's accessibility-settings flow.
 
-The new upgrade suite first installs the actual retained 0.8.1 build, seeds a note/theme/taskbar/desktop layout and backup, then installs the current build with `adb install -r`. It compares retained values and actual normal-text icon bounds, restores the previous-version backup, verifies undo, and reopens Notepad after a fresh Activity launch. Both APKs use the same disposable CI signing key for that emulator job. The delivery keeps the retained preview certificate. The historical baseline download is optional for future CI runs after artifact expiration; an unavailable baseline is explicitly reported as SKIP, never a verified upgrade.
+The new upgrade suite first installs the actual retained 0.8.1 build, seeds a note/theme/taskbar/desktop layout and backup, then installs the current build with `adb install -r`. It compares retained values and actual normal-text icon bounds, restores the previous-version backup, verifies undo, and reopens Notepad after a fresh Activity launch while comparing all selected appearance, pin and taskbar choices again. Both APKs use the same disposable CI signing key for that emulator job. The delivery keeps the retained preview certificate. The historical baseline download is optional for future CI runs after artifact expiration; an unavailable baseline is explicitly reported as SKIP, never a verified upgrade.
 
 Retained suites exercise fresh setup, Home/permission guidance, Settings catalogue traversal, built-in windows, Explorer/provider file operations, theme contrast, Task Manager, Widgets/markets, Nota, browser, Snap, feeds, photos and media. Physical Pixel 10 testing, physical mouse/keyboard hardware and production cloud-writing calls remain outside this automated pass. Android still owns privileged settings/accounts/lock screens. Market providers can restrict or delay symbols, and older WebViews retain the explicit update route.
 
