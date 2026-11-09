@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 /** Untitled41's dashboard: real feed stories, saved stories, cached weather and Nth games. */
 final class TenNews extends LinearLayout {
     final DesktopStore store; final Consumer<String> open; final FeedClient feed; final WeatherClient weather;final ElevenBriefing briefing;
-    boolean shellMode,settingsOnly;TextView brand;ElevenMarketCard markets;
+    boolean shellMode,settingsOnly,lastBoardWide;TextView brand;ElevenMarketCard markets;
     final TenNewsImages images=new TenNewsImages();final LinearLayout cards; final TextView status; boolean savedOnly,started,widgetsOnly; int columns=1;ConfigSession configuration;Runnable onClose;
     TenNews(Context c,DesktopStore store,Consumer<String> open,WeatherClient weather){this(c,store,open,weather,url->(java.net.HttpURLConnection)url.openConnection(),System::currentTimeMillis);}
     TenNews(Context c,DesktopStore store,Consumer<String> open,WeatherClient weather,FeedClient.Connections connections,java.util.function.LongSupplier clock){
@@ -26,7 +26,7 @@ final class TenNews extends LinearLayout {
         toolbar.addView(command("×","Close news and interests",()->{if(onClose!=null)onClose.run();}),new LayoutParams(dp(38),dp(44)));addView(toolbar);
         status=text("",11,0xffbdbdbd);status.setPadding(dp(16),dp(4),dp(12),dp(8));status.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);addView(status);
         ScrollView scroll=new ScrollView(c);scroll.setFillViewport(true);cards=new LinearLayout(c);cards.setOrientation(HORIZONTAL);cards.setPadding(dp(8),0,dp(8),dp(12));scroll.addView(cards);addView(scroll,new LayoutParams(-1,0,1));
-        addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int next=r-l>=dp(680)?3:r-l>=dp(480)?2:1;if(next!=columns){columns=next;render();}});render();
+        addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int next=r-l>=dp(680)?3:r-l>=dp(480)?2:1;boolean boardWide=r-l>=dp(640);if(next!=columns||boardWide!=lastBoardWide){columns=next;lastBoardWide=boardWide;render();}});render();
     }
     private int dp(int n){return Aero.dp(getContext(),n);}
     private boolean light(){return shellMode?TenStyle.light(getContext()):!TenAppearance.dark(getContext());}
@@ -39,7 +39,7 @@ final class TenNews extends LinearLayout {
         if(feed==null)return;setBackgroundColor(Color.TRANSPARENT);if(brand!=null)brand.setText(settingsOnly?"Settings":savedOnly?"Saved":widgetsOnly?"Widgets":"Discover");if(brand!=null)brand.setTextColor(ink());ViewGroup toolbar=(ViewGroup)getChildAt(0);for(int j=0;j<toolbar.getChildCount();j++)if(toolbar.getChildAt(j) instanceof TextView)((TextView)toolbar.getChildAt(j)).setTextColor(ink());status.setTextColor(light()?0xff5e606a:0xffbdbdbd);updateConfiguration();if(markets!=null&&markets.getParent() instanceof ViewGroup)((ViewGroup)markets.getParent()).removeView(markets);cards.removeAllViews();status.setText(widgetsOnly?"Your widgets":(savedOnly?"Saved stories · ":"")+feed.status());status.setContentDescription("News connection status");
         if(settingsOnly){settings();return;}
         if(!widgetsOnly&&!savedOnly&&!store.prefs.getBoolean("eleven_discover_enabled",true)){LinearLayout column=Aero.column(getContext());cards.addView(column,new LayoutParams(-1,-2));LinearLayout off=card(column,"Discover disabled");off.addView(text("Discover is off",20,Color.WHITE));off.addView(command("Open Widgets settings","Enable Discover in Widgets settings",()->{settingsOnly=true;render();}));return;}
-        boolean wide=widgetsOnly?columns>=3:columns>=2;LinearLayout main=Aero.column(getContext()),sidebar=wide?Aero.column(getContext()):main;cards.addView(main,new LayoutParams(0,-2,wide&&!widgetsOnly?2:1));if(wide)cards.addView(sidebar,new LayoutParams(0,-2,1));
+        boolean wide=widgetsOnly?lastBoardWide:columns>=2;LinearLayout main=Aero.column(getContext()),sidebar=wide?Aero.column(getContext()):main;cards.addView(main,new LayoutParams(0,-2,wide&&!widgetsOnly?2:1));if(wide)cards.addView(sidebar,new LayoutParams(0,-2,1));
         JSONArray source=widgetsOnly?new JSONArray():savedOnly?saved():FeedClient.items(store);
         if(!widgetsOnly&&source.length()==0){LinearLayout welcome=card(main,"News feed setup");boolean busy=feed.loading(),failed=!feed.error().isEmpty(),connected=!feed.url().isEmpty();String title=savedOnly?"Your saved stories":busy?"Connecting to your feed":failed?"Could not read this feed":connected?"No headlines published yet":"Your interests, at a glance";welcome.addView(text(title,23,Color.WHITE));String message=savedOnly?"Use Save on any story to keep its title and link here.":busy?"Headlines will appear here when the connection finishes.":failed?feed.error():connected?"The feed is connected but has no readable articles yet. Refresh later or choose another feed.":"Connect a news feed to see real headlines here. Weather uses your selected city. You can also add your own HTTPS RSS or Atom feed.";TextView hint=text(message,13,0xffcccccc);hint.setPadding(0,dp(12),0,dp(12));welcome.addView(hint);if(!savedOnly)welcome.addView(command(connected?"Manage news feed":"Connect a news feed","Choose news feed",this::configure));}
         if(source.length()>0){JSONObject hero=source.optJSONObject(0);if(hero!=null)story(main,hero,true);}
