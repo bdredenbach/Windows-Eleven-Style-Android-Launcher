@@ -82,6 +82,8 @@ public final class StorageSmoke extends ExplorerSmoke {
         usageSetup(store);
         ui(()->home.open("@computer"));
         await(()->explorer()!=null,"Computer opens");
+        ui(()->explorer().navigate("computer"));
+        await(()->find(explorer().content,v->"Internal storage".equals(v.getContentDescription()))!=null,"Computer storage tile is rendered");
         click("Internal storage");
         await(()->find("Enable device file browsing")!=null,"Denied access stays in an in-launcher setup page");
         check(!StorageAccess.has(getTargetContext()),"Browsing never silently grants all-files access");
