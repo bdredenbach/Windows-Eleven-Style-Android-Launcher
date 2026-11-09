@@ -8,6 +8,7 @@ on:
   workflow_dispatch:
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: eleven-${{ github.ref }}
   cancel-in-progress: true
@@ -50,8 +51,21 @@ jobs:
         run: python3 checks/CheckElevenManifest.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Nth-Desktop-Eleven-0.8.1-api-${{ matrix.api }}
+          name: Nth-Desktop-Eleven-0.8.2-api-${{ matrix.api }}
           path: app/build/outputs/apk/debug/app-debug.apk
+      - name: Download preceding release for upgrade check
+        id: upgrade_baseline
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: Nth-Desktop-Eleven-0.8.1-api-${{ matrix.api }}
+          run-id: 42632551226
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: build/upgrade-seed
+      - name: Match disposable emulator signing for upgrade check
+        if: steps.upgrade_baseline.outcome == 'success'
+        run: |
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign --ks "$HOME/.android/debug.keystore" --ks-key-alias androiddebugkey --ks-pass pass:android --key-pass pass:android --out build/upgrade-seed/previous.apk build/upgrade-seed/app-debug.apk
       - name: Enable emulator acceleration
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules

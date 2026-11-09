@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 launcher=com.nthexperience.desktop.eleven
-adb install -r app/build/outputs/apk/debug/app-debug.apk
+if [ -f build/upgrade-seed/previous.apk ]; then adb install -r build/upgrade-seed/previous.apk; else adb install -r app/build/outputs/apk/debug/app-debug.apk; fi
 adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 adb install -r fixture/build/outputs/apk/debug/fixture-debug.apk
 adb install -r installprobe/build/outputs/apk/debug/installprobe-debug.apk
@@ -29,6 +29,22 @@ run_native() {
  fi
  failures+=("$label")
 }
+adb shell pm clear "$launcher"
+if [ -f build/upgrade-seed/previous.apk ]; then
+run_native ElevenUpgradeSmoke UpgradeSeed -e phase seed
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+adb shell am force-stop "$launcher"
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+run_native ElevenUpgradeSmoke UpgradeCheck -e phase verify
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+collect
+else
+ echo "SKIP: preceding retained artifact unavailable; upgrade phases require that baseline." > eleven-upgrade-unavailable.txt
+fi
+adb shell pm clear "$launcher"
+run_native ElevenFinalPassSmoke ElevenFinalPassSmoke
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+collect
 adb shell pm clear "$launcher"
 run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
