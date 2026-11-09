@@ -164,7 +164,7 @@ final class StartMenu extends LinearLayout {
         View power=footerIcon("power","Power",null);power.setOnClickListener(v->powerMenu(power));footer.addView(power,new LayoutParams(dp(44),dp(44)));
     }
     private View footerIcon(String icon,String title,Runnable action){
-        View button=new TenStyle.Glyph(getContext(),icon,TenStyle.text(getContext()));button.setFocusable(true);button.setContentDescription(title);button.setTooltipText(title);
+        View button=new TenStyle.Glyph(getContext(),icon,TenStyle.text(getContext()));button.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);button.setFocusable(true);button.setContentDescription(title);button.setTooltipText(title);
         button.setPadding(dp(11),dp(11),dp(11),dp(11));button.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));if(action!=null)button.setOnClickListener(v->action.run());return button;
     }
     private void showFooterMenu(DesktopContextMenu menu,View anchor){if(footerMenu!=null)footerMenu.dismiss();footerMenu=menu;menu.aboveAnchor();int[] at=new int[2];anchor.getLocationOnScreen(at);ContextMenus.show(menu,anchor,at[0],at[1]-dp(4));}
@@ -181,7 +181,7 @@ final class StartMenu extends LinearLayout {
         menu.item("Restart Nth Desktop","refresh",()->actions.open("setting:restart-desktop"));showFooterMenu(menu,anchor);
     }
     void show(boolean keyboard){searchMode=keyboard;showApps=false;landing.scrollTo(0,0);searchFilter="All";search.setText("");render();setVisibility(VISIBLE);bringToFront();requestFocus();if(!store.prefs.getBoolean("reduce_motion",false)){setAlpha(0);setTranslationY(dp(14));animate().alpha(1).translationY(0).setDuration(180).start();}}
-    void hide(){animate().cancel();setAlpha(1);setTranslationY(0);((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(),0);search.clearFocus();setVisibility(GONE);}
+    void hide(){if(footerMenu!=null)footerMenu.dismiss();animate().cancel();setAlpha(1);setTranslationY(0);((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(),0);search.clearFocus();setVisibility(GONE);}
     JSONObject state(){JSONObject s=new JSONObject();GadgetLayout.put(s,"visible",getVisibility()==VISIBLE);GadgetLayout.put(s,"query",search.getText().toString());GadgetLayout.put(s,"apps",showApps);GadgetLayout.put(s,"searchMode",searchMode);GadgetLayout.put(s,"filter",searchFilter);return s;}
     void restore(JSONObject s){if(s==null||!s.optBoolean("visible"))return;show(s.optBoolean("searchMode"));showApps=s.optBoolean("apps");searchFilter=s.optString("filter","All");search.setText(s.optString("query"));render();}
 }

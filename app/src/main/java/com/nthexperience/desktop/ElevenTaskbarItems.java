@@ -37,4 +37,10 @@ final class ElevenTaskbarItems extends LinearLayout {
             child.layout(x[row],y,x[row]+child.getMeasuredWidth(),y+child.getMeasuredHeight());x[row]+=child.getMeasuredWidth()+p.rightMargin;
         }
     }
+    @Override protected boolean drawChild(android.graphics.Canvas canvas,View child,long time){
+        if(!expanded||running(child))return super.drawChild(canvas,child,time);
+        // Bottom pins scroll behind the fixed controls without painting through their transparent faces.
+        int save=canvas.save(),scroll=getParent() instanceof View?((View)getParent()).getScrollX():0;
+        canvas.clipRect(bottomOffset+scroll,0,getWidth(),getHeight());boolean drawn=super.drawChild(canvas,child,time);canvas.restoreToCount(save);return drawn;
+    }
 }
