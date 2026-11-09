@@ -692,7 +692,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         if(TenSystemTools.tool(id))return TenSystemTools.title(id);
         JSONObject location=FolderLinks.get(store,id);if(location!=null)return location.optString("title","Folder");
         if(id.startsWith("@gadget:")&&GadgetCatalog.extra(id.substring(8)))return GadgetCatalog.title(id.substring(8));
-        switch(id){case MediaLibrary.PLAYER:return MediaLibrary.PLAYER_TITLE;case MediaLibrary.CENTER:return MediaLibrary.CENTER_TITLE;case "@focus-timer":return "Focus session";case "@run":return "Run";case "@nota":return "Nth Nota";case "@settings":return "Settings";case "@news":return "Widgets";case "@battery":return "Battery";case "@taskview":return "Task View";case "@recycle":return "Recycle Bin";case "@workspaces":return "Saved Workspaces";case "@recent":return "Recent Items";case "@taskmanager":return "Task Manager";case "@actioncenter":return "Action Center";case "@welcome":return "Welcome Center";case "@organize":return "Desktop Organization";case "@quicklaunch":return "Quick Launch";case "@backup":return "Backup and Restore";case "@control":return "Settings";case "@system":return "System";case "@filemanagers":return "File Managers";case "@weather":return "Weather";case "@clock":return "Clock";case "@gadgets":return "Widgets";case "@sticky":return "Notes";case "@calendar":return "Calendar";case "@computer":return "Computer";case "@browser":return BrowserPanel.NAME;case "@photos":return "Photo Gallery";case "@files":return "File Explorer";case "@downloads":return "Downloads";case "@videos":return "Videos";case "@documents":return "Documents";case "@pictures":return "Pictures";case "@music":return "Music";case "@flip3d":return "Task View";case "@notes":return "Notepad";case "@appearance":return "Personalize";default:AppCatalog.Entry app=entries.get(id);return app==null?"Unavailable app":app.label;}
+        switch(id){case MediaLibrary.PLAYER:return MediaLibrary.PLAYER_TITLE;case MediaLibrary.CENTER:return MediaLibrary.CENTER_TITLE;case "@focus-timer":return "Focus session";case "@recorder":return "Steps Recorder";case "@run":return "Run";case "@nota":return "Nth Nota";case "@settings":return "Settings";case "@news":return "Widgets";case "@battery":return "Battery";case "@taskview":return "Task View";case "@recycle":return "Recycle Bin";case "@workspaces":return "Saved Workspaces";case "@recent":return "Recent Items";case "@taskmanager":return "Task Manager";case "@actioncenter":return "Action Center";case "@welcome":return "Welcome Center";case "@organize":return "Desktop Organization";case "@quicklaunch":return "Quick Launch";case "@backup":return "Backup and Restore";case "@control":return "Settings";case "@system":return "System";case "@filemanagers":return "File Managers";case "@weather":return "Weather";case "@clock":return "Clock";case "@gadgets":return "Widgets";case "@sticky":return "Notes";case "@calendar":return "Calendar";case "@computer":return "Computer";case "@browser":return BrowserPanel.NAME;case "@photos":return "Photo Gallery";case "@files":return "File Explorer";case "@downloads":return "Downloads";case "@videos":return "Videos";case "@documents":return "Documents";case "@pictures":return "Pictures";case "@music":return "Music";case "@flip3d":return "Task View";case "@notes":return "Notepad";case "@appearance":return "Personalize";default:AppCatalog.Entry app=entries.get(id);return app==null?"Unavailable app":app.label;}
     }
     @Override public void open(String id){
         if((id.equals("@taskview")||id.equals("@flip3d"))&&tenTasks!=null&&tenTasks.overlay!=null){tenTasks.dismiss();return;}
@@ -727,7 +727,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             case "@search":showStart(true);return;
             case "@focus-timer":if(!restoreTool(id))window(id,"Focus session",new ElevenFocus.Timer(this,this::open));return;
             case "@battery":vistaAction("android:battery");return;
-            case "@recorder":actionCenter();if(windows.get("@actioncenter")!=null)windows.get("@actioncenter").caption("Steps Recorder");return;
+            case "@recorder":actionCenter();return;
             case "@run":TenRun.show(this,store,this::runCommand);return;
             case "@power":Aero.dialog(this).setTitle("Power").setItems(new String[]{"Show desktop","Restart Nth Desktop","Android power settings"},(d,w)->{if(w==0)showDesktop();else if(w==1)vistaAction("restart-desktop");else vistaAction("android:battery");}).show();return;
             case "@settings":if(!restoreTool(id))window(id,"Settings",new TenSettings(this,store,this::open));return;
@@ -1065,11 +1065,11 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     private void desktopChangedTen(){if(root==null)return;renderDesktop();desktopScroll.scrollTo(0,0);desktopHidden.clear();arrangementUndo.clear();if(previews!=null)previews.dismiss();for(DesktopWindow w:windows.values())if(w.getParent()!=null){w.orientation(layoutKey);w.safeTop(windowTopInset);}renderTaskbar();}
     private void showTenTasks(){if(tenActions!=null)tenActions.dismiss();if(tenNews!=null)tenNews.dismiss();startMenu.hide();previews.dismiss();tray.dismiss();List<String> apps=new ArrayList<>();for(String id:ExternalTasks.list())if(entries.containsKey(id))apps.add(id);tenTasks.show(orderedWindows(),apps,this::label,this::open);}
     private void actionCenter(){
-        if(restoreTool("@actioncenter")){
-            ((ActionCenter)windows.get("@actioncenter").body).refresh();
+        if(restoreTool("@recorder")){
+            ((ActionCenter)windows.get("@recorder").body).refresh();
             return;
         }
-        window("@actioncenter","Action Center",new ActionCenter(this,store,steps,new ActionCenter.Host(){
+        window("@recorder","Steps Recorder",new ActionCenter(this,store,steps,new ActionCenter.Host(){
             public boolean isHome(){return MainActivity.this.isHome();}
             public void home(){MainActivity.this.home();}
             public void fileSetup(){storageSetup.show(true);}
@@ -1084,7 +1084,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     }
     private boolean captureDesktopStep(){
         if(!recordableDesktop())return false;
-        DesktopWindow center=windows.get("@actioncenter");
+        DesktopWindow center=windows.get("@recorder");
         if(center!=null)center.setVisibility(View.INVISIBLE);
         try{return steps.capture(workspace);}
         catch(OutOfMemoryError unavailable){return false;}
@@ -1766,7 +1766,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             JSONObject session=new JSONObject(saved);JSONObject desktopMetadata=session.optJSONObject("desktops");if(desktopMetadata!=null&&tenDesktops.all().isEmpty())tenDesktops.load(desktopMetadata);String activeDesktop=desktopMetadata==null?tenDesktops.current():desktopMetadata.optString("current",tenDesktops.current());JSONArray tools=session.optJSONArray("tools");
             if(tools!=null)for(int i=0;i<tools.length();i++){
                 JSONObject item=tools.optJSONObject(i);if(item==null)continue;String targetDesktop=item.optString("desktop",tenDesktops.current());if(!tenDesktops.desks.containsKey(targetDesktop))continue;tenDesktops.select(targetDesktop);String id=item.optString("id");
-                if(!id.startsWith("@organizer:")&&!id.startsWith("folder:")&&!validExplorerId(id)&&!FolderLinks.id(id)&&!(id.startsWith("@gadget:")&&GadgetCatalog.extra(id.substring(8)))&&!TenSystemTools.tool(id)&&!Arrays.asList("@focus-timer","@legacycontrol","@news","@nota","@settings","@notes","@sticky","@calendar","@gadgets","@clock","@weather","@appearance","@computer","@control","@system","@files","@documents","@pictures","@music","@downloads","@videos","@filemanagers","@organize","@quicklaunch","@backup","@welcome","@browser","@photos","@taskmanager","@recycle","@recent","@actioncenter",MediaLibrary.PLAYER).contains(id)&&!store.isFolder(id))continue;
+                if(!id.startsWith("@organizer:")&&!id.startsWith("folder:")&&!validExplorerId(id)&&!FolderLinks.id(id)&&!(id.startsWith("@gadget:")&&GadgetCatalog.extra(id.substring(8)))&&!TenSystemTools.tool(id)&&!Arrays.asList("@recorder","@focus-timer","@legacycontrol","@news","@nota","@settings","@notes","@sticky","@calendar","@gadgets","@clock","@weather","@appearance","@computer","@control","@system","@files","@documents","@pictures","@music","@downloads","@videos","@filemanagers","@organize","@quicklaunch","@backup","@welcome","@browser","@photos","@taskmanager","@recycle","@recent","@actioncenter",MediaLibrary.PLAYER).contains(id)&&!store.isFolder(id))continue;
                 if(id.startsWith("@organizer:")||(id.startsWith("folder:")&&!store.isFolder(id)))organizer(id,"desktop");else open(id);DesktopWindow tool=windows.get(id);if(tool==null)continue;if(tool.body instanceof TenSettings){TenSettings settings=(TenSettings)tool.body;if(item.optJSONObject("ten_state")!=null)settings.restoreState(item.optJSONObject("ten_state"));else settings.navigate(item.optString("ten_page","home"));}tool.readGeometry(item.optJSONObject("geometry"));tool.setVisibility(item.optBoolean("visible",true)?View.VISIBLE:View.GONE);ToolViewState.restore(tool,item.optJSONObject("ui"));
             }
             tenDesktops.select(activeDesktop);
