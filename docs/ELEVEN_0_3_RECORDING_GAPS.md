@@ -38,7 +38,15 @@ An earlier Android 11 Shake check exposed slow synchronous injection producing a
 
 ## Delivery status
 
-The execution environment disconnected before the final retained-key APK could be produced and saved. Source and CI builds are preserved in GitHub. A final update APK using Eleven's existing preview signing key remains pending; CI debug packages should not be treated as a matching-key update over an installed preview.
+The retained preview signing key was restored from its saved backup. The final 0.3.0 APK is signed with the same certificate as the existing Eleven previews and can be installed as an ordinary update.
+
+- Package: `com.nthexperience.desktop.eleven`; version 0.3.0 (code 5).
+- APK SHA-256: `f738076415b513cfbabb86135a97a18eea030c41eac175f9fefe61195b145d3a`.
+- Certificate SHA-256: `b704c7a2da2d0d4425fa5fe61c122483389b07be327ad565ff198064af696265`.
+- APK Signature Scheme v2/v3 verification and 16 KiB ZIP alignment pass.
+- All 537 non-signing APK entries match the independent API 30/API 36 CI builds and delivered APK, including non-signature META-INF content.
+
+The download ZIP contains the APK, install notes and build-verification report. No application code changed during signing-key recovery.
 
 ## Remaining work
 
