@@ -1,0 +1,39 @@
+# Eleven 0.7.0 — markets and another recording pass
+
+This round embeds TradingView's official display-only Market Overview widget. It retains the provider's attribution and links, and never extracts quotes, calls undocumented quote APIs or bundles sample market values. Data can be delayed or unavailable for a particular symbol. The probe displayed all four ETF prices/changes; SPX and Nasdaq Composite displayed provider restriction indicators, so the ETF view remains the default. The default clearly labeled Index ETFs view shows SPY, QQQ, DIA and IWM; Indices selects S&P 500, Nasdaq Composite, Dow Jones and Russell 2000 subject to the provider's display permissions. ETF prices are not index values.
+
+The default chart range is one month, with intraday and longer ranges available. The official embedded view permits its own third-party web storage; browser cookie preferences are unchanged. The card has native symbol/range selectors, retry, report links and an off switch. Loading is optional in the card and Widgets Settings. Only the enabled choice, symbol set and range are portable settings. Quote values, chart history, provider web storage and cookies are excluded from desktop backups. Each provider WebView denies local-file/content access, mixed content, device permissions and non-HTTPS navigation. There is no native JavaScript bridge. Views are destroyed while hidden/backgrounded or when their board is closed; ordinary board rendering retains the displayed widget.
+
+## Fresh recording review
+
+Fresh frames were decoded directly from all three recordings at 15-second intervals across their full durations, followed by full-resolution frames of the changing Start view and Widgets board. The original recordings and review images remain private inputs outside the repository. This is a sampled visual/source review, not a numerical pixel-match certification.
+
+| Finding | Recording evidence | Change |
+| --- | --- | --- |
+| G31 | 224513 00:00–00:03 | The All menu offers Category, Grid and List. Category had been missing. Add the category tile mosaic, real app actions and full category lists. Android-declared categories classify installed apps; unknown apps remain Other. Nth tools have explicit categories. Selection is saved and portable. |
+| G32 | 224513 03:43–04:20 | The board leads with weather and uses per-card ellipsis menus. Move weather into the main Widgets lane, use equal lanes when wide enough, stack on narrow phones, and add Hide/Customize commands to weather, markets, calendar, scores and history cards. Hidden cards remain recoverable through Choose widgets. |
+| G33 | 224513 03:45–03:51 | The market card includes actual values and percentage changes. Replace the report-only card with an official price/chart embed plus persistent report links. ETF and index modes are explicit; provider availability/delay labels stay visible. |
+
+Existing 0.3–0.6 implementations are retained: Settings hierarchy/navigation, Explorer commands and file operations, Recycle Bin selection/recovery, Snap, Focus, 23 presets, Transparency effects, notification filters, storage/power controls, Start/search choices, Nota, browser, media and modern Task Manager.
+
+The integration pass also found that minimizing the browser called the process-wide `WebView.pauseTimers()`, which could freeze other WebViews. Timer ownership now belongs to the Activity foreground/background lifecycle; per-window pause/resume remains local. A native regression checks an actual market-display timer continues after the browser window is minimized.
+
+The full storage regression also exposed ambiguous test targeting: the Computer tile and navigation pane can both expose a Documents label. The test now targets the Computer content area, maximizes its restored window, and checks the actual device-folder path before file bytes/visibility checks. This isolates the native test from unrelated saved navigation/window state.
+
+The Android 11 system image ships an older web engine that rejects the provider’s logical-assignment syntax. The card detects that specific syntax failure and replaces the blank view with a WebView update route and retained report links. The current Android 16 engine displays the ETF quotes. Native tests check both interval timers and animation frames continue after browser minimization.
+
+Start shortcut rows now accept keyboard focus without requiring touch focus. The native check opens the full category list and uses an injected touchscreen tap to launch the actual app. The additional Google APIs image installs more apps, so its final check explicitly scrolls the chosen row into view before touching it.
+
+## Verification
+
+The [full regression matrix](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42616169930), application/test source `89c400566976cccab617c11bd49fc38f22639f55`, passed **all 17 native suites and all 48 unit tests on both Android 11/API30 and Android 16/API36**. Both jobs also passed 157,840 geometry policies, Nota command boundaries, 46 pinned icon checks and package/runner identity validation. Market/category assertions: 29 per API. The [additional full-system Android 15/API35 run](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42617832131) passed the market/category suite with 30 assertions and the same application sources. Its final native test explicitly scrolls an app into view before injecting a real tap; additional installed Google apps can put Notepad below the visible category-list area. Start shortcuts remain keyboard-focusable without requiring touch focus.
+
+Retained assertions per API include 265 purchaser, 91 completion, 232 Task Manager, 4,417 theme, 216 shell, 109 recording-gap and 171 Nota. Provider outcomes: API30 `Index ETFs: WEBVIEW_UPDATE_REQUIRED; Indices: WEBVIEW_UPDATE_REQUIRED`; API36 `Index ETFs: FRAME_OPENED; Indices: FRAME_OPENED`; API35 `Index ETFs: FRAME_OPENED; Indices: FRAME_OPENED`. The full-system API35 native screenshot visibly renders the one-month SPY line/area chart and all four ETF prices/changes. API36 app-view captures show ETF values but omit the hardware-rendered chart; API35 system capture supplies direct graph evidence. The Indices view displays provider restriction indicators for SPX and Nasdaq Composite; ETF mode remains the default. API30 recovery replaces its unsupported-script blank view with an explicit WebView update route and report links. Each symbol/range combination is not individually certified. An iframe existing is not treated as proof that every symbol has data. Captured AndroidRuntime logs contain no FATAL EXCEPTION.
+
+The delivered APK is 0.7.0/code 9, signed with the retained preview certificate, with v2/v3 verification and 16 KiB alignment. All 537 non-signing payload entries match both independent full-matrix builds and the signed delivery. APK SHA256: `fe77bb08918cba46fd9006d5bce168b3847c28983e2a93c517b0a884cba1b825`. New unit checks cover fixed provider configuration, injection-resistant options, safe navigation, portable settings and honest app-category mapping. Native checks use a separately labeled local document to test display/lifecycle and record the official provider probe independently. A created iframe alone is not proof that all quotes are available; native screenshots must be reviewed.
+
+## References
+
+- [Official TradingView widgets](https://www.tradingview.com/widget/) and [integration documentation](https://www.tradingview.com/widget-docs/getting-started/).
+- [Market Overview embed configuration](https://www.tradingview.com/widget-docs/widgets/watchlists/market-overview) and [data availability/delays](https://www.tradingview.com/widget-docs/faq/data/).
+- [Attribution and terms](https://www.tradingview.com/policies/) and [widget privacy FAQ](https://www.tradingview.com/widget-docs/faq/general/). Attribution is retained as provided; the app offers direct display only.

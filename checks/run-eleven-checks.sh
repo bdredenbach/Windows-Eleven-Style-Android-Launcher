@@ -12,7 +12,7 @@ adb exec-out screencap -p > screenshots/eleven-at-exit.png
 adb shell dumpsys activity top > eleven-activity-top.txt
 adb shell dumpsys activity lastanr > eleven-last-anr.txt
 adb shell dumpsys input_method > eleven-input-method.txt
-for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\|photo-\|ten7-\|storage-\|home-first-run\|vista-usage-\|nth-media-\).*\.\(png\|tsv\)$/p'); do
+for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\|photo-\|ten7-\|storage-\|home-first-run\|vista-usage-\|nth-media-\).*\.\(png\|tsv\|txt\)$/p'); do
  adb exec-out run-as "$launcher" cat "files/$file" > "screenshots/$file"
 done
 }
@@ -31,7 +31,7 @@ run_native() {
 }
 adb shell pm clear "$launcher"
 run_native StorageSmoke StorageSetup -e suite storage -e phase setup
-for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
+for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
  run_native "$runner" "$runner"
 done
 adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
