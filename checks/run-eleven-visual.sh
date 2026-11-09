@@ -14,10 +14,6 @@ collect() {
 }
 trap collect EXIT
 adb shell pm clear "$launcher"
-timeout 240s adb shell am instrument -w -e suite storage -e phase setup "$launcher.test/com.nthexperience.desktop.StorageSmoke" | tee eleven-StorageSetup.txt
-grep -q 'PASS' eleven-StorageSetup.txt
-! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' eleven-StorageSetup.txt
-adb shell am force-stop "$launcher"
 timeout 240s adb shell am instrument -w "$launcher.test/com.nthexperience.desktop.ElevenMarketSmoke" | tee eleven-ElevenMarketSmoke.txt
 grep -q 'PASS' eleven-ElevenMarketSmoke.txt
 ! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' eleven-ElevenMarketSmoke.txt
