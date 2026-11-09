@@ -966,7 +966,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             public void switchTo(String id){DesktopWindow manager=windows.get("@taskmanager");if(manager!=null)manager.minimize();DesktopWindow window=windows.get(id);if(window!=null&&window.getParent()!=null)window.restore();else open(id);}
             public void end(String id){DesktopWindow window=windows.get(id);if(window!=null)window.closeWindow();}
             public void appInfo(String id){ComponentName component=ComponentName.unflattenFromString(id);if(component!=null)launchSystem(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,Uri.parse("package:"+component.getPackageName())));}
-            public void restart(){vistaAction("restart-desktop");}public void newTask(){showStart(true);}
+            public void restart(){vistaAction("restart-desktop");}public void newTask(){MainActivity.this.open("@run");}public void open(String id){MainActivity.this.open(id);}
             public void close(){DesktopWindow window=windows.get("@taskmanager");if(window!=null)window.closeWindow();}
         }));
     }
@@ -1051,7 +1051,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     AeroWallpaper wallpaperSurface(){return wallpaper;}
     void wallpaperReady(){if(!destroyed&&ElevenColors.automatic(store,wallpaper))applyTenAppearance();}
     void applyTenFont(){applyTenAppearance();TenFonts.apply(root);}
-    void applyTenAppearance(){if(root==null)return;TenAppearance.context(this);wallpaper.theme(store.prefs.getInt("wallpaper",11));ElevenColors.automatic(store,wallpaper);wallpaper.appearanceChanged();if(tenActions!=null)tenActions.dismiss();if(tenNews!=null)tenNews.dismiss();if(previews!=null)previews.dismiss();if(desktopMenu!=null)desktopMenu.dismiss();if(jumpMenu!=null)jumpMenu.dismiss();rebuildTenTaskbar();startMenu.appearanceChanged();for(DesktopWindow tool:tenDesktops.all()){if(tool.body instanceof TenSettings)((TenSettings)tool.body).refreshAppearance();else if(tool.body instanceof TenNews)((TenNews)tool.body).render();TenAppearance.apply(tool.body);tool.active(tool.active());}renderDesktop();renderTaskbar();}
+    void applyTenAppearance(){if(root==null)return;TenAppearance.context(this);wallpaper.theme(store.prefs.getInt("wallpaper",11));ElevenColors.automatic(store,wallpaper);wallpaper.appearanceChanged();if(tenActions!=null)tenActions.dismiss();if(tenNews!=null)tenNews.dismiss();if(previews!=null)previews.dismiss();if(desktopMenu!=null)desktopMenu.dismiss();if(jumpMenu!=null)jumpMenu.dismiss();rebuildTenTaskbar();startMenu.appearanceChanged();for(DesktopWindow tool:tenDesktops.all()){if(tool.body instanceof TenSettings)((TenSettings)tool.body).refreshAppearance();else if(tool.body instanceof TenNews)((TenNews)tool.body).render();else if(tool.body instanceof TaskManagerPanel)((TaskManagerPanel)tool.body).appearance();TenAppearance.apply(tool.body);tool.active(tool.active());}renderDesktop();renderTaskbar();}
     void refreshTen(){
         if(root==null)return;
         layoutWorkspace();renderDesktop();renderTaskbar();startMenu.appearanceChanged();
