@@ -68,7 +68,7 @@ jobs:
           heap-size: 384M
           emulator-options: -no-window -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
-          script: bash checks/run-eleven-checks.sh
+          script: bash checks/run-eleven-taskbar-focus.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
