@@ -223,7 +223,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         clock=Aero.text(this,"",10,TenStyle.text(this));clock.setGravity(Gravity.CENTER);clock.setMaxLines(2);clock.setIncludeFontPadding(false);clock.setPadding(dp(5),0,dp(5),0);clock.setMinWidth(dp(52));clock.setBackground(TenStyle.hover(this,Color.TRANSPARENT));clock.setOnClickListener(v->open("@tenactions"));clock.setContentDescription("Clock and calendar");indicators.addView(clock,new LinearLayout.LayoutParams(-2,dp(44)));
         TenStyle.Glyph actionButton=new TenStyle.Glyph(this,"actions",TenStyle.text(this));actionButton.setContentDescription("Notifications and calendar");actionButton.setPadding(dp(4),dp(12),dp(4),dp(12));actionButton.setTooltipText("Notifications and calendar");actionButton.setFocusable(true);actionButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));actionButton.setOnClickListener(v->open("@tenactions"));indicators.addView(actionButton,new LinearLayout.LayoutParams(dp(28),dp(48)));
         FrameLayout peek=new FrameLayout(this);desktopToggle=peek;View peekStrip=new View(this);peekStrip.setBackgroundColor(0xff777777);peek.addView(peekStrip,new FrameLayout.LayoutParams(dp(1),-1,Gravity.END));peek.setContentDescription("Show desktop");peek.setOnClickListener(v->{previews.dismiss();showDesktop();});ContextMenus.bind(peek,(x,y)->taskbarMenu(peek,x,y));previews.bindDesktopPeek(peek);indicators.addView(peek,new LinearLayout.LayoutParams(dp(6),dp(48)));
-        Runnable align=()->{if(elevenBar.getWidth()==0)return;int left=leftAligned||newsButton.getVisibility()==View.GONE?dp(4):newsButton.getWidth()+dp(4);int right=indicators.getWidth()+dp(4);int fixed=dp(ElevenLayout.taskbarFixed(getResources().getConfiguration().screenWidthDp,searchMode));int desired=fixed+Math.max(dp(48),taskItems.getWidth());int room=Math.max(1,elevenBar.getWidth()-left-right);int w=ElevenLayout.taskbarWidth(room,desired);FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)taskbar.getLayoutParams();int x=leftAligned?left:ElevenLayout.taskbarLeft(elevenBar.getWidth(),left,right,desired);if(pos.width!=w||pos.leftMargin!=x){pos.width=w;pos.leftMargin=x;taskbar.setLayoutParams(pos);}};
+        Runnable align=()->{if(elevenBar.getWidth()==0)return;int left=leftAligned||newsButton.getVisibility()==View.GONE?dp(4):newsButton.getWidth()+dp(4);int right=indicators.getWidth()+dp(4);int fixed=dp(ElevenLayout.taskbarFixed(getResources().getConfiguration().screenWidthDp,searchMode));int desired=fixed+Math.max(dp(48),((ElevenTaskbarItems)taskItems).singleRowWidth());int room=Math.max(1,elevenBar.getWidth()-left-right);int w=ElevenLayout.taskbarWidth(room,desired);FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)taskbar.getLayoutParams();int x=leftAligned?left:ElevenLayout.taskbarLeft(elevenBar.getWidth(),left,right,desired);if(pos.width!=w||pos.leftMargin!=x){pos.width=w;pos.leftMargin=x;taskbar.setLayoutParams(pos);}};
         elevenBar.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->align.run());taskItems.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->elevenBar.post(align));
         shell.addView(elevenBar,new LinearLayout.LayoutParams(-1,dp(expanded?100:52)));updateClock();renderTaskbar();
     }
@@ -307,10 +307,10 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         List<String> pins=new ArrayList<>(store.quickLaunch());pins.remove("@nota");
         Map<String,LinearLayout> buttons=new LinkedHashMap<>();
         int viewport=taskViewportWidth>0?taskViewportWidth:dp(240);
-        int taskRoom=viewport*(store.prefs.getBoolean("taskbar_expanded",false)?2:1);
+        int taskRoom=viewport;
         int firstTask=taskItems.getChildCount();
         int occupied=external.size();
-        for(String pin:pins)if(!taskIds.contains(pin)&&!external.contains(pin))occupied++;
+        if(!store.prefs.getBoolean("taskbar_expanded",false))for(String pin:pins)if(!taskIds.contains(pin)&&!external.contains(pin))occupied++;
         String grouping=store.prefs.getString("taskbar_grouping","Always");
         List<String> folderPins=new ArrayList<>();
         for(String pin:pins)if(folderTask(pin,windows.get(pin)))folderPins.add(pin);
@@ -343,7 +343,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             previews.bindTask(button,members,mousePreviews,()->ContextMenus.centered(button,commands));
             LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(showLabels&&grouped?dp(112):buttonWidth,dp(48));
             size.rightMargin=gap;
-            button.setLayoutParams(size);
+            button.setLayoutParams(size);ElevenTaskbarItems.slot(button,true);
             familyInPinnedSlot|=pinnedExplorerFamily;
             String slot=pinnedExplorerFamily?folderSlot:target.toolId;
             taskbarButton(button,slot,target.toolId);buttons.put(slot,button);
@@ -364,7 +364,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             ContextMenus.bindJumpList(button,(x,y)->showJumpList(button,id,x,y));
             previews.bindApp(button,title,true,mousePreviews,()->open(id),()->ContextMenus.centered(button,commands));
             LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(buttonWidth,dp(48));
-            lp.rightMargin=gap;button.setLayoutParams(lp);taskbarButton(button,id,id);buttons.put(id,button);
+            lp.rightMargin=gap;button.setLayoutParams(lp);ElevenTaskbarItems.slot(button,true);taskbarButton(button,id,id);buttons.put(id,button);
         }
         for(String id:pins){
             if(familyInPinnedSlot&&!id.equals(folderSlot)&&folderTask(id,windows.get(id)))continue;
@@ -382,7 +382,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
                 previews.bindApp(pinned,label(id),false,false,()->open(id),()->ContextMenus.centered(pinned,commands));
                 LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(buttonWidth,dp(48));
                 size.rightMargin=gap;
-                button.setLayoutParams(size);taskbarButton(button,id,id);
+                button.setLayoutParams(size);ElevenTaskbarItems.slot(button,false);taskbarButton(button,id,id);
             }
             taskItems.addView(button);
         }
@@ -626,32 +626,15 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         return slots*cell+separator;
     }
     private void fitTaskButtons(int first,int room){
-        int count=taskItems.getChildCount()-first;
-        if(count==0)return;
         boolean expanded=store.prefs.getBoolean("taskbar_expanded",false);
-        int slots=expanded?(count+1)/2:count;if(expanded)room/=2;
-        int preferred=0,column=0;
-        for(int i=0;i<count;i++){
-            LinearLayout.LayoutParams size=(LinearLayout.LayoutParams)taskItems.getChildAt(first+i).getLayoutParams();
-            if(expanded){column=Math.max(column,size.width+size.rightMargin);if(i%2==1||i==count-1){preferred+=column;column=0;}}
-            else preferred+=size.width+size.rightMargin;
-        }
-        if(preferred<=room)return;
-        int gap=room/slots>=dp(32)?dp(3):0;
-        int width=Math.max(0,room-slots*gap);
-        for(int i=0;i<count;i++){
-            LinearLayout button=(LinearLayout)taskItems.getChildAt(first+i);
-            LinearLayout.LayoutParams size=(LinearLayout.LayoutParams)button.getLayoutParams();
-            int slot=expanded?i/2:i;size.width=width/slots+(slot<width%slots?1:0);
-            size.rightMargin=gap;
-            button.setLayoutParams(size);
-            if(size.width<dp(46)){
-                button.setGravity(Gravity.CENTER);
-                button.setPadding(0,0,0,0);
-                button.getChildAt(1).setVisibility(View.GONE);
-                View icon=button.getChildAt(0);
-                int side=Math.min(icon.getLayoutParams().width,size.width);
-                icon.setLayoutParams(new LinearLayout.LayoutParams(side,side));
+        for(int row=0;row<(expanded?2:1);row++){
+            List<LinearLayout> buttons=new ArrayList<>();int preferred=0;
+            for(int i=first;i<taskItems.getChildCount();i++){LinearLayout button=(LinearLayout)taskItems.getChildAt(i);if(expanded&&(ElevenTaskbarItems.running(button)?0:1)!=row)continue;buttons.add(button);LinearLayout.LayoutParams p=(LinearLayout.LayoutParams)button.getLayoutParams();preferred+=p.width+p.rightMargin;}
+            int count=buttons.size();if(count==0||preferred<=room)continue;
+            int gap=room/count>=dp(32)?dp(3):0,width=Math.max(0,room-count*gap);
+            for(int i=0;i<count;i++){
+                LinearLayout button=buttons.get(i);LinearLayout.LayoutParams size=(LinearLayout.LayoutParams)button.getLayoutParams();size.width=width/count+(i<width%count?1:0);size.rightMargin=gap;button.setLayoutParams(size);
+                if(size.width<dp(46)){button.setGravity(Gravity.CENTER);button.setPadding(0,0,0,0);button.getChildAt(1).setVisibility(View.GONE);View icon=button.getChildAt(0);int side=Math.min(icon.getLayoutParams().width,size.width);icon.setLayoutParams(new LinearLayout.LayoutParams(side,side));}
             }
         }
     }
@@ -1056,7 +1039,17 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         };
         window(id,id.equals("@computer")?"Computer":id.equals("@filemanagers")?"File Managers":"Files",new VistaExplorer(this,store,vistaActions,files,()->new ArrayList<>(entries.values()),page));
     }
-    private void syncTaskbarHeight(){if(taskItems instanceof ElevenTaskbarItems&&((ElevenTaskbarItems)taskItems).expanded!=store.prefs.getBoolean("taskbar_expanded",false)){rebuildTenTaskbar();for(DesktopWindow tool:windows.values()){if(tool.body instanceof TenSettings&&((TenSettings)tool.body).page.equals("taskbar"))((TenSettings)tool.body).refreshAppearance();if(tool.body instanceof VistaControlPanel&&((VistaControlPanel)tool.body).page().equals("taskbar"))((VistaControlPanel)tool.body).render();}}}
+    private void syncTaskbarHeight(){
+        boolean expanded=store.prefs.getBoolean("taskbar_expanded",false);
+        if(taskItems instanceof ElevenTaskbarItems&&((ElevenTaskbarItems)taskItems).expanded!=expanded){
+            // Keep the existing fixed controls and tray alive while resizing only the app strip.
+            if(taskbarReorder!=null)taskbarReorder.cancel();if(previews!=null)previews.dismiss();if(tray!=null)tray.dismiss();
+            ((ElevenTaskbarItems)taskItems).expanded(expanded);int height=dp(expanded?96:48);
+            View clip=(View)taskStrip.getParent(),bar=(View)clip.getParent(),surface=(View)bar.getParent();
+            ViewGroup.LayoutParams p=clip.getLayoutParams();p.height=height;clip.setLayoutParams(p);p=bar.getLayoutParams();p.height=height;bar.setLayoutParams(p);p=surface.getLayoutParams();p.height=dp(expanded?100:52);surface.setLayoutParams(p);renderTaskbar();
+            for(DesktopWindow tool:windows.values()){if(tool.body instanceof TenSettings&&((TenSettings)tool.body).page.equals("taskbar"))((TenSettings)tool.body).refreshAppearance();if(tool.body instanceof VistaControlPanel&&((VistaControlPanel)tool.body).page().equals("taskbar"))((VistaControlPanel)tool.body).render();}
+        }
+    }
     private void rebuildTenTaskbar(){if(tenNews!=null)tenNews.dismiss();if(tray!=null)tray.stop();if(taskbarReorder!=null)taskbarReorder.close();if(previews!=null)previews.dismiss();if(shell.getChildCount()>1)shell.removeViewAt(shell.getChildCount()-1);taskViewportWidth=0;buildTaskbar();if(tray!=null)tray.start();}
     android.graphics.drawable.Drawable tenShellSurface(){return new AeroGlass(wallpaper,AeroGlass.START);}
     AeroWallpaper wallpaperSurface(){return wallpaper;}

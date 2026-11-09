@@ -30,6 +30,11 @@ run_native() {
  failures+=("$label")
 }
 adb shell pm clear "$launcher"
+run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+collect
+adb shell wm size reset
+adb shell pm clear "$launcher"
 run_native StorageSmoke StorageSetup -e suite storage -e phase setup
 for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
  run_native "$runner" "$runner"
@@ -38,7 +43,6 @@ adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
 run_native StorageSmoke StorageDevice -e suite storage -e phase device
 run_native PhotoSmoke PhotoSmoke
 run_native MediaSmoke MediaSmoke
-run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
 if [ "${#failures[@]}" -ne 0 ]; then
  echo "Failed native suites: ${failures[*]}"
  exit 1

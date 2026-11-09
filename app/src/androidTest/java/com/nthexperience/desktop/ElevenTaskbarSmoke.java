@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 
 /** Recording regression: changing taskbar height must not resnap the desktop behind it. */
 public final class ElevenTaskbarSmoke extends Instrumentation {
-    MainActivity home;View root;DesktopStore store;int scenarios,frames;
+    MainActivity home;View root;DesktopStore store;int scenarios,frames,fixedScenarios,fixedFrames;
     @Override public void onCreate(Bundle args){super.onCreate(args);start();}
     @Override public void onStart(){Bundle result=new Bundle();try{
         shell("wm size 1080x2400");
@@ -33,7 +33,9 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         scenario("scrolled",true,true,true);
         recentTaskbarStability();
         keyboardAndRows();
-        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area\n");finish(Activity.RESULT_OK,result);
+        runningPlacement();
+        fixedControls();
+        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
     }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));try{shot("eleven-taskbar-failure");}catch(Exception ignored){}finish(Activity.RESULT_CANCELED,result);}}
     void recentTaskbarStability()throws Exception{
         List<String> probes=new ArrayList<>();for(AppCatalog.Entry entry:AppCatalog.load(home))if(entry.id.startsWith("com.nthexperience.desktop.fixture/"))probes.add(entry.id);
@@ -50,15 +52,38 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         ui(()->{store.quickLaunch(Collections.singletonList(apps.get(0)));home.refreshTen();});settle();check(barKeys().get(0).equals(apps.get(0)),"Changed pins reset the default pinned order");shot("eleven-taskbar-stable-android-taskbar");
     }
     void keyboardAndRows()throws Exception{
+        ui(()->{store.quickLaunch(Arrays.asList("@calendar","@weather",ExternalTasks.list().get(0)));home.refreshTen();});settle();
         for(boolean fit:new boolean[]{false,true})for(boolean labels:new boolean[]{false,true}){
             ui(()->{store.prefs.edit().putBoolean("taskbar_static",fit).putBoolean("taskbar_show_labels",labels).putBoolean("taskbar_expanded",true).commit();home.refreshTen();});settle();
             ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);check(items.expanded&&items.getHeight()==Aero.dp(home,96),"Two full-height rows");
-                for(int i=0;i<items.getChildCount();i++){View child=items.getChildAt(i);check(child.getHeight()==Aero.dp(home,48)&&child.getTop()==i%2*Aero.dp(home,48),"Normal touch height on correct row");if(fit)check(child.getRight()<=((HorizontalScrollView)items.getParent()).getWidth(),"Static buttons fit the visible strip");}
-                try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("taskbarReorder");field.setAccessible(true);Object reorder=field.get(home);java.lang.reflect.Method hit=TaskbarReorder.class.getDeclaredMethod("indexAt",float.class,float.class,String.class);hit.setAccessible(true);View top=items.getChildAt(0),bottom=items.getChildAt(1);String moving=TaskbarReorder.key(items.getChildAt(items.getChildCount()-1));float x=top.getLeft()+top.getWidth()/2f-1;int a=(Integer)hit.invoke(reorder,x,top.getTop()+top.getHeight()/2f,moving),b=(Integer)hit.invoke(reorder,x,bottom.getTop()+bottom.getHeight()/2f,moving);check(a==0&&b==1,"Drag insertion distinguishes upper and lower rows");}catch(Exception e){throw new RuntimeException(e);}
+                for(int i=0;i<items.getChildCount();i++){View child=items.getChildAt(i);check(child.getHeight()==Aero.dp(home,48)&&child.getTop()==(ElevenTaskbarItems.running(child)?0:1)*Aero.dp(home,48),"Normal touch height on correct row");if(fit)check(child.getRight()<=((HorizontalScrollView)items.getParent()).getWidth(),"Static buttons fit the visible strip");}
+                try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("taskbarReorder");field.setAccessible(true);Object reorder=field.get(home);java.lang.reflect.Method hit=TaskbarReorder.class.getDeclaredMethod("indexAt",float.class,float.class,String.class);hit.setAccessible(true);
+                    for(boolean running:new boolean[]{false,true}){List<View> row=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(ElevenTaskbarItems.running(items.getChildAt(i))==running)row.add(items.getChildAt(i));check(row.size()>=2,"Multiple buttons in each actual row");View target=row.get(0),moving=row.get(row.size()-1);List<String> keys=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(items.getChildAt(i)!=moving)keys.add(TaskbarReorder.key(items.getChildAt(i)));int index=(Integer)hit.invoke(reorder,target.getLeft()+target.getWidth()/2f-1,(running?72:24)*home.getResources().getDisplayMetrics().density,TaskbarReorder.key(moving));check(index==keys.indexOf(TaskbarReorder.key(target)),"Drag stays in the source row even over the other row");}
+                }catch(Exception e){throw new RuntimeException(e);}
+
             });
         }
         List<String> before=barKeys();ui(()->{View first=find(ElevenTaskbarItems.class).getChildAt(0);check(first.requestFocusFromTouch(),"Task button receives keyboard focus after touch");check(first.dispatchKeyEvent(new KeyEvent(0,0,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_RIGHT,0,KeyEvent.META_CTRL_ON|KeyEvent.META_SHIFT_ON)),"Task button handles keyboard reorder");});settle();check(barKeys().get(1).equals(before.get(0)),"Actual keyboard reorder persists across rows");
         DesktopBackup.Plan plan=DesktopBackup.parse(DesktopBackup.snapshot(store).toString());check(Boolean.TRUE.equals(plan.values.get("taskbar_expanded")),"Expansion participates in portable backups");shot("eleven-taskbar-static-labels");
+    }
+    View slot(String id){ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int i=0;i<items.getChildCount();i++)if(id.equals(TaskbarReorder.key(items.getChildAt(i))))return items.getChildAt(i);return null;}
+    void closeAll(){for(int i=0;i<40;i++){DesktopWindow window=find(DesktopWindow.class);if(window==null)return;window.closeWindow();}}
+    void runningPlacement()throws Exception{
+        ui(()->{closeAll();for(String id:ExternalTasks.list())ExternalTasks.remove(id);store.quickLaunch(Arrays.asList("@notes","@calendar","@weather"));store.prefs.edit().putBoolean("taskbar_expanded",true).putBoolean("taskbar_static",false).putBoolean("taskbar_show_labels",false).commit();home.applyTenAppearance();home.open("@notes");});settle();
+        ui(()->{check(slot("@notes").getTop()==0,"Pinned open Notepad moves to the upper row");check(slot("@calendar").getTop()==Aero.dp(home,48)&&slot("@weather").getTop()==Aero.dp(home,48),"Idle pins stay on the bottom row");find(DesktopWindow.class).minimize();});settle();check(slot("@notes").getTop()==0,"Minimized app remains an open task on top");shot("eleven-taskbar-open-upper");
+        ui(()->find(DesktopWindow.class).closeWindow());settle();check(slot("@notes").getTop()==Aero.dp(home,48),"Closed pinned app returns to bottom");
+    }
+    Map<String,View> fixedViews(){
+        View bar=TenSmoke.description(root,"Eleven taskbar");Map<String,View> result=new LinkedHashMap<>();for(String name:new String[]{"Start menu","Search","Task View","Widgets","Clock and calendar","Notifications and calendar","Show desktop","Restore desktop windows"}){View child=TenSmoke.description(bar,name);if(child!=null&&child.isShown())result.put(name,child);}
+        try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("tenNotaButton");field.setAccessible(true);result.put("Nth Nota",(View)field.get(home));}catch(Exception e){throw new RuntimeException(e);}result.put("System tray",TenSmoke.find(bar,SystemTray.class));return result;
+    }
+    String bounds(View view){int[] at=new int[2];view.getLocationOnScreen(at);return at[0]+","+at[1]+","+view.getWidth()+","+view.getHeight();}
+    void fixedControls()throws Exception{
+        for(String alignment:new String[]{"Left","Center"})for(boolean landscape:new boolean[]{false,true})for(boolean fit:new boolean[]{false,true}){
+            ui(()->{store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("taskbar_static",fit).putBoolean("taskbar_expanded",false).commit();store.quickLaunch(Arrays.asList("@notes","@calendar"));home.setRequestedOrientation(landscape?ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);home.applyTenAppearance();});settle();
+            Map<String,View> controls=fixedViews();Map<String,String> before=new LinkedHashMap<>();for(Map.Entry<String,View> entry:controls.entrySet())before.put(entry.getKey(),bounds(entry.getValue()));String[] failure={null};int[] count={0};ViewTreeObserver.OnPreDrawListener watcher=()->{count[0]++;Map<String,View> current=fixedViews();for(String id:controls.keySet())if(failure[0]==null&&(current.get(id)!=controls.get(id)||!before.get(id).equals(bounds(controls.get(id)))))failure[0]=id+" changed from "+before.get(id)+" to "+bounds(controls.get(id));return true;};
+            ui(()->root.getViewTreeObserver().addOnPreDrawListener(watcher));try{for(int n=0;n<2;n++){ui(this::toggleMenu);settle();check(failure[0]==null,"Fixed controls stay put: "+alignment+"/"+landscape+"/"+fit+": "+failure[0]);}}finally{ui(()->root.getViewTreeObserver().removeOnPreDrawListener(watcher));fixedFrames+=count[0];}fixedScenarios++;
+        }
     }
     List<String> barKeys()throws Exception{List<String> ids=new ArrayList<>();ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int n=0;n<items.getChildCount();n++){String id=TaskbarReorder.key(items.getChildAt(n));if(id!=null)ids.add(id);}});return ids;}
     Map<String,String> barGeometry()throws Exception{Map<String,String> values=new LinkedHashMap<>();ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int n=0;n<items.getChildCount();n++){View child=items.getChildAt(n);String id=TaskbarReorder.key(child);if(id!=null)values.put(id,child.getLeft()+","+child.getTop()+","+child.getWidth()+","+child.getHeight());}});return values;}
