@@ -35,6 +35,14 @@ No new evidence from this pass establishes missing Start pin folders, automatic 
 
 ## Validation
 
-Added an Eleven appearance regression covering every preset in portrait/landscape, menu contrast, all four app/shell mode combinations, the accent palette, transparency, note/selection retention, solid-background pixels, portable themes/backups, custom/automatic accents and Widgets settings. Existing shell, Explorer/Snap/Focus, Nota and browser suites remain enabled for Android 11 and Android 16. Results will be recorded after the run completes.
+Added an Eleven appearance regression covering every preset in portrait/landscape, menu contrast, all four app/shell mode combinations, the accent palette, transparency, note/selection retention, solid-background pixels, portable themes/backups, custom/automatic accents and Widgets settings. Existing shell, Explorer/Snap/Focus, Nota and browser suites remain enabled for Android 11 and Android 16. The final run passed on both API levels: [42548515367](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42548515367), application/validation source `10a2376c5529219e7e6718e38fbe957659b6eafe`.
+
+All **34 unit tests**, main/instrumentation APK builds, **157,840 geometry checks**, Nota command boundaries, **46 pinned icon checks** and installed identity checks pass. Each API level passed all eight native suites, including **4,417 appearance assertions** over **46 preset/orientation combinations**, **216 shell**, **110 recording-gap** and **171 Nota** assertions. The appearance suite also checks slideshow draft restoration, actual Save/Cancel behavior, literal solid-background pixels, theme packing and backup validation.
+
+Native screenshots on Android 11 and app-view captures on Android 16 were visually reviewed, including menu cascades, dark/light shell panels, portrait Colors and the recorded theme counterparts. Android 16 headless system captures remained black; its app-view captures and native behavior assertions are the evidence for that API level. New previews scale down in landscape; mode-specific selectors appear under Custom.
+
+The delivered 0.4.0 APK (code 6) uses the retained preview certificate `b704c7a2da2d0d4425fa5fe61c122483389b07be327ad565ff198064af696265`. Signature schemes v2/v3 and 16 KiB ZIP alignment pass. All 537 non-signing ZIP entries match both independent CI builds. APK SHA-256: `e430f651f7e1c820b04aad75238f098ebe1c30242b9bab0f10cbc13b5268e6e7`.
+
+No physical Pixel 10 or numerical visual-match percentage is claimed. The new artwork and Android material rendering are explicit approximations.
 
 Microsoft references: [materials and solid fallbacks](https://learn.microsoft.com/en-us/windows/apps/develop/ui/materials), [personalize colors](https://support.microsoft.com/en-US/Windows/Experience/Personalization/personalize-your-colors-in-windows), [theme customization](https://support.microsoft.com/en-us/windows/experience/personalization/personalize-your-windows-experience-with-themes). The Windows 11 material names describe the visual reference; this app renders its own Android approximation.
