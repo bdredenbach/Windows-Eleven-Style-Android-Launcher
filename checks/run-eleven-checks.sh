@@ -32,11 +32,9 @@ run_native() {
 adb shell pm clear "$launcher"
 if [ -f build/upgrade-seed/previous.apk ]; then
 run_native ElevenUpgradeSmoke UpgradeSeed -e phase seed
-if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 adb shell am force-stop "$launcher"
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 run_native ElevenUpgradeSmoke UpgradeCheck -e phase verify
-if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect
 else
  echo "SKIP: preceding retained artifact unavailable; upgrade phases require that baseline." > eleven-upgrade-unavailable.txt
