@@ -55,6 +55,10 @@ public final class StorageSmoke extends ExplorerSmoke {
             finish(Activity.RESULT_OK,result);return;
         }
         if(phase.equals("setup")){
+        if(getTargetContext().getPackageName().equals("com.nthexperience.desktop.eleven")){
+            orderedElevenSetup(store);app.unregisterActivityLifecycleCallbacks(lifecycle);
+            result.putString("stream","PASS: Eleven ordered native setup after intro, explicit Android Home request/cancellation, file-step recreation/deferral, Usage/Notifications/Brightness order, native approximate location grant, completed Welcome/no repeat, manual Usage recovery, denied file browsing and remembered window resizing.\n");finish(Activity.RESULT_OK,result);return;
+        }
         shell("settings put global animator_duration_scale 1");shell("appops set --uid "+getTargetContext().getPackageName()+" GET_USAGE_STATS deny");store.usagePrefs.edit().clear().commit();getTargetContext().getSharedPreferences(StorageAccess.PREFS,0).edit().clear().commit();store.prefs.edit().putInt("startup_mode",0).putBoolean("startup_sound",false).putBoolean("welcome_on_start",false).commit();getTargetContext().getSharedPreferences(StartupExperience.SESSION,0).edit().clear().commit();
         progress("checking optional setup appears after the introduction and survives recreation");home=(MainActivity)startActivitySync(new Intent(Intent.ACTION_MAIN).setComponent(new ComponentName(getTargetContext(),MainActivity.class)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));current=home;root=home.getWindow().getDecorView();
         await(this::systemHomePrompt,"Android offers the Home role at first launch");
@@ -247,6 +251,37 @@ public final class StorageSmoke extends ExplorerSmoke {
                 .setComponent(new ComponentName(getTargetContext(),MainActivity.class))
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
         current=home;root=home.getWindow().getDecorView();
+    }
+    private void orderedElevenSetup(DesktopStore store)throws Exception{
+        shell("settings put global animator_duration_scale 1");shell("appops set --uid "+getTargetContext().getPackageName()+" GET_USAGE_STATS deny");
+        store.usagePrefs.edit().clear().commit();getTargetContext().getSharedPreferences(StorageAccess.PREFS,0).edit().clear().commit();
+        getTargetContext().getSharedPreferences(InitializationState.PREFS,0).edit().clear().commit();
+        getTargetContext().getSharedPreferences(StartupExperience.SESSION,0).edit().clear().commit();
+        store.prefs.edit().putInt("startup_mode",0).putBoolean("startup_sound",false).putBoolean("welcome_on_start",false).commit();
+        progress("checking the ordered optional setup after the introduction");startDesktop();
+        await(()->node("Default Launcher")!=null,"Default Launcher is the first explicit setup step");
+        check(find("Nth startup sequence")==null,"Ordered setup follows the introduction");systemClick("Choose default launcher");
+        await(this::systemHomePrompt,"Choosing default launcher opens Android's real Home role request");shot("home-first-run.png");systemClick("Cancel");
+        await(()->node("Enable File Browsing")!=null,"File access follows the canceled Home request");
+        check(!home.isHome(),"Cancel preserves Android's selected launcher");recreate(MainActivity.class);
+        await(()->node("Enable File Browsing")!=null,"File setup survives Activity recreation without repeating Home");shot("storage-ordered-files.png");systemClick("Later");
+        for(String title:new String[]{"Enable Usage Access","Allow Notifications Access","Modify System Settings (Brightness)"}){
+            await(()->node(title)!=null,"Next ordered setup step: "+title);systemClick("Later");
+        }
+        await(()->node("Allow Location")!=null,"Location follows brightness");
+        systemClick(Build.VERSION.SDK_INT>=31?"Choose location access":"Use approximate location");
+        if(Build.VERSION.SDK_INT>=31){await(()->node("Approximate")!=null,"Android offers its native approximate choice");systemClick("Approximate");}
+        systemClick("While using the app");
+        await(()->new InitializationState(getTargetContext()).step()==InitializationState.Step.DONE,"Empty folder-repair step completes after location");
+        check(LocationAccess.permitted(getTargetContext())&&!LocationAccess.precise(getTargetContext()),"Native approximate-only access is accepted without precise access");
+        check(!StorageAccess.has(getTargetContext())&&!ExternalTasks.permitted(getTargetContext()),"Deferred file/usage access remains denied");
+        await(()->TenSmoke.find(root,WelcomeCenter.class)!=null,"Welcome follows all setup steps");shot("storage-ordered-complete.png");
+        check(getTargetContext().getSharedPreferences(StartupExperience.SESSION,0).getInt("runs",0)==1,"The original introduction plays once");
+        shell("settings put global animator_duration_scale 0");recreate(MainActivity.class);await(home::hasWindowFocus,"Completed setup returns focus after recreation");
+        check(node("Default Launcher")==null&&node("Enable File Browsing")==null&&node("Allow Location")==null,"Completed steps are not repeated");
+        usageSetup(store);ui(()->home.open("@computer"));await(()->explorer()!=null,"Computer opens after deferred setup");
+        ui(()->explorer().navigate("computer"));await(()->find(explorer().content,v->"Internal storage".equals(v.getContentDescription()))!=null,"Computer storage tile is rendered");
+        click("Internal storage");await(()->find("Enable device file browsing")!=null,"Denied browsing offers in-launcher recovery");check(!StorageAccess.has(getTargetContext()),"No file permission was silently granted");resizeWindow();
     }
     private void dismissHomeOffer(SharedPreferences session,String screenshot)throws Exception{
         await(this::systemHomePrompt,"Android offers to make Seven the Home app");

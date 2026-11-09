@@ -19,7 +19,7 @@ final class StartMenu extends LinearLayout {
     final EditText search; final LinearLayout searchTabs,dashboard,appList,tileGroups,rail,content;
     final ScrollView landing,apps,tiles;
     boolean searchMode,showApps,expanded; String searchFilter="All";
-    private final LinearLayout footer; private int columns;
+    private final LinearLayout footer; private int columns;private DesktopContextMenu footerMenu;
 
     StartMenu(Context c,Actions actions,DesktopStore store,AeroWallpaper wallpaper) {
         super(c);this.actions=actions;this.store=store;data=new TenStartData(store);
@@ -35,7 +35,7 @@ final class StartMenu extends LinearLayout {
         dashboard=Aero.column(c);tileGroups=dashboard;tiles=landing;landing.addView(dashboard);landing.setContentDescription("Pinned and all apps");
         content.addView(landing,new LayoutParams(-1,0,1));
         apps=new ScrollView(c);appList=Aero.column(c);apps.addView(appList);apps.setContentDescription("All apps");content.addView(apps,new LayoutParams(-1,0,1));
-        rail=Aero.column(c);rail.setVisibility(GONE);footer=new LinearLayout(c);footer.setGravity(Gravity.CENTER_VERTICAL);addView(footer,new LayoutParams(-1,dp(56)));
+        rail=Aero.column(c);rail.setVisibility(GONE);footer=new LinearLayout(c);footer.setGravity(Gravity.CENTER_VERTICAL);LayoutParams footerBounds=new LayoutParams(-1,dp(60));footerBounds.leftMargin=-dp(24);footerBounds.rightMargin=-dp(24);addView(footer,footerBounds);footer.setContentDescription("Start profile and power");
         search.setOnClickListener(v->{searchMode=true;render();});
         search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int count,int after){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int before,int count){render();}});
         addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int n=ElevenLayout.pinColumns(Math.round((r-l)/getResources().getDisplayMetrics().density)-40);if(n!=columns){columns=n;render();}});
@@ -65,7 +65,7 @@ final class StartMenu extends LinearLayout {
         searchTabs.removeAllViews();searchTabs.setVisibility(results?VISIBLE:GONE);
         if(results){TextView back=command("‹ Back",()->{searchMode=false;showApps=false;search.setText("");render();});searchTabs.addView(back,new LayoutParams(dp(76),-1));
             for(String f:new String[]{"All","Apps","Settings"}){TextView tab=command(f,()->{searchFilter=f;render();});tab.setContentDescription("Search tab "+f);if(f.equals(searchFilter))tab.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffdae6fa:0xff394154,4));searchTabs.addView(tab,new LayoutParams(0,-1,1));}}
-        renderPins();renderApps();renderFooter();
+        renderPins();renderApps();renderFooter();footer.setVisibility(searchMode?GONE:VISIBLE);
     }
     private TextView command(String title,Runnable run){TextView v=TenStyle.command(getContext(),title,run);v.setTextColor(TenStyle.text(getContext()));return v;}
     private void heading(String title,String action,Runnable click){LinearLayout line=new LinearLayout(getContext());line.setGravity(Gravity.CENTER_VERTICAL);TextView label=Aero.text(getContext(),title,14,TenStyle.text(getContext()));Aero.bold(label);line.addView(label,new LayoutParams(0,dp(52),1));if(action!=null)line.addView(command(action,click),new LayoutParams(dp(136),dp(40)));dashboard.addView(line);}
@@ -126,6 +126,7 @@ final class StartMenu extends LinearLayout {
         menu.item("Open",item.kind,()->openResult(item.id));boolean pinned=store.startPins().contains(item.id);
         if(item.shortcut)menu.item(pinned?"Unpin from Start":"Pin to Start","programs",()->{List<String> ids=new ArrayList<>(store.startPins());if(pinned)ids.remove(item.id);else if(ids.size()<32)ids.add(item.id);store.startPins(ids);render();});
         if(pinned){menu.item("Move earlier","empty",()->move(item.id,-1));menu.item("Move later","empty",()->move(item.id,1));}
+        AppUninstaller.add(menu,getContext(),item.id);
         menu.item("More options","control",()->actions.options(anchor,item.id));ContextMenus.centered(anchor,(x,y)->ContextMenus.show(menu,anchor,x,y));
     }
     private void renderApps(){
@@ -143,15 +144,44 @@ final class StartMenu extends LinearLayout {
         if(!query.isEmpty()){appList.addView(command("Ask Nth Nota",()->openResult("nota-query:"+android.net.Uri.encode(query))));appList.addView(command("Search linked files and folders",()->openResult("start-search:"+android.net.Uri.encode(query))));appList.addView(command("Search the web",()->openResult("web-search:"+android.net.Uri.encode(query))));}
     }
     private void renderFooter(){
-        footer.removeAllViews();footer.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffe4e9f3:0xff202532,0));
-        View portrait=ProfilePortrait.view(getContext(),store);footer.addView(portrait,new LayoutParams(dp(32),dp(32)));portrait.setVisibility(store.prefs.getBoolean("eleven_start_hide_profile",false)?GONE:VISIBLE);
-        TextView name=command(store.prefs.getString("desktop_name","Nth Desktop Eleven"),()->actions.open("ten-setting:profile"));name.setMaxLines(1);name.setEllipsize(TextUtils.TruncateAt.END);name.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);name.setPadding(dp(10),0,0,0);footer.addView(name,new LayoutParams(0,-1,1));name.setVisibility(store.prefs.getBoolean("eleven_start_hide_profile",false)?INVISIBLE:VISIBLE);
-        String selected=store.prefs.getString("eleven_start_folders","");List<String[]> shortcuts=new ArrayList<>();for(String[] row:new String[][]{{"settings","Settings","@settings"},{"document","Documents","@documents"},{"folder","Downloads","@downloads"},{"sound","Music","@music"},{"picture","Pictures","@pictures"},{"display","Videos","@videos"}})if(Arrays.asList(selected.split(",")).contains(row[1]))shortcuts.add(row);shortcuts.add(new String[]{"power","Power","@power"});HorizontalScrollView iconScroll=new HorizontalScrollView(getContext());iconScroll.setHorizontalScrollBarEnabled(false);LinearLayout iconRow=new LinearLayout(getContext());iconRow.setGravity(Gravity.CENTER_VERTICAL);iconScroll.addView(iconRow);footer.addView(iconScroll,new LayoutParams(dp(Math.min(160,40*shortcuts.size())),dp(48)));for(String[] a:shortcuts){View b=new TenStyle.Glyph(getContext(),a[0],TenStyle.text(getContext()));b.setFocusable(true);b.setContentDescription(a[1]);b.setTooltipText(a[1]);b.setPadding(dp(10),dp(10),dp(10),dp(10));b.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));b.setOnClickListener(v->{if(a[2].equals("@power"))powerMenu(b);else actions.open(a[2]);});iconRow.addView(b,new LayoutParams(dp(40),dp(44)));}
-
+        footer.removeAllViews();footer.setPadding(dp(24),0,dp(20),0);
+        footer.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffe4e9f3:0xff202532,0));
+        LinearLayout profile=new LinearLayout(getContext());profile.setGravity(Gravity.CENTER_VERTICAL);
+        profile.setContentDescription("Start profile");profile.setFocusable(true);profile.setPadding(dp(8),0,dp(8),0);
+        profile.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));profile.setOnClickListener(v->profileMenu(profile));
+        View portrait=ProfilePortrait.view(getContext(),store);profile.addView(portrait,new LayoutParams(dp(28),dp(28)));
+        TextView name=Aero.text(getContext(),store.prefs.getString("desktop_name","Nth Desktop Eleven"),13,TenStyle.text(getContext()));
+        name.setSingleLine();name.setEllipsize(TextUtils.TruncateAt.END);name.setGravity(Gravity.START|Gravity.CENTER_VERTICAL);name.setPadding(dp(10),0,0,0);profile.addView(name,new LayoutParams(0,-1,1));
+        footer.addView(profile,new LayoutParams(0,dp(44),1));profile.setVisibility(store.prefs.getBoolean("eleven_start_hide_profile",false)?INVISIBLE:VISIBLE);
+        String selected=store.prefs.getString("eleven_start_folders","");List<String[]> shortcuts=new ArrayList<>();
+        for(String[] row:new String[][]{{"settings","Settings","@settings"},{"document","Documents","@documents"},{"folder","Downloads","@downloads"},{"sound","Music","@music"},{"picture","Pictures","@pictures"},{"display","Videos","@videos"}})if(Arrays.asList(selected.split(",")).contains(row[1]))shortcuts.add(row);
+        if(!shortcuts.isEmpty()){
+            HorizontalScrollView iconScroll=new HorizontalScrollView(getContext());iconScroll.setHorizontalScrollBarEnabled(false);
+            LinearLayout iconRow=new LinearLayout(getContext());iconScroll.addView(iconRow);iconScroll.setContentDescription("Start folder shortcuts");
+            footer.addView(iconScroll,new LayoutParams(dp(Math.min(getResources().getConfiguration().screenWidthDp<480?80:160,40*shortcuts.size())),dp(44)));
+            for(String[] a:shortcuts)iconRow.addView(footerIcon(a[0],a[1],()->actions.open(a[2])),new LayoutParams(dp(40),dp(44)));
+        }
+        View power=footerIcon("power","Power",null);power.setOnClickListener(v->powerMenu(power));footer.addView(power,new LayoutParams(dp(44),dp(44)));
     }
-    private void powerMenu(View anchor){DesktopContextMenu menu=new DesktopContextMenu(getContext(),"Start power options");menu.item("Show desktop","computer",()->actions.open("setting:show-desktop"));menu.item("Restart Nth Desktop","refresh",()->actions.open("setting:restart-desktop"));menu.item("Android power settings","power",()->actions.open("setting:android:battery"));ContextMenus.centered(anchor,(x,y)->ContextMenus.show(menu,anchor,x,y));}
+    private View footerIcon(String icon,String title,Runnable action){
+        View button=new TenStyle.Glyph(getContext(),icon,TenStyle.text(getContext()));button.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_YES);button.setFocusable(true);button.setContentDescription(title);button.setTooltipText(title);
+        button.setPadding(dp(11),dp(11),dp(11),dp(11));button.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));if(action!=null)button.setOnClickListener(v->action.run());return button;
+    }
+    private void showFooterMenu(DesktopContextMenu menu,View anchor){if(footerMenu!=null)footerMenu.dismiss();footerMenu=menu;menu.aboveAnchor();int[] at=new int[2];anchor.getLocationOnScreen(at);ContextMenus.show(menu,anchor,at[0],at[1]-dp(4));}
+    private void profileMenu(View anchor){
+        DesktopContextMenu menu=new DesktopContextMenu(getContext(),"Start profile options");
+        menu.item("Account settings","accounts",()->actions.open("ten-setting:profile"));
+        menu.item("Android accounts","accounts",()->actions.open("setting:android:accounts"));showFooterMenu(menu,anchor);
+    }
+    private void powerMenu(View anchor){
+        DesktopContextMenu menu=new DesktopContextMenu(getContext(),"Start power options");
+        menu.item("Screen lock settings","security",()->actions.open("setting:android:security"));
+        menu.item("Screen timeout","display",()->actions.open("setting:android:display"));
+        menu.separator();menu.item("Android power settings","power",()->actions.open("setting:android:battery"));
+        menu.item("Restart Nth Desktop","refresh",()->actions.open("setting:restart-desktop"));showFooterMenu(menu,anchor);
+    }
     void show(boolean keyboard){searchMode=keyboard;showApps=false;landing.scrollTo(0,0);searchFilter="All";search.setText("");render();setVisibility(VISIBLE);bringToFront();requestFocus();if(!store.prefs.getBoolean("reduce_motion",false)){setAlpha(0);setTranslationY(dp(14));animate().alpha(1).translationY(0).setDuration(180).start();}}
-    void hide(){animate().cancel();setAlpha(1);setTranslationY(0);((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(),0);search.clearFocus();setVisibility(GONE);}
+    void hide(){if(footerMenu!=null)footerMenu.dismiss();animate().cancel();setAlpha(1);setTranslationY(0);((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(),0);search.clearFocus();setVisibility(GONE);}
     JSONObject state(){JSONObject s=new JSONObject();GadgetLayout.put(s,"visible",getVisibility()==VISIBLE);GadgetLayout.put(s,"query",search.getText().toString());GadgetLayout.put(s,"apps",showApps);GadgetLayout.put(s,"searchMode",searchMode);GadgetLayout.put(s,"filter",searchFilter);return s;}
     void restore(JSONObject s){if(s==null||!s.optBoolean("visible"))return;show(s.optBoolean("searchMode"));showApps=s.optBoolean("apps");searchFilter=s.optString("filter","All");search.setText(s.optString("query"));render();}
 }

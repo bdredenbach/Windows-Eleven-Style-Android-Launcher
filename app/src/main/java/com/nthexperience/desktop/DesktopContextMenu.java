@@ -18,14 +18,15 @@ final class DesktopContextMenu {
     private final android.os.Handler handler=new android.os.Handler(android.os.Looper.getMainLooper());
     static boolean openingSubmenu(){return openingParent!=null;}
     private final int rowHeight,menuWidth;
-    private final boolean plain;private boolean hasSubmenus;
+    private final boolean plain,classic;private boolean hasSubmenus,aboveAnchor;
     private final View.OnLayoutChangeListener bounds=(v,l,t,r,b,ol,ot,or,ob)->{if(r-l!=or-ol||b-t!=ob-ot)dismiss();};
     private final View.OnAttachStateChangeListener lifetime=new View.OnAttachStateChangeListener(){public void onViewAttachedToWindow(View v){}public void onViewDetachedFromWindow(View v){dismiss();}};
     DesktopContextMenu(Context context){this(context,"Desktop context menu");}
     DesktopContextMenu(Context context,String description){this(context,description,36,238);}
     DesktopContextMenu(Context context,String description,int rowHeight,int menuWidth){
-        this.context=context;this.plain=description.equals("Start button context menu");this.rowHeight=rowHeight;this.menuWidth=menuWidth;items=Aero.column(context);items.setContentDescription(description);
+        this.context=context;this.plain=description.equals("Start button context menu");this.classic=description.equals("Classic desktop context menu");this.rowHeight=rowHeight;this.menuWidth=menuWidth;items=Aero.column(context);items.setContentDescription(description);
         ScrollView scroll=new ScrollView(context);scroll.setFillViewport(false);scroll.setBackground(plain?ElevenMaterial.shell(context,0):ElevenMaterial.menu(context));scroll.setPadding(dp(4),dp(4),dp(4),dp(4));scroll.addView(items);scroll.setFocusableInTouchMode(true);scroll.setOnKeyListener(this::menuKey);
+        if(classic)scroll.setBackground(new ElevenMaterial(context,false,true,0));
         if(plain){scroll.setBackground(ElevenMaterial.shell(context,0));TenAppearance.preserve(scroll);}else TenAppearance.bind(scroll);popup=new PopupWindow(scroll,dp(menuWidth),-2,true);popup.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));popup.setOutsideTouchable(true);popup.setElevation(dp(8));popup.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);popup.setOnDismissListener(()->{handler.removeCallbacksAndMessages(null);if(child!=null){child.closeBranch();child=null;}if(owner!=null){owner.removeOnAttachStateChangeListener(lifetime);owner.removeOnLayoutChangeListener(bounds);owner=null;}if(parent!=null&&parent.child==this)parent.child=null;if(!branchClosing&&parent!=null)parent.dismiss();});
     }
     void item(String title,String icon,Runnable action){item(title,icon,true,action);}
@@ -71,6 +72,7 @@ final class DesktopContextMenu {
         row.setOnKeyListener((v,key,event)->{if(menuKey(v,key,event))return true;if(event.getAction()!=KeyEvent.ACTION_DOWN)return false;if(key==KeyEvent.KEYCODE_DPAD_RIGHT){open.run();return true;}if(key==KeyEvent.KEYCODE_DPAD_LEFT&&parent!=null){closeBranch();if(parentRow!=null)parentRow.requestFocus();return true;}return false;});
     }
     void separator(){LinearLayout row=new LinearLayout(context);row.setPadding(dp(plain?10:34),dp(3),dp(10),dp(3));View line=new View(context);line.setBackgroundColor(plain?0xff696969:0xffc6cbcf);row.addView(line,new LinearLayout.LayoutParams(-1,dp(1)));items.addView(row,new LinearLayout.LayoutParams(-1,dp(7)));}
+    void aboveAnchor(){aboveAnchor=true;}
     void show(View root,float screenX,float screenY,int leftInset,int topInset,int rightInset,int bottomInset){
         if(owner!=null){owner.removeOnAttachStateChangeListener(lifetime);owner.removeOnLayoutChangeListener(bounds);}owner=root;root.addOnAttachStateChangeListener(lifetime);root.addOnLayoutChangeListener(bounds);int[] location=new int[2];root.getLocationOnScreen(location);int left=location[0]+leftInset+dp(3),top=location[1]+topInset+dp(3),right=location[0]+root.getWidth()-rightInset-dp(3),bottom=location[1]+root.getHeight()-bottomInset-dp(3);
         boolean cascading=openingParent!=null&&openingParent.showing()&&openingRow!=null;
@@ -78,10 +80,10 @@ final class DesktopContextMenu {
         if(cascading){parent=openingParent;parentRow=openingRow;parent.child=this;int[] at=new int[2];parentRow.getLocationOnScreen(at);anchor=new android.graphics.Rect(at[0],at[1],at[0]+parentRow.getWidth(),at[1]+parentRow.getHeight());}
         int width=Math.min(dp(menuWidth),Math.max(1,right-left));
         if(anchor!=null)width=Math.min(width,Math.max(1,Math.max(anchor.left-left,right-anchor.right)+dp(3)));
-        else if(hasSubmenus)width=Math.min(width,Math.max(1,(right-left)/2));
+        else if(hasSubmenus&&!classic)width=Math.min(width,Math.max(1,(right-left)/2));
         fitRows(Math.max(1,width-dp(8)));
         popup.getContentView().measure(View.MeasureSpec.makeMeasureSpec(width,View.MeasureSpec.EXACTLY),View.MeasureSpec.makeMeasureSpec(Math.max(1,bottom-top),View.MeasureSpec.AT_MOST));int height=Math.min(popup.getContentView().getMeasuredHeight(),Math.max(1,bottom-top));popup.setWidth(width);popup.setHeight(height);
-        int x=Math.max(left,Math.min(Math.round(screenX),right-width)),y=Math.max(top,Math.min(Math.round(screenY),bottom-height));
+        int x=Math.max(left,Math.min(Math.round(screenX),right-width)),y=Math.max(top,Math.min(Math.round(screenY)-(aboveAnchor?height:0),bottom-height));
         if(anchor!=null){int rightSpace=right-anchor.right,leftSpace=anchor.left-left;x=rightSpace>=leftSpace?anchor.right-dp(3):anchor.left-width+dp(3);x=Math.max(left,Math.min(x,right-width));y=Math.max(top,Math.min(anchor.top,bottom-height));}
         popup.showAtLocation(root,Gravity.TOP|Gravity.LEFT,x,y);
         if(root.isInTouchMode())popup.getContentView().requestFocus();

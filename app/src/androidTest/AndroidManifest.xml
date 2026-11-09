@@ -49,4 +49,5 @@
     <instrumentation android:name="com.nthexperience.desktop.ElevenTaskbarSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
     <instrumentation android:name="com.nthexperience.desktop.ElevenUpgradeSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
     <instrumentation android:name="com.nthexperience.desktop.ElevenFinalPassSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
+    <instrumentation android:name="com.nthexperience.desktop.ElevenScreenshotSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
 </manifest>
