@@ -151,10 +151,10 @@ public final class StorageSmoke extends ExplorerSmoke {
         }
         shell("appops set --uid "+getTargetContext().getPackageName()+" GET_USAGE_STATS allow");
         back();
-        await(()->home.hasWindowFocus()&&box.isChecked(),"A real grant checks the box when Vista resumes");
+        await(()->home.hasWindowFocus()&&find(label) instanceof CheckBox&&((CheckBox)find(label)).isChecked(),"A real grant checks the visible box when Eleven resumes");
         check(!store.usagePrefs.contains(DesktopStore.TASKBAR_USAGE),"A grant enables inclusion without a saved override");
-        ui(box::performClick);
-        check(!box.isChecked()&&!store.usagePrefs.getBoolean(DesktopStore.TASKBAR_USAGE,true),"Opt-out persists with the Android grant");
+        ui(()->((CheckBox)find(label)).performClick());
+        check(!((CheckBox)find(label)).isChecked()&&!store.usagePrefs.getBoolean(DesktopStore.TASKBAR_USAGE,true),"Opt-out persists with the Android grant");
         ui(()->home.open("@welcome"));
         click("Set up Usage Access");
         await(()->home.hasWindowFocus()&&find(label)!=null,"With a grant, Welcome opens the Taskbar page");
