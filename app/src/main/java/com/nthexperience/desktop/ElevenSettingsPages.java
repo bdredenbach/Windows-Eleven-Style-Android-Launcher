@@ -131,9 +131,9 @@ final class ElevenSettingsPages {
     }
     static void themes(TenSettings s) {
         GridLayout grid=new GridLayout(s.getContext());int columns=s.width-s.navWidth>=s.dp(440)?3:2;grid.setColumnCount(columns);
-        for(int i=0;i<6&&i<TenThemes.TEN.size();i++) {
-            TenThemes.Preset preset=TenThemes.TEN.get(i);FrameLayout tile=new FrameLayout(s.getContext());
-            AeroWallpaper art=new AeroWallpaper(s.getContext(),preset.wallpaper,false);s.extraPreviews.add(art);tile.addView(art,new FrameLayout.LayoutParams(-1,-1));
+        for(int i=0;i<TenThemes.LANDING.size();i++) {
+            TenThemes.Preset preset=TenThemes.LANDING.get(i);FrameLayout tile=new FrameLayout(s.getContext());
+            AeroWallpaper art=new AeroWallpaper(s.getContext(),preset.wallpaper,false);s.extraPreviews.add(art);tile.addView(art,new FrameLayout.LayoutParams(-1,-1));TenAppearance.preserve(tile);
             View bar=new View(s.getContext());bar.setBackgroundColor(preset.light?0xffeeeeee:0xff202532);tile.addView(bar,new FrameLayout.LayoutParams(-1,s.dp(10),Gravity.BOTTOM));
             if(preset.matches(s.store)){TextView check=Aero.text(s.getContext(),"✓",18,TenAccent.on(preset.accent));check.setGravity(Gravity.CENTER);check.setBackgroundColor(preset.accent);tile.addView(check,new FrameLayout.LayoutParams(s.dp(24),s.dp(24),Gravity.END|Gravity.BOTTOM));}
             tile.setContentDescription("Apply theme: "+preset.name);tile.setTooltipText(preset.name);tile.setFocusable(true);tile.setOnClickListener(v->{preset.apply(s.store);s.appearanceChanged();});

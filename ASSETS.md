@@ -51,3 +51,10 @@ The Windows 11 shell assets in `drawable-nodpi/win11_*.png` are pixel-preserving
 `docs/ELEVEN_ICON_ASSETS.json` records each path, source blob and SHA-256, available frames, selected size, PNG hash and UI kinds. The upstream README is retained in `third_party/windows-icons/README.upstream.md`. That README describes direct icon usage and identifies Windows/Microsoft and other original sources. No standalone LICENSE or COPYING file is present in the pinned repository; this project does not describe the pack as public domain or invent a permissive license. Original ownership remains with the corresponding rights holders.
 
 Pristine assets take precedence in AeroIcon, including desktop shortcuts, Start, Explorer navigation/file types, caption icons and menus. Task View uses its supplied light/dark variants; Widgets uses the supplied Windows 11 panel icon. Nth launcher/adaptive/monochrome branding, Nota and installed Android app icons are unchanged. Monochrome action glyphs and original fallbacks remain for controls without an appropriate supplied icon.
+
+
+## Eleven 0.4 recorded theme counterparts
+
+`ElevenWallpapers.java` adds original resolution-independent Canvas artwork for Glow, Captured Motion, Sunrise, Flow, Bubbles and Nth Spotlight. The names identify the recorded visual collections; these are newly drawn Nth counterparts, not extracted Microsoft wallpaper files. The recorder did not reveal the source/name of its green-bubble custom/OEM theme. Nth Spotlight rotates bundled Nth scenery and does not use the Microsoft Spotlight service. `AeroWallpaper.java` also gives the existing Spectrum folds a distinct purple palette. No new bitmap, font, sound, network provider or permission was added for these wallpapers.
+
+`ElevenMaterial.java` uses a softened sample of the selected wallpaper with theme-aware tinting and a solid fallback. It does not sample private windows or foreground app content. This is an Android approximation of the recorded Mica/Acrylic appearance. Existing source-icon provenance above remains unchanged.

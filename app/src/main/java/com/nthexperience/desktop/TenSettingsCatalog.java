@@ -56,6 +56,7 @@ final class TenSettingsCatalog {
         new Page("vpn","VPN","network","Virtual private networks","setting:android:vpn"),
         new Page("airplane","Airplane mode","network","Android airplane mode","setting:android:airplane"),
         new Page("background","Background","personalization","Desktop pictures and slideshows",""),
+        new Page("background-slideshow","Slideshow","personalization","Choose pictures, interval, shuffle and fit","","background"),
         new Page("colors","Colors","personalization","Light, dark, transparency and accent colors",""),
         new Page("themes","Themes","personalization","Desktop backgrounds and sound schemes",""),
         new Page("lock","Lock screen","personalization","Android lock screen background and security",""),

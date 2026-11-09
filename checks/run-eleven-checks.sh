@@ -12,12 +12,12 @@ adb exec-out screencap -p > screenshots/eleven-at-exit.png
 adb shell dumpsys activity top > eleven-activity-top.txt
 adb shell dumpsys activity lastanr > eleven-last-anr.txt
 adb shell dumpsys input_method > eleven-input-method.txt
-for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\).*\.png$/p'); do
+for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\).*\.\(png\|tsv\)$/p'); do
  adb exec-out run-as "$launcher" cat "files/$file" > "screenshots/$file"
 done
 }
 trap collect EXIT
-for runner in ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke; do
+for runner in ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke; do
  adb shell am force-stop "$launcher"
  timeout 240s adb shell am instrument -w "$launcher.test/com.nthexperience.desktop.$runner" | tee "eleven-$runner.txt"
  grep -q 'PASS' "eleven-$runner.txt"

@@ -190,7 +190,7 @@ final class WindowPreviews {
         int height=Aero.dp(context,(sticky?179:149)+(mediaControls?36:0));
         LinearLayout shell=Aero.column(context);
         shell.setContentDescription(group==null?(cards.size()>1?"Browser tab previews":"Window preview for "+cards.get(0).title):group);
-        shell.setBackground(Aero.gloss(context,new int[]{0xff6088ab,0xff365a7c,0xff183c5d},6,0xff9dbbd0));
+        shell.setBackground(ElevenMaterial.menu(context));
         HorizontalScrollView scroll=new HorizontalScrollView(context);scroll.setHorizontalScrollBarEnabled(cards.size()>2);
         if(!sticky)scroll.setOnHoverListener((v,event)->{
             main.removeCallbacks(dismissFolderHover);
@@ -256,7 +256,7 @@ final class WindowPreviews {
             options.setOnClickListener(v->{dismiss();if(anchor.isAttachedToWindow())commands.run();});
             shell.addView(options,new LinearLayout.LayoutParams(-1,Aero.dp(context,29)));
         }
-        PopupWindow picker=new PopupWindow(shell,width,height,sticky);folderPicker=picker;
+        TenAppearance.bind(shell);PopupWindow picker=new PopupWindow(shell,width,height,sticky);folderPicker=picker;
         picker.setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));
         picker.setOutsideTouchable(sticky);picker.setInputMethodMode(PopupWindow.INPUT_METHOD_NOT_NEEDED);
         picker.setElevation(Aero.dp(context,8));

@@ -10,7 +10,7 @@ import java.util.List;
 
 final class DesktopBackgrounds {
     static final String[] NAMES={"Aero","Twilight","Meadow","Seven Blue","Harmony","Alpine Morning",
-            "Pacific Dusk","Canyon Light","Glass Pavilion","Midnight Circuit","Paper Skies","Eleven Blue","Eleven Daylight","Eleven Midnight","Eleven Spectrum"};
+            "Pacific Dusk","Canyon Light","Glass Pavilion","Midnight Circuit","Paper Skies","Eleven Blue","Eleven Daylight","Eleven Midnight","Eleven Spectrum","Glow","Captured Motion","Sunrise","Flow","Bubbles","Nth Spotlight"};
     static final String[] GROUPS={"Aero and Abstract","Landscapes","Architecture","Illustrations"};
     static final int[] INTERVALS={10,30,60,180,600,1800,3600,21600,86400};
     static final String[] INTERVAL_LABELS={"10 seconds","30 seconds","1 minute","3 minutes","10 minutes",
@@ -50,6 +50,7 @@ final class DesktopBackgrounds {
         return java.util.Collections.singletonList(valid(photo)?photo:stock(id>=0&&id<NAMES.length?id:AeroWallpaper.SEVEN));
     }
     static void choose(SharedPreferences.Editor edit,List<String> keys,int fallback){
+        edit.putString("eleven_background_mode",keys.size()>1?"Slideshow":"Picture");
         String first=keys.get(0);
         int id=stockId(first);
         edit.putInt("wallpaper",id<0?fallback:id).putString("wallpaper_photo",id<0?first:"");

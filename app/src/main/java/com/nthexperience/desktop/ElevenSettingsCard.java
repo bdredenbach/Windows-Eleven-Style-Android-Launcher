@@ -31,14 +31,14 @@ final class ElevenSettingsCard extends LinearLayout {
     }
     void link(Runnable action) {
         arrow("›"); header.setFocusable(true); header.setContentDescription(title.getText());
-        header.setBackground(TenStyle.hover(getContext(), Color.TRANSPARENT));
+        header.setBackground(TenStyle.appHover(getContext(), Color.TRANSPARENT));
         header.setOnClickListener(v -> action.run());
         setFocusable(true); setOnClickListener(v -> action.run());
     }
     void expandable(boolean expanded, java.util.function.Consumer<Boolean> changed) {
         arrow(expanded ? "⌃" : "⌄"); children.setVisibility(expanded ? VISIBLE : GONE);
         header.setFocusable(true); header.setContentDescription(title.getText() + (expanded ? ", expanded" : ", collapsed"));
-        header.setBackground(TenStyle.hover(getContext(), Color.TRANSPARENT));
+        header.setBackground(TenStyle.appHover(getContext(), Color.TRANSPARENT));
         header.setOnClickListener(v -> {
             boolean next = children.getVisibility() != VISIBLE;
             children.setVisibility(next ? VISIBLE : GONE); arrow.setText(next ? "⌃" : "⌄");

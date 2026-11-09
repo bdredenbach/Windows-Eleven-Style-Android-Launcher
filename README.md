@@ -1,10 +1,12 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.3.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.4.0**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
 ## Recording-based update
+
+0.4.0 adds the recorded theme collection counterparts, shared transparency effects, independent app/shell menu colors, fuller Background/Colors/Themes controls and in-board Widgets settings. See [the appearance round and refreshed gap audit](docs/ELEVEN_0_4_THEMES_AND_AUDIT.md).
 
 0.3.0 adds recorded Settings history and grouped controls, real app inventory, staged Explorer options and filters, adjacent menus, top-drag Snap and timed Focus. See [implementation and validation](docs/ELEVEN_0_3_RECORDING_GAPS.md) for the completed batch and remaining work.
 
