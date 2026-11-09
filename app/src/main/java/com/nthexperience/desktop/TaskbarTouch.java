@@ -50,7 +50,7 @@ final class TaskbarTouch {
         });
         view.setOnKeyListener((button,key,event)->{
             if(event.getAction()!=KeyEvent.ACTION_DOWN)return false;
-            if(key==KeyEvent.KEYCODE_MENU){button.performContextClick();return true;}
+            if(ContextMenus.requestsMenu(event)){button.performContextClick();return true;}
             if(event.isCtrlPressed()&&event.isShiftPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT))
                 return reorder.move(TaskbarReorder.key(button),key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);
             return false;

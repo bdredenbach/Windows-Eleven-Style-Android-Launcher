@@ -1,6 +1,6 @@
 # Recording gaps and implementation progress
 
-Current release status: [0.8.1 taskbar row correction](ELEVEN_0_8_1_TASKBAR_ROWS.md), following [0.8.0 expanded taskbar](ELEVEN_0_8_EXPANDED_TASKBAR.md), following [0.7.0 markets and recording pass](ELEVEN_0_7_MARKETS_AND_RECORDING_PASS.md), following [0.6.0 Task Manager and polish](ELEVEN_0_6_TASK_MANAGER.md), following the [0.5.0 completion and purchaser walkthrough](ELEVEN_0_5_COMPLETION_AND_WALKTHROUGH.md). This document preserves the original recording findings and 0.3.0 implementation state.
+Current release status: [0.8.2 usability and upgrade pass](ELEVEN_0_8_2_FINAL_USABILITY_PASS.md), following [0.8.1 taskbar row correction](ELEVEN_0_8_1_TASKBAR_ROWS.md), following [0.8.0 expanded taskbar](ELEVEN_0_8_EXPANDED_TASKBAR.md), following [0.7.0 markets and recording pass](ELEVEN_0_7_MARKETS_AND_RECORDING_PASS.md), following [0.6.0 Task Manager and polish](ELEVEN_0_6_TASK_MANAGER.md), following the [0.5.0 completion and purchaser walkthrough](ELEVEN_0_5_COMPLETION_AND_WALKTHROUGH.md). This document preserves the original recording findings and 0.3.0 implementation state.
 
 Original audit: November 8, 2026 against application source [`3366104c343dd662c80b0dcf8025114923937715`](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/tree/3366104c343dd662c80b0dcf8025114923937715). The observations below describe the 0.2.1 baseline; the progress table tracks subsequent implementation.
 

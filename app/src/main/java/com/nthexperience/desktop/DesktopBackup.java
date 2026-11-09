@@ -137,7 +137,9 @@ final class DesktopBackup {
     static void discard(Context context,String name){new AtomicFile(file(context,name)).delete();}
     static void apply(Context context,DesktopStore store,Plan plan,boolean undo)throws IOException,JSONException{
         Map<String,?> old=new LinkedHashMap<>(store.prefs.getAll());if(!undo)stage(context,UNDO,snapshot(store).toString());
-        SharedPreferences.Editor edit=store.prefs.edit().clear();for(Map.Entry<String,Object> e:plan.values.entrySet())put(edit,e.getKey(),e.getValue());edit.putBoolean("desktop_v41",true).putBoolean("eleven_initialized",true);
+        SharedPreferences.Editor edit=store.prefs.edit().clear();for(Map.Entry<String,Object> e:plan.values.entrySet())put(edit,e.getKey(),e.getValue());
+        // A restored layout is already initialized; first-run defaults must not overwrite it on restart.
+        edit.putBoolean("desktop_v41",true).putBoolean("desktop_recycle_added",true).putBoolean("eleven_initialized",true).putBoolean("ten_initialized",true).putBoolean("ten_v2_defaults",true).putBoolean("ten_v13_taskbar_defaults",true).putBoolean("seven_taskbar_grouping_set",true);
         if(!edit.commit()){SharedPreferences.Editor rollback=store.prefs.edit().clear();for(Map.Entry<String,?> e:old.entrySet())put(rollback,e.getKey(),e.getValue());rollback.commit();throw new IOException("The desktop could not be saved. Your previous setup was kept.");}
         discard(context,PENDING);if(undo)discard(context,UNDO);
     }

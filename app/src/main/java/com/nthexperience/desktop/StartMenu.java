@@ -115,17 +115,18 @@ final class StartMenu extends LinearLayout {
         TextView text=Aero.text(getContext(),item.title,12,TenStyle.text(getContext()));text.setMaxLines(2);text.setEllipsize(TextUtils.TruncateAt.END);text.setGravity(pin?Gravity.CENTER:Gravity.CENTER_VERTICAL);text.setPadding(pin?0:dp(12),pin?dp(6):0,0,0);
         row.addView(text,new LayoutParams(pin?-1:0,pin?-2:-1,pin?0:1));row.setFocusable(true);row.setContentDescription("Open "+item.title);row.setOnClickListener(v->openResult(item.id));ContextMenus.bind(row,(x,y)->options(row,item));
         if(store.prefs.getBoolean("eleven_start_new",true)&&newApp(item.id)){TextView badge=Aero.text(getContext(),"New",10,TenAccent.readableOn(TenStyle.accent(getContext()),TenStyle.surface(getContext())));badge.setContentDescription("New app: "+item.title);row.addView(badge,new LayoutParams(-2,-2));}
-        row.setOnKeyListener((v,key,event)->{if(event.getAction()==KeyEvent.ACTION_DOWN&&key==KeyEvent.KEYCODE_MENU){options(row,item);return true;}if(pin&&event.getAction()==KeyEvent.ACTION_DOWN&&event.isCtrlPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)){move(item.id,key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return false;});
+        row.setOnKeyListener((v,key,event)->{if(ContextMenus.requestsMenu(event)){options(row,item);return true;}if(pin&&event.getAction()==KeyEvent.ACTION_DOWN&&event.isCtrlPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)){move(item.id,key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return false;});
         return row;
     }
     private boolean newApp(String id){if(ElevenLocalState.strings(store,ElevenLocalState.SEEN).contains(id))return false;for(AppCatalog.Entry app:all)if(app.id.equals(id))return app.installed>System.currentTimeMillis()-7L*24*3600000;return false;}
     private void openResult(String id){ElevenLocalState.searched(store,search.getText().toString());actions.open(id);}
     private void move(String id,int direction){List<String> pins=new ArrayList<>(store.startPins());int from=pins.indexOf(id),to=from+direction;if(from<0||to<0||to>=pins.size())return;Collections.swap(pins,from,to);store.startPins(pins);renderPins();View p=tileViews.get(id);if(p!=null)p.requestFocus();}
     private void options(View anchor,StartSearch.Result item){
-        PopupMenu menu=new PopupMenu(getContext(),anchor);boolean pinned=store.startPins().contains(item.id);
-        if(item.shortcut)menu.getMenu().add(pinned?"Unpin from Start":"Pin to Start").setOnMenuItemClickListener(v->{List<String> ids=new ArrayList<>(store.startPins());if(pinned)ids.remove(item.id);else if(ids.size()<32)ids.add(item.id);store.startPins(ids);render();return true;});
-        if(pinned){menu.getMenu().add("Move earlier").setOnMenuItemClickListener(v->{move(item.id,-1);return true;});menu.getMenu().add("Move later").setOnMenuItemClickListener(v->{move(item.id,1);return true;});}
-        menu.getMenu().add("More options").setOnMenuItemClickListener(v->{actions.options(anchor,item.id);return true;});menu.show();
+        DesktopContextMenu menu=new DesktopContextMenu(getContext(),"Start app options");
+        menu.item("Open",item.kind,()->openResult(item.id));boolean pinned=store.startPins().contains(item.id);
+        if(item.shortcut)menu.item(pinned?"Unpin from Start":"Pin to Start","programs",()->{List<String> ids=new ArrayList<>(store.startPins());if(pinned)ids.remove(item.id);else if(ids.size()<32)ids.add(item.id);store.startPins(ids);render();});
+        if(pinned){menu.item("Move earlier","empty",()->move(item.id,-1));menu.item("Move later","empty",()->move(item.id,1));}
+        menu.item("More options","control",()->actions.options(anchor,item.id));ContextMenus.centered(anchor,(x,y)->ContextMenus.show(menu,anchor,x,y));
     }
     private void renderApps(){
         appList.removeAllViews();String query=search.getText().toString().trim();List<StartSearch.Result> found=new ArrayList<>();
