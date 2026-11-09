@@ -1,12 +1,12 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.5.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.6.0**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
 ## Recording-based update
 
-0.5.0 adds the remaining recovery, notification, battery/storage, Start/Search, privacy/account and browser controls, richer forecast/NHL/history cards, and a fresh-install purchaser regression. See [the current completion and walkthrough status](docs/ELEVEN_0_5_COMPLETION_AND_WALKTHROUGH.md).
+0.6.0 modernizes Task Manager with Windows 11 side navigation, filtering, commands, resource graphs and local themes, and polishes file counts and menu symbols. See [the Task Manager round](docs/ELEVEN_0_6_TASK_MANAGER.md).
 
 0.3.0 adds recorded Settings history and grouped controls, real app inventory, staged Explorer options and filters, adjacent menus, top-drag Snap and timed Focus. See [implementation and validation](docs/ELEVEN_0_3_RECORDING_GAPS.md) for the completed batch and remaining work.
 
