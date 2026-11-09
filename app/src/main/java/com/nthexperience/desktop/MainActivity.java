@@ -82,7 +82,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     private DesktopContextMenu desktopMenu;
     private int desktopRows,desktopCutoutLeft,desktopCutoutRight,windowTopInset;
     private WeatherLocation weatherLocation;
-    private LinearLayout shell,taskItems;private HorizontalScrollView taskStrip;private int taskViewportWidth;
+    private LinearLayout shell,taskItems;private HorizontalScrollView taskStrip;private int taskViewportWidth;private Runnable taskbarAlign;
     private StartMenu startMenu;
     private TaskbarReorder taskbarReorder;
     private List<String> liveTaskbarOrder=Collections.emptyList(),liveTaskbarPins=Collections.emptyList();private final Map<String,Integer> taskColors=new HashMap<>();
@@ -224,6 +224,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         TenStyle.Glyph actionButton=new TenStyle.Glyph(this,"actions",TenStyle.text(this));actionButton.setContentDescription("Notifications and calendar");actionButton.setPadding(dp(4),dp(12),dp(4),dp(12));actionButton.setTooltipText("Notifications and calendar");actionButton.setFocusable(true);actionButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));actionButton.setOnClickListener(v->open("@tenactions"));indicators.addView(actionButton,new LinearLayout.LayoutParams(dp(28),dp(48)));
         FrameLayout peek=new FrameLayout(this);desktopToggle=peek;View peekStrip=new View(this);peekStrip.setBackgroundColor(0xff777777);peek.addView(peekStrip,new FrameLayout.LayoutParams(dp(1),-1,Gravity.END));peek.setContentDescription("Show desktop");peek.setOnClickListener(v->{previews.dismiss();showDesktop();});ContextMenus.bind(peek,(x,y)->taskbarMenu(peek,x,y));previews.bindDesktopPeek(peek);indicators.addView(peek,new LinearLayout.LayoutParams(dp(6),dp(48)));
         Runnable align=()->{if(elevenBar.getWidth()==0)return;int left=leftAligned||newsButton.getVisibility()==View.GONE?dp(4):newsButton.getWidth()+dp(4);int right=indicators.getWidth()+dp(4);int fixed=dp(ElevenLayout.taskbarFixed(getResources().getConfiguration().screenWidthDp,searchMode));int desired=fixed+Math.max(dp(48),((ElevenTaskbarItems)taskItems).singleRowWidth());int room=Math.max(1,elevenBar.getWidth()-left-right);int w=ElevenLayout.taskbarWidth(room,desired);FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)taskbar.getLayoutParams();int x=leftAligned?left:ElevenLayout.taskbarLeft(elevenBar.getWidth(),left,right,desired);if(pos.width!=w||pos.leftMargin!=x){pos.width=w;pos.leftMargin=x;taskbar.setLayoutParams(pos);}};
+        taskbarAlign=align;
         elevenBar.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->align.run());taskItems.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->elevenBar.post(align));
         shell.addView(elevenBar,new LinearLayout.LayoutParams(-1,dp(expanded?100:52)));updateClock();renderTaskbar();
     }
@@ -405,6 +406,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         desktopHidden.entrySet().removeIf(item->item.getValue().getParent()==null||windows.get(item.getKey())!=item.getValue());if(desktopToggle!=null){String hint=desktopHidden.isEmpty()?"Show desktop":"Restore desktop windows";desktopToggle.setContentDescription(hint);desktopToggle.setTooltipText(hint+". Hold to peek.");}
         main.removeCallbacks(taskProgressTick);
         if(!taskProgressSurfaces.isEmpty())main.post(taskProgressTick);
+        if(taskbarAlign!=null)taskbarAlign.run();
         DesktopWindow manager=windows.get("@taskmanager");if(manager!=null&&manager.getParent()!=null&&manager.body instanceof TaskManagerPanel)((TaskManagerPanel)manager.body).tasksChanged();
     }
     private void refreshTaskProgress(){
