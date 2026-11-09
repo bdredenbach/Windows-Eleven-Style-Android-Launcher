@@ -1,8 +1,8 @@
 # Eleven 0.7.0 — markets and another recording pass
 
-This round embeds TradingView's official display-only Market Overview widget. It retains the provider's attribution and links, and never extracts quotes, calls undocumented quote APIs or bundles sample market values. Data can be delayed or unavailable for a particular symbol. The default clearly labeled Index ETFs view shows SPY, QQQ, DIA and IWM; Indices selects S&P 500, Nasdaq Composite, Dow Jones and Russell 2000 subject to the provider's display permissions. ETF prices are not index values.
+This round embeds TradingView's official display-only Market Overview widget. It retains the provider's attribution and links, and never extracts quotes, calls undocumented quote APIs or bundles sample market values. Data can be delayed or unavailable for a particular symbol. The probe displayed all four ETF prices/changes; SPX and Nasdaq Composite displayed provider restriction indicators, so the ETF view remains the default. The default clearly labeled Index ETFs view shows SPY, QQQ, DIA and IWM; Indices selects S&P 500, Nasdaq Composite, Dow Jones and Russell 2000 subject to the provider's display permissions. ETF prices are not index values.
 
-The card has native symbol/range selectors, retry, report links and an off switch. Loading is optional in the card and Widgets Settings. Only the enabled choice, symbol set and range are portable settings. Quote values, chart history, provider web storage and cookies are excluded from desktop backups. Each provider WebView denies local-file/content access, mixed content, device permissions and non-HTTPS navigation. There is no native JavaScript bridge. Views are destroyed while hidden/backgrounded or when their board is closed; ordinary board rendering retains the displayed widget.
+The default chart range is one month, with intraday and longer ranges available. The official embedded view permits its own third-party web storage; browser cookie preferences are unchanged. The card has native symbol/range selectors, retry, report links and an off switch. Loading is optional in the card and Widgets Settings. Only the enabled choice, symbol set and range are portable settings. Quote values, chart history, provider web storage and cookies are excluded from desktop backups. Each provider WebView denies local-file/content access, mixed content, device permissions and non-HTTPS navigation. There is no native JavaScript bridge. Views are destroyed while hidden/backgrounded or when their board is closed; ordinary board rendering retains the displayed widget.
 
 ## Fresh recording review
 
@@ -17,6 +17,8 @@ Fresh frames were decoded directly from all three recordings at 15-second interv
 Existing 0.3–0.6 implementations are retained: Settings hierarchy/navigation, Explorer commands and file operations, Recycle Bin selection/recovery, Snap, Focus, 23 presets, Transparency effects, notification filters, storage/power controls, Start/search choices, Nota, browser, media and modern Task Manager.
 
 The integration pass also found that minimizing the browser called the process-wide `WebView.pauseTimers()`, which could freeze other WebViews. Timer ownership now belongs to the Activity foreground/background lifecycle; per-window pause/resume remains local. A native regression checks an actual market-display timer continues after the browser window is minimized.
+
+The full storage regression also exposed ambiguous test targeting: the Computer tile and navigation pane can both expose a Documents label. The test now targets the Computer content area, maximizes its restored window, and checks the actual device-folder path before file bytes/visibility checks. This isolates the native test from unrelated saved navigation/window state.
 
 ## Verification
 
