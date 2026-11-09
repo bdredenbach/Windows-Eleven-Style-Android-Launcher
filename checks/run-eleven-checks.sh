@@ -23,6 +23,10 @@ run_native() {
  local runner="$1" label="$2"
  shift 2
  adb shell am force-stop "$launcher"
+ # Existing UI suites run with completed optional setup. Ordered setup itself is covered by InitializationFlowTest.
+ adb shell "run-as $launcher sh -c 'mkdir -p shared_prefs; cat > shared_prefs/desktop_initialization_v1.xml'" <<'XML'
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?><map><int name="flow_version" value="2"/><int name="step" value="7"/></map>
+XML
  if timeout 240s adb shell am instrument -w "$@" "$launcher.test/com.nthexperience.desktop.$runner" | tee "eleven-$label.txt"; then
   if grep -q 'PASS' "eleven-$label.txt" && ! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' "eleven-$label.txt"; then
    return
@@ -47,6 +51,10 @@ collect
 else
  echo "SKIP: preceding retained artifact unavailable; upgrade phases require that baseline." > eleven-upgrade-unavailable.txt
 fi
+adb shell pm clear "$launcher"
+run_native ElevenScreenshotSmoke ElevenScreenshotSmoke
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+collect
 adb shell pm clear "$launcher"
 run_native ElevenFinalPassSmoke ElevenFinalPassSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi

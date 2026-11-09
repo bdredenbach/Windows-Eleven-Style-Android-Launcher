@@ -95,6 +95,11 @@ public class InitializationFlowTest {
     @Test public void oldCompletedSetupOffersLocationOnce(){
         flow.state.prefs.edit().putInt("flow_version",1).putInt("step",6).commit();InitializationState migrated=new InitializationState(activity);assertEquals(Step.LOCATION,migrated.step());migrated.advance();assertEquals(Step.FOLDERS,new InitializationState(activity).step());
     }
+    @Test public void originalReleaseWelcomeMigratesWithoutReplayingOldPermissions(){
+        flow.state.prefs.edit().clear().commit();activity.getSharedPreferences(StartupExperience.SESSION,0).edit().putBoolean("welcome_seen",true).commit();
+        InitializationState migrated=new InitializationState(activity);assertEquals(Step.LOCATION,migrated.step());migrated.advance();
+        assertEquals(Step.FOLDERS,new InitializationState(activity).step());
+    }
     @Test public void migrationKeepsAnInFlightFolderSelection(){
         flow.state.prefs.edit().putInt("flow_version",1).putInt("step",5).putInt("waiting",InitializationFlow.REPAIR).putString("repair_uri","content://example.documents/tree/old").commit();InitializationState migrated=new InitializationState(activity);assertEquals(Step.LOCATION,migrated.step());assertEquals(InitializationFlow.REPAIR,migrated.waiting());assertEquals("content://example.documents/tree/old",migrated.prefs.getString("repair_uri",null));
     }
