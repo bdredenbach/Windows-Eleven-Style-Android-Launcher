@@ -25,7 +25,11 @@ The polish pass also corrects singular recovery/file counts and replaces generic
 
 Six new unit tests cover CPU/rate arithmetic, missing-data sorting, legacy migration, bounded state round trips and invalid portable choices. The new native suite covers all pages, real Nth window actions and Run, live samples, pause/manual refresh, animation/visibility/background behavior, all 23 presets in both orientations, local palette isolation, backup, recreation, reopening, external App info routing and restart confirmation/callback scope. It is added to the complete Android 11/API30 and Android 16/API36 matrix.
 
-Final matrix and APK verification will be recorded after completion. The market card still opens reports; embedded market values/graphs remain outside this update pending a suitable data provider. No private recording frames are included.
+Final matrix: [42561471587](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42561471587), application/validation source `d21e4195fbc18755cff9099764b7d76dd837421f`. **Both API30 and API36 passed all 16 native suites and all 43 unit tests**, plus 157,840 geometry policies, 46 pinned icon checks, command boundaries and identity validation. Each API passed 232 Task Manager assertions and all 46 preset/orientation combinations, alongside the retained 265 purchaser, 94 completion, 4,417 theme, 216 shell, 109 gap and 171 Nota assertions. Android 11 native screenshots and Android 16 app-view captures were reviewed. Captured AndroidRuntime logs contain no FATAL EXCEPTION.
+
+The delivered version 0.6.0/code 8 APK uses the retained preview certificate, verifies v2/v3 signatures and 16 KiB alignment, and matches all 537 non-signing payload entries from both independent builds. SHA256: `7ed5e03de580351dd3abe40f3b6ba4cbf7b19761410262241707427be2080aab`.
+
+The market card still opens reports; embedded market values/graphs remain outside this update pending a suitable data provider. No private recording frames are included.
 
 ## Primary references
 
