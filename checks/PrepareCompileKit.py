@@ -9,7 +9,7 @@ out = Path('build/compile-kit')
 shutil.copy2(Path(os.environ['ANDROID_HOME']) / 'platforms/android-36/android.jar', out / 'android.jar')
 cache = Path.home() / '.gradle/caches/modules-2/files-2.1'
 for group in cache.iterdir():
-    if not (group.name.startswith('androidx.') or group.name == 'org.jspecify'):
+    if not (group.name.startswith(('androidx.', 'org.jspecify', 'com.google.mlkit', 'com.google.android.gms', 'com.google.guava', 'com.google.ai', 'org.jetbrains.kotlin', 'org.json', 'junit', 'org.hamcrest'))):
         continue
     for artifact in group.rglob('*'):
         if artifact.suffix not in ('.jar', '.aar'):
@@ -22,3 +22,8 @@ for group in cache.iterdir():
         else:
             shutil.copy2(artifact, target)
 print('Prepared Android 36 and AndroidX compile jars')
+
+compiled = Path('app/build/intermediates/javac/debug/compileDebugJavaWithJavac/classes')
+if compiled.exists(): shutil.copytree(compiled, out / 'classes', dirs_exist_ok=True)
+for resource in Path('app/build/intermediates').rglob('R.jar'):
+    if 'androidTest' not in str(resource): shutil.copy2(resource, out / 'libs' / ('resource-' + '-'.join(resource.parts[-4:-1]) + '.jar'))

@@ -27,6 +27,6 @@ final class StartSearch {
         JSONObject locations=FolderLinks.list(store);Iterator<String> linkKeys=locations.keys();while(linkKeys.hasNext()){String key=linkKeys.next();JSONObject link=locations.optJSONObject(key);if(link!=null&&link.optString("title").toLowerCase(Locale.ROOT).contains(q))result.add(new Result(key,store.name(key,link.optString("title")),"Folders","files",null,true));}
         JSONArray recent=RecentFiles.list(store);for(int i=0;i<recent.length();i++){JSONObject item=recent.optJSONObject(i);if(item!=null&&item.optString("name").toLowerCase(Locale.ROOT).contains(q)&&seen.add(item.optString("uri")))result.add(new Result("recent-file:"+item.optString("uri"),item.optString("name"),"Recent Items",item.optString("kind").equals("folder")?"files":"documentfile",null,false));}
         JSONArray favorites=new BrowserData(store.context).list("favorites");for(int i=0;i<favorites.length();i++){JSONObject item=favorites.optJSONObject(i);if(item!=null&&(item.optString("title")+" "+item.optString("url")).toLowerCase(Locale.ROOT).contains(q)&&BrowserUrls.web(item.optString("url")))result.add(new Result("favorite-web:"+item.optString("url"),item.optString("title",item.optString("url")),"Favorites","browser",null,false));}
-        return result;
+        result.removeIf(r->!ElevenLocalState.accepts(store,r));return result;
     }
 }

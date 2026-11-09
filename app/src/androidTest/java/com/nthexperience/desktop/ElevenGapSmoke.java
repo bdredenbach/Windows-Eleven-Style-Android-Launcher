@@ -55,11 +55,7 @@ public final class ElevenGapSmoke extends Instrumentation {
         ui(()->{Rect a=menuRect(parent[0]),b=menuRect(child[0]);check(b.left>=a.right-Aero.dp(home,10)||b.right<=a.left+Aero.dp(home,10),"Portrait cascade keeps both menus visible side by side");View choice=items(child[0]).getChildAt(0);check(choice.requestFocus(),"Child choice receives keyboard focus");check(choice.dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_LEFT))&&!child[0].showing()&&parent[0].showing(),"Left arrow closes only the child branch");check(items(parent[0]).getChildAt(0).dispatchKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_RIGHT))&&child[0].showing(),"Right arrow reopens the focused submenu");choice=items(child[0]).getChildAt(0);int[] point=new int[2];choice.getLocationOnScreen(point);check(point[0]>=0&&point[1]>=0&&point[0]+choice.getWidth()<=root.getWidth()+Aero.dp(home,2),"Cascade stays inside the viewport");choice.performClick();check(selected[0]&&!parent[0].showing()&&!child[0].showing(),"Leaf choice closes the full cascade once");});
     }
     void explorer()throws Exception{
-        String authority="com.nthexperience.desktop.fixture.documents";
-        android.net.Uri tree=android.provider.DocumentsContract.buildTreeDocumentUri(authority,"root:");
-        try(ParcelFileDescriptor fd=getUiAutomation().executeShellCommand("am start -n com.nthexperience.desktop.fixture/.GrantActivity --ez reset true");InputStream in=new ParcelFileDescriptor.AutoCloseInputStream(fd)){byte[] b=new byte[1024];while(in.read(b)!=-1){}}
-        long deadline=SystemClock.uptimeMillis()+12000;boolean granted=false;while(SystemClock.uptimeMillis()<deadline){try{getTargetContext().getContentResolver().takePersistableUriPermission(tree,Intent.FLAG_GRANT_READ_URI_PERMISSION|Intent.FLAG_GRANT_WRITE_URI_PERMISSION);granted=true;break;}catch(SecurityException waiting){SystemClock.sleep(100);}}
-        check(granted,"Explorer receives a real fixture tree grant");
+        android.net.Uri tree=ElevenFixture.grant(this);
         android.net.Uri parent=android.provider.DocumentsContract.buildDocumentUriUsingTree(tree,"root:");
         for(String name:new String[]{"Alpha.PDF","Sheet.XLSX","Photo.AVIF","Word.DOCX"})DocumentOps.createText(getTargetContext(),parent,name,"Isolated recording-gap fixture",new DocumentOps.Cancel());
         final VistaExplorer[] browser={null};

@@ -1,5 +1,7 @@
 # Recording gaps and implementation progress
 
+Current release status: [0.5.0 completion and purchaser walkthrough](ELEVEN_0_5_COMPLETION_AND_WALKTHROUGH.md). This document preserves the original recording findings and 0.3.0 implementation state.
+
 Original audit: November 8, 2026 against application source [`3366104c343dd662c80b0dcf8025114923937715`](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/tree/3366104c343dd662c80b0dcf8025114923937715). The observations below describe the 0.2.1 baseline; the progress table tracks subsequent implementation.
 
 The remaining work is chiefly deeper controls, page composition and interaction details. The broad 0.2.0 reference mapping establishes that a destination exists; it does not establish that every control inside the recorded destination is reproduced. The thirty items below identify that difference explicitly.

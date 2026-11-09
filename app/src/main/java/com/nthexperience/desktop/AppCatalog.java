@@ -15,8 +15,9 @@ import java.util.Set;
 final class AppCatalog {
     static final class Entry {
         final String id, label;
-        final Drawable icon;
-        Entry(String id, String label, Drawable icon) { this.id = id; this.label = label; this.icon = icon; }
+        final Drawable icon;final long installed;
+        Entry(String id,String label,Drawable icon){this(id,label,icon,0);}
+        Entry(String id,String label,Drawable icon,long installed){this.id=id;this.label=label;this.icon=icon;this.installed=installed;}
     }
     static List<Entry> load(Context context) {
         PackageManager manager = context.getPackageManager();
@@ -29,7 +30,7 @@ final class AppCatalog {
             String id = component.flattenToString();
             if (!seen.add(id)) continue;
             try {
-                entries.add(new Entry(id, info.loadLabel(manager).toString(), info.loadIcon(manager)));
+                long installed=0;try{installed=manager.getPackageInfo(info.activityInfo.packageName,0).firstInstallTime;}catch(PackageManager.NameNotFoundException ignored){}entries.add(new Entry(id,info.loadLabel(manager).toString(),info.loadIcon(manager),installed));
             } catch (RuntimeException ignored) { /* Package may be changing during this scan. */ }
         }
         Collator collator = Collator.getInstance();
