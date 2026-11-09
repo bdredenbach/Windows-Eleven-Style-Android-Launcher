@@ -55,10 +55,17 @@ final class TaskbarReorder {
         if(!started){active=null;return false;}
         button.setAlpha(.4f);main.post(autoscroll);return true;
     }
+    private boolean expanded(){return items instanceof ElevenTaskbarItems&&((ElevenTaskbarItems)items).expanded;}
+    private View button(String id){for(int i=0;i<items.getChildCount();i++)if(id.equals(key(items.getChildAt(i))))return items.getChildAt(i);return null;}
     boolean move(String id,int delta){
         if(closed||active!=null)return false;
-        List<String> current=keys();int index=current.indexOf(id);
-        if(index<0||index+delta<0||index+delta>=current.size())return false;
+        List<String> current=keys();
+        if(expanded()){
+            View source=button(id);if(source==null)return false;List<String> row=new ArrayList<>();for(String key:current)if(ElevenTaskbarItems.running(button(key))==ElevenTaskbarItems.running(source))row.add(key);
+            int index=row.indexOf(id);if(index<0||index+delta<0||index+delta>=row.size())return false;
+            List<String> moved=TaskbarOrder.move(row,id,index+delta),result=new ArrayList<>();int at=0;for(String key:current)result.add(row.contains(key)?moved.get(at++):key);finished.accept(result);return true;
+        }
+        int index=current.indexOf(id);if(index<0||index+delta<0||index+delta>=current.size())return false;
         finished.accept(TaskbarOrder.move(current,id,index+delta));return true;
     }
     private boolean drag(DragEvent event){
@@ -79,10 +86,10 @@ final class TaskbarReorder {
         }
     }
     private int indexAt(float x,float y,String moving){
-        if(items instanceof ElevenTaskbarItems&&((ElevenTaskbarItems)items).expanded){
-            int best=0,index=0;double distance=Double.MAX_VALUE;
-            for(int i=0;i<items.getChildCount();i++){View child=items.getChildAt(i);String id=key(child);if(id==null||id.equals(moving))continue;double dx=x-child.getLeft()-child.getWidth()/2f,dy=y-child.getTop()-child.getHeight()/2f;double next=dx*dx+dy*dy;if(next<distance){distance=next;best=index+(x>child.getLeft()+child.getWidth()/2f?1:0);}index++;}
-            return best;
+        if(expanded()){
+            View source=button(moving);int best=keys().indexOf(moving),index=0;double distance=Double.MAX_VALUE;
+            for(int i=0;i<items.getChildCount();i++){View child=items.getChildAt(i);String id=key(child);if(id==null||id.equals(moving))continue;if(source!=null&&ElevenTaskbarItems.running(child)==ElevenTaskbarItems.running(source)){double dx=x-child.getLeft()-child.getWidth()/2f,dy=y-child.getTop()-child.getHeight()/2f,next=dx*dx+dy*dy;if(next<distance){distance=next;best=index+(x>child.getLeft()+child.getWidth()/2f?1:0);}}index++;}
+            return Math.max(0,best);
         }
         int index=0;
         for(int i=0;i<items.getChildCount();i++){
@@ -94,12 +101,11 @@ final class TaskbarReorder {
     private void updateMarker(){
         if(active==null)return;
         int[] at=new int[2];items.getLocationOnScreen(at);
-        int index=indexAt(rawX-at[0],rawY-at[1],active.id),seen=0,x=0,y=0;
+        int index=indexAt(rawX-at[0],rawY-at[1],active.id),seen=0,x=active.source.getLeft(),y=active.source.getTop();
         for(int i=0;i<items.getChildCount();i++){
             View child=items.getChildAt(i);String id=key(child);
             if(id==null||id.equals(active.id))continue;
-            if(seen++==index){x=child.getLeft();y=child.getTop();break;}
-            x=child.getRight();y=child.getTop();
+            if(!expanded()||ElevenTaskbarItems.running(child)==ElevenTaskbarItems.running(active.source)){if(seen>=index){x=child.getLeft();y=child.getTop();break;}x=child.getRight();y=child.getTop();}seen++;
         }
         int width=Aero.dp(items.getContext(),2),pad=Aero.dp(items.getContext(),3);
         int rowHeight=items instanceof ElevenTaskbarItems&&((ElevenTaskbarItems)items).expanded?Aero.dp(items.getContext(),48):items.getHeight();

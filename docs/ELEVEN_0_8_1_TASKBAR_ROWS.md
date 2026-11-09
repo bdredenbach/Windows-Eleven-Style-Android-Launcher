@@ -1,0 +1,17 @@
+# Eleven 0.8.1 — running apps above fixed controls
+
+Expanded mode now puts every open app button on the upper row and idle pinned shortcuts on the lower row. A pinned app uses its existing button: opening it moves that button up; minimizing leaves it up because the app remains open; closing returns its pinned shortcut to the lower row. Nth Nota's dedicated fixed button remains on the bottom row with Start, Search, Task View, Widgets, the clock and the tray.
+
+The previous layout alternated buttons by child index. Expansion also rebuilt fixed controls, and centering depended on the narrower two-row content width. This fix uses each button's actual running state, resizes the existing taskbar in place, and calculates its horizontal anchor from the same preferred single-row width in both modes. Static mode fits each row independently; scrolling and grouping remain available. Keyboard and drag reordering operate within each button's assigned row.
+
+The expansion setting and its menu, Settings and Advanced Desktop Settings entry points are unchanged. Desktop geometry stays anchored to the normal one-row work area, and saved positions are preserved.
+
+## Verification
+
+[Run 42632551226](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42632551226), application/test source `37da856f1123033914f020e510b0bea102410e53`, passed **all 18 native suites and all 48 unit tests on both Android 11/API30 and Android 16/API36**. Both builds also passed 157,840 geometry policies, Nota command boundaries, 46 pinned icon checks, and package/provider/runner identity checks.
+
+The taskbar suite passed seven desktop scenarios (151 pre-draw frames on API30; 146 on API36) and eight fixed-control scenarios (91 frames on API30; 80 on API36). It compared full screen bounds and object identity for the existing fixed controls across expansion/collapse, both alignments/orientations and fitting modes, including an open pinned app. It also verified real open/minimized/closed pinned-app row transitions, running Android tasks, labels/scrolling/static fitting, row-constrained drag and keyboard ordering, unchanged desktop layout bytes and portable expansion settings. App-view screenshots were reviewed for the upper running-app row and lower idle pins.
+
+The taskbar preflight collects its screenshots, then resets test data/screen size before the retained suites. Purchaser, theme, Task Manager, Markets, storage, Nota, browser, Snap, photo and media checks passed; captured AndroidRuntime logs contain no FATAL EXCEPTION. This is automated emulator testing with screenshot review; no physical Pixel 10 test is claimed.
+
+The 0.8.1/code11 APK retains the preview certificate and verifies v2/v3 signatures plus 16 KiB alignment. All 537 non-signing payload entries match both independent builds and the signed delivery. APK SHA256: `c38001ccf462c8f0b0f49d917cbdb87c49226b231fa1d626f24668b88caf0114`. The strengthened native suite checks real open/minimized/closed pinned apps, running Android buttons, mixed rows with labels/static fitting/scrolling, row-constrained drag and keyboard ordering, backup round trips, and the existing seven desktop stability cases. Eight additional scenarios watch every pre-draw frame and compare the actual View identities plus complete screen bounds of the fixed controls across expansion/collapse, both alignments, both orientations and both fitting modes. The taskbar preflight collects evidence and resets test data/screen size before the retained suites run.
