@@ -22,7 +22,7 @@ final class RecyclePanel extends VistaShell {
     private final View classicMenu;
     private LinearLayout tenRibbonTools;
     private View tenRibbon;
-    private TextView restoreSelection;
+    private TextView restoreSelection,deleteSelection;
     private final Map<TextView,LinearLayout> ribbonCommands=new LinkedHashMap<>();
     private int viewWidth;private boolean checks=true,compact,extensions=true,hidden=true,detailsPane,previewPane;private int previewGeneration;
 
@@ -73,7 +73,7 @@ final class RecyclePanel extends VistaShell {
         if(tab.equals("View")){
             recycleCommand(command("Layout",this::views),"apps");recycleCommand(command("Sort by",()->menu("View")),"menu");recycleCommand(command("Refresh",this::refresh),"update");
         }else{
-            recycleCommand(emptyButton,"delete");recycleCommand(command("Recycle Bin properties",this::properties),"document");recycleCommand(restoreButton,"update");recycleCommand(restoreSelection,"update");recycleCommand(command("Delete selected",this::confirmSelected),"delete");recycleCommand(command("Sort",()->menu("View")),"menu");recycleCommand(command("View",this::views),"apps");recycleCommand(command("More",()->menu("Edit")),"menu");
+            recycleCommand(emptyButton,"delete");recycleCommand(command("Recycle Bin properties",this::properties),"document");recycleCommand(restoreButton,"update");recycleCommand(restoreSelection,"update");deleteSelection=command("Delete selected",this::confirmSelected);recycleCommand(deleteSelection,"delete");recycleCommand(command("Sort",()->menu("View")),"menu");recycleCommand(command("View",this::views),"apps");recycleCommand(command("More",()->menu("Edit")),"menu");
         }
         updateCommands();TenAppearance.apply(tenRibbon);
     }
@@ -125,7 +125,7 @@ final class RecyclePanel extends VistaShell {
     private void selectItem(JSONObject item){selected=item.optString("id");selection.clear();selection.add(selected);render();}
     private List<JSONObject> selectedItems(){List<JSONObject> values=new ArrayList<>();for(JSONObject item:items)if(selection.contains(item.optString("id")))values.add(item);return values;}
     private void updateCommands(){
-        if(restoreSelection!=null)restoreSelection.setEnabled(!busy&&!selectedItems().isEmpty());
+        if(restoreSelection!=null)restoreSelection.setEnabled(!busy&&!selectedItems().isEmpty());if(deleteSelection!=null)deleteSelection.setEnabled(!busy&&!selectedItems().isEmpty());
         for(TextView button:new TextView[]{restoreButton,emptyButton}){
             button.setEnabled(!busy&&!items.isEmpty());
             button.setAlpha(button.isEnabled()?1f:.5f);
