@@ -86,17 +86,20 @@ final class TenAppearance {
     /** Include gradient stops and interaction states; transparent controls inherit their parent surface. */
     private static int[] accentSurfaces(View view){java.util.ArrayList<Integer> colors=new java.util.ArrayList<>();View current=view;while(current!=null){if(surfaces(current.getBackground(),colors))break;ViewParent parent=current.getParent();current=parent instanceof View?(View)parent:null;}if(colors.isEmpty())colors.add(background(view.getContext()));int[] result=new int[colors.size()];for(int i=0;i<result.length;i++)result[i]=colors.get(i);return result;}
     private static boolean surfaces(Drawable drawable,java.util.List<Integer> colors){
+        if(drawable instanceof ElevenMaterial){for(int color:((ElevenMaterial)drawable).textSurfaces())colors.add(color);return true;}
         if(drawable instanceof Aero.ThemeStates){boolean opaque=true;for(Drawable child:((Aero.ThemeStates)drawable).children)opaque=surfaces(child,colors)&&opaque;return opaque;}
         if(drawable instanceof StateListDrawable)return surfaces(drawable.getCurrent(),colors);
         if(drawable instanceof InsetDrawable)return surfaces(((InsetDrawable)drawable).getDrawable(),colors);
         // The first layer is the text surface; later layers include the narrow Settings selection stripe.
         if(drawable instanceof LayerDrawable){LayerDrawable layers=(LayerDrawable)drawable;return layers.getNumberOfLayers()>0&&surfaces(layers.getDrawable(0),colors);}
         if(drawable instanceof GradientDrawable){GradientDrawable gradient=(GradientDrawable)drawable;int[] values=gradient.getColors();if(values==null&&gradient.getColor()!=null)values=new int[]{gradient.getColor().getDefaultColor()};if(values==null)return false;boolean opaque=true;for(int color:values){if(Color.alpha(color)==255)colors.add(color);else opaque=false;}return opaque;}
-        if(drawable instanceof ColorDrawable){int color=((ColorDrawable)drawable).getColor();if(Color.alpha(color)==255){colors.add(color);return true;}}
+        if(drawable instanceof ElevenMaterial){((ElevenMaterial)drawable).appearance();}
+        else if(drawable instanceof ColorDrawable){int color=((ColorDrawable)drawable).getColor();if(Color.alpha(color)==255){colors.add(color);return true;}}
         return false;
     }
     static void enable(Context c,Drawable drawable){
-        if(drawable instanceof ColorDrawable){int color=originalColors.computeIfAbsent(drawable,key->((ColorDrawable)key).getColor());int mapped=surface(c,color);if(((ColorDrawable)drawable).getColor()!=mapped)((ColorDrawable)drawable).setColor(mapped);}
+        if(drawable instanceof ElevenMaterial){((ElevenMaterial)drawable).appearance();}
+        else if(drawable instanceof ColorDrawable){int color=originalColors.computeIfAbsent(drawable,key->((ColorDrawable)key).getColor());int mapped=surface(c,color);if(((ColorDrawable)drawable).getColor()!=mapped)((ColorDrawable)drawable).setColor(mapped);}
         else if(drawable instanceof Aero.ThemePanel){Aero.ThemePanel panel=(Aero.ThemePanel)drawable;panel.appThemed=true;panel.appearance();}
         else if(drawable instanceof Aero.LiteralPanel)return;
         else if(drawable instanceof GradientDrawable)gradient(c,(GradientDrawable)drawable);

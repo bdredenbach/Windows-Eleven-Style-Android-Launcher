@@ -1047,8 +1047,10 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     }
     private void rebuildTenTaskbar(){if(tenNews!=null)tenNews.dismiss();if(tray!=null)tray.stop();if(taskbarReorder!=null)taskbarReorder.close();if(previews!=null)previews.dismiss();if(shell.getChildCount()>1)shell.removeViewAt(shell.getChildCount()-1);taskViewportWidth=0;buildTaskbar();if(tray!=null)tray.start();}
     android.graphics.drawable.Drawable tenShellSurface(){return new AeroGlass(wallpaper,AeroGlass.START);}
+    AeroWallpaper wallpaperSurface(){return wallpaper;}
+    void wallpaperReady(){if(!destroyed&&ElevenColors.automatic(store,wallpaper))applyTenAppearance();}
     void applyTenFont(){applyTenAppearance();TenFonts.apply(root);}
-    void applyTenAppearance(){if(root==null)return;TenAppearance.context(this);wallpaper.theme(store.prefs.getInt("wallpaper",11));wallpaper.appearanceChanged();rebuildTenTaskbar();startMenu.appearanceChanged();for(DesktopWindow tool:tenDesktops.all()){if(tool.body instanceof TenSettings)((TenSettings)tool.body).refreshAppearance();TenAppearance.apply(tool.body);tool.active(tool.active());}renderDesktop();renderTaskbar();}
+    void applyTenAppearance(){if(root==null)return;TenAppearance.context(this);wallpaper.theme(store.prefs.getInt("wallpaper",11));ElevenColors.automatic(store,wallpaper);wallpaper.appearanceChanged();if(tenActions!=null)tenActions.dismiss();if(tenNews!=null)tenNews.dismiss();if(previews!=null)previews.dismiss();if(desktopMenu!=null)desktopMenu.dismiss();if(jumpMenu!=null)jumpMenu.dismiss();rebuildTenTaskbar();startMenu.appearanceChanged();for(DesktopWindow tool:tenDesktops.all()){if(tool.body instanceof TenSettings)((TenSettings)tool.body).refreshAppearance();TenAppearance.apply(tool.body);tool.active(tool.active());}renderDesktop();renderTaskbar();}
     void refreshTen(){
         if(root==null)return;
         layoutWorkspace();renderDesktop();renderTaskbar();startMenu.appearanceChanged();
@@ -1435,7 +1437,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     private void applyWallpaperImport(List<String> photos){
         if(destroyed||restoringBackup)return;
         if(photos.isEmpty()){toast("No accessible pictures were found.");return;}
-        DesktopWindow tenSettings=windows.get("@settings");if(tenSettings!=null&&tenSettings.getParent()!=null&&tenSettings.body instanceof TenSettings&&((TenSettings)tenSettings.body).page.equals("background")){android.content.SharedPreferences.Editor edit=store.prefs.edit();DesktopBackgrounds.choose(edit,photos,11);edit.apply();wallpaper.reload();((TenSettings)tenSettings.body).navigate("background");return;}
+        DesktopWindow tenSettings=windows.get("@settings");if(tenSettings!=null&&tenSettings.getParent()!=null&&tenSettings.body instanceof TenSettings&&(((TenSettings)tenSettings.body).page.equals("background")||((TenSettings)tenSettings.body).page.equals("background-slideshow"))){android.content.SharedPreferences.Editor edit=store.prefs.edit();DesktopBackgrounds.choose(edit,photos,11);edit.apply();wallpaper.reload();((TenSettings)tenSettings.body).navigate("background");return;}
         List<DesktopWindow> ordered=orderedWindows();Collections.reverse(ordered);
         for(DesktopWindow window:ordered)if(window.getVisibility()==View.VISIBLE&&window.body instanceof VistaControlPanel){
             VistaControlPanel panel=(VistaControlPanel)window.body;

@@ -11,9 +11,9 @@ import java.util.function.Consumer;
 final class TenThemeGallery extends LinearLayout {
     final DesktopStore store;final Consumer<String> open;final Runnable changed;final List<AeroWallpaper> previews=new ArrayList<>();final int columns;
     TenThemeGallery(Context c,DesktopStore store,int width,Consumer<String> open,Runnable changed){
-        super(c);this.store=store;this.open=open;this.changed=changed;columns=width>=Aero.dp(c,760)?3:width>=Aero.dp(c,420)?2:1;setOrientation(VERTICAL);setContentDescription("Ten theme gallery");
+        super(c);this.store=store;this.open=open;this.changed=changed;columns=width>=Aero.dp(c,760)?3:width>=Aero.dp(c,420)?2:1;setOrientation(VERTICAL);setContentDescription("Eleven theme gallery");
         TextView name=Aero.text(c,"Current theme: "+TenThemes.currentName(store),18,Aero.INK);name.setMinHeight(Aero.dp(c,40));addView(name,new LayoutParams(-1,-2));
-        section("Nth Desktop Eleven themes",TenThemes.TEN);section("Aero from Nth Desktop Seven",TenThemes.AERO);
+        section("Themes from your recordings",TenThemes.RECORDED);java.util.List<TenThemes.Preset> extra=new java.util.ArrayList<>(TenThemes.TEN);extra.removeAll(TenThemes.RECORDED);section("More Nth themes",extra);section("Classic Aero themes",TenThemes.AERO);
         heading("My themes");addView(button("Save current theme…",()->open.accept("setting:theme-save")));addView(button("Import an Nth theme…",()->open.accept("setting:theme-import")));
         JSONArray saved=ThemeProfiles.saved(store);for(int i=0;i<saved.length();i++){JSONObject row=saved.optJSONObject(i);if(row==null)continue;final int index=i;TextView entry=button(row.optString("name","Saved theme"),()->open.accept("setting:theme-preview:"+index));entry.setContentDescription("Saved theme: "+row.optString("name"));addView(entry);}
     }

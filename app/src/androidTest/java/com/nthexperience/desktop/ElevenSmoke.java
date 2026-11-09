@@ -12,7 +12,7 @@ import java.util.concurrent.*;
 import org.json.*;
 
 /** First Eleven behavior regression, independent of Ten's appearance assertions. */
-public final class ElevenSmoke extends Instrumentation {
+public class ElevenSmoke extends Instrumentation {
  MainActivity home;View root;DesktopStore store;int checks;
  @Override public void onCreate(Bundle args){super.onCreate(args);start();}
  @Override public void onStart(){Bundle result=new Bundle();try{

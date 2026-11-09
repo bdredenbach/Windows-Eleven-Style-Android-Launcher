@@ -39,6 +39,7 @@ final class ThemeProfiles {
     static JSONObject capture(DesktopStore store,String title)throws JSONException{
         JSONObject profile=new JSONObject().put("name",title.trim())
                 .put("backgrounds",new JSONArray(DesktopBackgrounds.current(store.prefs)))
+                .put("eleven_background_mode",store.prefs.getString("eleven_background_mode",DesktopBackgrounds.current(store.prefs).size()>1?"Slideshow":"Picture")).put("eleven_solid_color",store.prefs.getInt("eleven_solid_color",0xff0a263b)).put(ElevenColors.MODE,store.prefs.getString(ElevenColors.MODE,"Manual"))
                 .put("position",store.prefs.getString("wallpaper_position","Fill")).put(DesktopSounds.SCHEME,DesktopSounds.scheme(store));
         for(int i=0;i<SWITCHES.length;i++)profile.put(SWITCHES[i],store.prefs.getBoolean(SWITCHES[i],SWITCH_DEFAULTS[i]));
         for(int i=0;i<NUMBERS.length;i++)profile.put(NUMBERS[i],store.prefs.getInt(NUMBERS[i],DEFAULTS[i]));
@@ -88,6 +89,7 @@ final class ThemeProfiles {
         List<String> pictures=validate(profile);
         SharedPreferences.Editor edit=store.prefs.edit();
         DesktopBackgrounds.choose(edit,pictures,AeroWallpaper.SEVEN);
+        edit.putString("eleven_background_mode",profile.optString("eleven_background_mode",pictures.size()>1?"Slideshow":"Picture")).putInt("eleven_solid_color",profile.optInt("eleven_solid_color",0xff0a263b)).putString(ElevenColors.MODE,profile.optString(ElevenColors.MODE,"Manual"));
         edit.putString("wallpaper_position",profile.getString("position")).putString(DesktopSounds.SCHEME,profile.optString(DesktopSounds.SCHEME,"classic"));
         for(String key:SWITCHES)edit.putBoolean(key,profile.getBoolean(key));
         for(String key:NUMBERS)edit.putInt(key,profile.getInt(key));

@@ -86,14 +86,14 @@ final class VistaExplorer extends VistaShell {
             if(!organizeLabel.contentEquals(organize.getText()))organize.setText(organizeLabel);
             if(!viewsLabel.contentEquals(views.getText()))views.setText(viewsLabel);
             sendTo.setVisibility(narrow?GONE:VISIBLE);
-            location.setBackgroundColor(TenAppearance.dark(getContext())?0xff242632:0xfff6f6fb);crumbs.setBackground(ElevenSurface.round(getContext(),TenAppearance.dark(getContext())?0xff2d303c:0xffeaeaf0,4));for(TextView nav:new TextView[]{back,forward,up}){nav.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));nav.setTextColor(TenAppearance.ink(getContext()));}
+            location.setBackground(ElevenMaterial.app(getContext(),0));crumbs.setBackground(ElevenSurface.round(getContext(),TenAppearance.dark(getContext())?0xff2d303c:0xffeaeaf0,4));for(TextView nav:new TextView[]{back,forward,up}){nav.setBackground(TenStyle.hover(getContext(),Color.TRANSPARENT));nav.setTextColor(TenAppearance.ink(getContext()));}
             ((View)commands.getParent()).setVisibility(wide?GONE:VISIBLE);
             if(previewEnabled&&((r-l>=dp(560))!=(or-ol>=dp(560))))render();
         });
         back.setOnLongClickListener(v->{historyMenu(back);return true;});forward.setOnLongClickListener(v->{historyMenu(forward);return true;});start(picker==null&&initial.equals("home")&&options.openTo.equals("This PC")?"computer":initial);if(picker==null)createTabs();
     }
     private void addTenRibbon(){
-        HorizontalScrollView scroll=new HorizontalScrollView(getContext());scroll.setHorizontalScrollBarEnabled(false);scroll.setBackgroundColor(0xfff6f8fc);scroll.setContentDescription("File Explorer command bar");ribbonTools=new LinearLayout(getContext());ribbonTools.setGravity(Gravity.CENTER_VERTICAL);scroll.addView(ribbonTools);addView(scroll,indexOfChild((View)crumbs.getParent())+1,new LayoutParams(-1,dp(48)));
+        HorizontalScrollView scroll=new HorizontalScrollView(getContext());scroll.setHorizontalScrollBarEnabled(false);scroll.setBackground(ElevenMaterial.app(getContext(),0));scroll.setContentDescription("File Explorer command bar");ribbonTools=new LinearLayout(getContext());ribbonTools.setGravity(Gravity.CENTER_VERTICAL);scroll.addView(ribbonTools);addView(scroll,indexOfChild((View)crumbs.getParent())+1,new LayoutParams(-1,dp(48)));
         compactCommand("New","folder",()->{if(canCreate()&&!busy)newFolder();},true);
         compactCommand("Cut","cut",()->ribbonSelection(true,false),false);compactCommand("Copy","copy",()->ribbonSelection(false,false),false);compactCommand("Paste","paste",()->{if(canCreate()&&!busy&&!ExplorerClipboard.files.isEmpty())paste();},false);
         compactCommand("Rename","rename",()->{if(selected.size()==1)rename(selected.values().iterator().next());},false);compactCommand("Share","share",this::sendSelected,false);compactCommand("Delete","delete",()->ribbonSelection(false,true),false);

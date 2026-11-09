@@ -16,7 +16,7 @@ final class TenActionCenter {
  private int dp(int n){return Aero.dp(context,n);}
  void show(){
   dismiss();overlay=new FrameLayout(context);overlay.setElevation(dp(40));overlay.setContentDescription("Notifications and calendar overlay");overlay.setOnClickListener(v->dismiss());
-  panel=Aero.column(context);panel.setPadding(dp(14),dp(10),dp(14),dp(12));panel.setBackground(ElevenSurface.round(context,TenStyle.surface(context),8));panel.setOnClickListener(v->{});panel.setContentDescription("Notifications and calendar panel");
+  panel=Aero.column(context);panel.setPadding(dp(14),dp(10),dp(14),dp(12));panel.setBackground(ElevenMaterial.shell(context,8));panel.setOnClickListener(v->{});panel.setContentDescription("Notifications and calendar panel");
   int width=Math.min(dp(370),Math.max(1,host.getWidth()-safeLeft-safeRight-dp(16))),height=Math.min(dp(680),Math.max(1,host.getHeight()-safeTop-dp(16)));
   FrameLayout.LayoutParams bounds=new FrameLayout.LayoutParams(width,height,Gravity.BOTTOM|Gravity.END);bounds.rightMargin=safeRight+dp(8);bounds.bottomMargin=dp(8);overlay.addView(panel,bounds);
   LinearLayout header=new LinearLayout(context);TextView title=Aero.text(context,"Notifications",16,TenStyle.text(context));Aero.bold(title);header.addView(title,new LinearLayout.LayoutParams(0,dp(44),1));TextView close=TenStyle.command(context,"×",this::dismiss);close.setContentDescription("Close notifications and calendar");header.addView(close,new LinearLayout.LayoutParams(dp(44),dp(44)));panel.addView(header);

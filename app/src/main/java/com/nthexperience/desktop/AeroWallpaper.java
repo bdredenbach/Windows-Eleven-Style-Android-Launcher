@@ -19,16 +19,18 @@ final class AeroWallpaper extends View {
     private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Path path = new Path();
     private final SevenScenery scenery=new SevenScenery();
+    private final ElevenWallpapers eleven=new ElevenWallpapers();
     private List<String> slides=Collections.emptyList();
     private List<String> order=Collections.emptyList();
     private int cursor,interval;
     private boolean shuffle,resumed;
     private String rendered="";
     private final Runnable rotation=this::next;
+    private String backgroundMode="Picture";private int solidColor=0xff0a263b;
     private int theme;private boolean following,closed;private Bitmap photo;private int photoWidth,photoHeight,background=0xff0a263b;private String position="Fill";private android.os.CancellationSignal request;
     private static final java.util.concurrent.ExecutorService images=java.util.concurrent.Executors.newSingleThreadExecutor();
     private static Bitmap artwork,wideArtwork;
-    private final java.util.List<java.lang.ref.WeakReference<AeroGlass>> surfaces=new java.util.ArrayList<>();
+    private final java.util.List<java.lang.ref.WeakReference<android.graphics.drawable.Drawable>> surfaces=new java.util.ArrayList<>();
     private Bitmap softened;
     private int softWidth,softHeight,softTheme=-1;
     private final int[] ownLocation=new int[2],targetLocation=new int[2];
@@ -36,11 +38,13 @@ final class AeroWallpaper extends View {
     AeroWallpaper(Context context, int theme,boolean following) { super(context); this.theme = theme;this.following=following;
         if(artwork==null){try{artwork=BitmapFactory.decodeStream(context.getAssets().open("wallpapers/aero-aurora.webp"));}catch(java.io.IOException ignored){}} if(wideArtwork==null){try{wideArtwork=BitmapFactory.decodeStream(context.getAssets().open("wallpapers/aero-aurora-landscape.webp"));}catch(java.io.IOException ignored){}} setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);if(following)reload(); }
     void theme(int value) { if(following)reload();else theme=value;softened=null;appearanceChanged(); }
-    void appearanceChanged(){invalidate();for(java.util.Iterator<java.lang.ref.WeakReference<AeroGlass>> i=surfaces.iterator();i.hasNext();){AeroGlass glass=i.next().get();if(glass==null)i.remove();else glass.invalidateSelf();}}
-    void register(AeroGlass glass){surfaces.add(new java.lang.ref.WeakReference<>(glass));}
+    void appearanceChanged(){invalidate();for(java.util.Iterator<java.lang.ref.WeakReference<android.graphics.drawable.Drawable>> i=surfaces.iterator();i.hasNext();){android.graphics.drawable.Drawable glass=i.next().get();if(glass==null)i.remove();else glass.invalidateSelf();}}
+    void register(android.graphics.drawable.Drawable glass){surfaces.add(new java.lang.ref.WeakReference<>(glass));}
     @Override protected void onDraw(Canvas c) {
         float w = getWidth(), h = getHeight();
+        if(following&&backgroundMode.equals("Solid color")){c.drawColor(solidColor);return;}
         if(photo!=null&&!photo.isRecycled()){drawPhoto(c,w,h);return;}
+        if(theme>=15&&theme<=20){eleven.draw(c,w,h,theme);return;}
         if(theme>=11&&theme<=14){drawTen(c,w,h);return;}
         if(theme==SEVEN){drawSeven(c,w,h);return;}
         if(theme>SEVEN&&theme<DesktopBackgrounds.NAMES.length){scenery.draw(c,w,h,theme);return;}
@@ -70,11 +74,11 @@ final class AeroWallpaper extends View {
         for(int i=0;i<24;i++) { float x=((i*167+41)%997)/997f*w, y=((i*107+73)%997)/997f*h; c.drawCircle(x,y,1+(i%3),paint); }
     }
     private void drawTen(Canvas c,float w,float h){
-        boolean light=theme==11||theme==12;int base=light?0xffd6e7ff:theme==14?0xff130c2d:0xff07162e;
+        boolean light=theme==11||theme==12;boolean spectrum=theme==14;int base=light?0xffd6e7ff:theme==14?0xff130c2d:0xff07162e;
         paint.setShader(new LinearGradient(0,0,w,h,new int[]{base,light?0xfff3f7ff:0xff0c2449},null,Shader.TileMode.CLAMP));c.drawRect(0,0,w,h,paint);
         int save=c.save();c.translate(w*.56f,h*.52f);float size=Math.max(w*.9f,h*.64f);c.rotate(-24);
         for(int n=11;n>=0;n--){float k=n/11f;path.reset();path.moveTo(-size*.44f,-size*.05f);path.cubicTo(-size*.6f,-size*.6f,size*.6f,-size*.42f,size*.34f,size*.04f);path.cubicTo(size*.05f,size*.34f,-size*.35f,size*.32f,-size*.12f,size*.6f);path.cubicTo(-size*.58f,size*.32f,-size*.63f,size*.15f,-size*.44f,-size*.05f);path.close();
-            paint.setShader(new LinearGradient(-size*.5f,-size*.4f,size*.5f,size*.5f,new int[]{light?0xff7ca9fa:0xff24519f,light?0xffe3efff:0xff6195ed,0xff2463ce,light?0xffa6caff:0xff12316b},null,Shader.TileMode.CLAMP));c.drawPath(path,paint);c.scale(.91f,.91f);c.rotate(7);}
+            paint.setShader(new LinearGradient(-size*.5f,-size*.4f,size*.5f,size*.5f,new int[]{spectrum?0xff8d45bd:light?0xff7ca9fa:0xff24519f,spectrum?0xffe59ce4:light?0xffe3efff:0xff6195ed,spectrum?0xff7543ab:0xff2463ce,spectrum?0xff251447:light?0xffa6caff:0xff12316b},null,Shader.TileMode.CLAMP));c.drawPath(path,paint);c.scale(.91f,.91f);c.rotate(7);}
         c.restoreToCount(save);paint.setShader(null);
     }
     void draft(int theme,Bitmap image,int width,int height,String position,int background){this.theme=theme;photo=image;photoWidth=width;photoHeight=height;this.position=position;this.background=background;softened=null;appearanceChanged();}
@@ -84,9 +88,10 @@ final class AeroWallpaper extends View {
     void reload(){
         if(closed||!following)return;
         android.content.SharedPreferences prefs=getContext().getSharedPreferences("desktop",0);
+        String nextMode=prefs.getString("eleven_background_mode","Picture");int nextSolid=prefs.getInt("eleven_solid_color",0xff0a263b);boolean modeChanged=!nextMode.equals(backgroundMode)||nextSolid!=solidColor;backgroundMode=nextMode;solidColor=nextSolid;
         String placement=prefs.getString("wallpaper_position","Fill");
         int color=BackgroundPicker.COLORS[Math.max(0,Math.min(BackgroundPicker.COLORS.length-1,prefs.getInt("wallpaper_bg",0)))];
-        boolean geometryChanged=!position.equals(placement)||color!=background;
+        boolean geometryChanged=modeChanged||!position.equals(placement)||color!=background;
         position=placement;background=color;
         List<String> selected=DesktopBackgrounds.current(prefs);
         boolean random=prefs.getBoolean(DesktopBackgrounds.SHUFFLE,false);
@@ -122,7 +127,7 @@ final class AeroWallpaper extends View {
         int id=DesktopBackgrounds.stockId(key);
         theme=id>=0?id:getContext().getSharedPreferences("desktop",0).getInt("wallpaper",SEVEN);
         photo=null;softened=null;appearanceChanged();
-        if(id>=0)return;
+        if(id>=0){if(following&&getContext() instanceof MainActivity)post(()->((MainActivity)getContext()).wallpaperReady());return;}
         android.os.CancellationSignal signal=new android.os.CancellationSignal();request=signal;
         android.content.Context context=getContext().getApplicationContext();
         images.execute(()->{
@@ -135,7 +140,7 @@ final class AeroWallpaper extends View {
                 if(decoded==null)rendered="";
                 photo=decoded==null?null:decoded.bitmap;
                 photoWidth=decoded==null?0:decoded.width;photoHeight=decoded==null?0:decoded.height;
-                softened=null;appearanceChanged();
+                softened=null;appearanceChanged();if(following&&getContext() instanceof MainActivity)((MainActivity)getContext()).wallpaperReady();
             });
         });
     }
