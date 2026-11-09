@@ -17,24 +17,27 @@ for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(e
 done
 }
 trap collect EXIT
-adb shell pm clear "$launcher"
-adb shell am force-stop "$launcher"
-timeout 240s adb shell am instrument -w -e suite storage -e phase setup "$launcher.test/com.nthexperience.desktop.StorageSmoke" | tee eleven-StorageSetup.txt
-grep -q 'PASS' eleven-StorageSetup.txt
-! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' eleven-StorageSetup.txt
-for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
+failures=()
+run_native() {
+ local runner="$1" label="$2"
+ shift 2
  adb shell am force-stop "$launcher"
- timeout 240s adb shell am instrument -w "$launcher.test/com.nthexperience.desktop.$runner" | tee "eleven-$runner.txt"
- grep -q 'PASS' "eleven-$runner.txt"
- ! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' "eleven-$runner.txt"
+ if timeout 240s adb shell am instrument -w "$@" "$launcher.test/com.nthexperience.desktop.$runner" | tee "eleven-$label.txt"; then
+  if grep -q 'PASS' "eleven-$label.txt" && ! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' "eleven-$label.txt"; then
+   return
+  fi
+ fi
+ failures+=("$label")
+}
+adb shell pm clear "$launcher"
+run_native StorageSmoke StorageSetup -e suite storage -e phase setup
+for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
+ run_native "$runner" "$runner"
 done
-
 adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
-adb shell am force-stop "$launcher"
-timeout 240s adb shell am instrument -w -e suite storage -e phase device "$launcher.test/com.nthexperience.desktop.StorageSmoke" | tee eleven-StorageDevice.txt
-grep -q 'PASS' eleven-StorageDevice.txt
-! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' eleven-StorageDevice.txt
-adb shell am force-stop "$launcher"
-timeout 240s adb shell am instrument -w "$launcher.test/com.nthexperience.desktop.PhotoSmoke" | tee eleven-PhotoSmoke.txt
-grep -q 'PASS' eleven-PhotoSmoke.txt
-! grep -q 'FAIL:\|INSTRUMENTATION_FAILED\|Process crashed' eleven-PhotoSmoke.txt
+run_native StorageSmoke StorageDevice -e suite storage -e phase device
+run_native PhotoSmoke PhotoSmoke
+if [ "${#failures[@]}" -ne 0 ]; then
+ echo "Failed native suites: ${failures[*]}"
+ exit 1
+fi
