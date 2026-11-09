@@ -6,7 +6,7 @@ Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten,
 
 ## Recording-based update
 
-0.8.2 measures desktop and menu labels for larger text, unifies Start app options with themed context menus, and adds desktop/Start/taskbar keyboard-menu and real preceding-version upgrade checks. See [the usability pass](docs/ELEVEN_0_8_2_FINAL_USABILITY_PASS.md).
+0.8.2 measures desktop and menu labels for larger text, unifies Start app options with themed context menus, preserves restored appearance/pin/taskbar settings through restart, and adds desktop/Start/taskbar keyboard-menu and real preceding-version upgrade checks. See [the usability pass](docs/ELEVEN_0_8_2_FINAL_USABILITY_PASS.md).
 
 0.8.1 places running apps on the expanded upper row and idle pins below, while retaining fixed controls in place. See [taskbar row correction](docs/ELEVEN_0_8_1_TASKBAR_ROWS.md).
 
