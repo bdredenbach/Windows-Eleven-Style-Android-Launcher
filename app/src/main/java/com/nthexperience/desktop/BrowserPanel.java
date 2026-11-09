@@ -122,8 +122,8 @@ final class BrowserPanel extends LinearLayout {
         try {
             tab.web=new WebView(activity);
             if(privateTab){if(privateName==null)privateName="nth-private-"+UUID.randomUUID();WebViewCompat.setProfile(tab.web,privateName);privateStorage=WebViewCompat.getProfile(tab.web).getWebStorage();}
-            configure(tab);tabs.add(tab);select(tab);if(BrowserUrls.web(url))navigate(url);save();
-        }catch(RuntimeException|LinkageError ex){if(tab.web!=null)tab.web.destroy();message("Browser engine unavailable","Install or enable Android System WebView, then reopen Nth Browser.\n\n"+ex.getClass().getSimpleName());}
+            configure(tab);WebViewTimers.attach(tab.web);tabs.add(tab);select(tab);if(BrowserUrls.web(url))navigate(url);save();
+        }catch(RuntimeException|LinkageError ex){if(tab.web!=null){WebViewTimers.detach(tab.web);tab.web.destroy();}message("Browser engine unavailable","Install or enable Android System WebView, then reopen Nth Browser.\n\n"+ex.getClass().getSimpleName());}
     }
     private void configure(Tab tab){
         WebView view=tab.web;WebSettings settings=view.getSettings();
@@ -180,10 +180,10 @@ final class BrowserPanel extends LinearLayout {
     private void rebuildTabs(){tabStrip.removeAllViews();for(Tab tab:tabs){LinearLayout item=new LinearLayout(activity);item.setGravity(Gravity.CENTER_VERTICAL);android.graphics.drawable.GradientDrawable tabShape=new android.graphics.drawable.GradientDrawable();tabShape.setColor(tab==selected?0xfff9f9f9:0xffdfdfdf);tabShape.setCornerRadii(new float[]{dp(7),dp(7),dp(7),dp(7),0,0,0,0});item.setBackground(tabShape);TextView label=Aero.text(activity,(tab.privateTab?"▣  ":"")+tab.title,12,0xff263e50);label.setSingleLine();label.setEllipsize(android.text.TextUtils.TruncateAt.END);label.setPadding(dp(9),0,0,0);label.setContentDescription("Browser tab "+(tabs.indexOf(tab)+1)+(tab.privateTab?" InPrivate":"")+": "+tab.title);label.setOnClickListener(v->select(tab));item.addView(label,new LayoutParams(dp(102),dp(36)));BrowserGlyph close=glyph("close","Close browser tab "+(tabs.indexOf(tab)+1),()->closeTab(tab),32);item.addView(close);LayoutParams params=new LayoutParams(-2,-1);params.rightMargin=dp(3);tabStrip.addView(item,params);}}
     boolean goBack(){if(fullScreen!=null){exitFullScreen();return true;}if(findBar.getVisibility()==VISIBLE){closeFind();return true;}if(web()!=null&&web().canGoBack()){selected.failure=null;showSelected();web().goBack();return true;}if(selected!=null&&!selected.url.isEmpty()){home();return true;}return false;}
     void closeCurrentTab(){if(selected!=null)closeTab(selected);}
-    private void closeTab(Tab tab){if(!tabs.contains(tab))return;if(tab==selected){cancelSiteRequests();cancelUpload();exitFullScreen();}tabs.remove(tab);if(tab.web.getParent() instanceof ViewGroup)((ViewGroup)tab.web.getParent()).removeView(tab.web);tab.web.stopLoading();tab.web.destroy();if(selected==tab){selected=null;if(tabs.isEmpty())addTab("",false);else select(tabs.get(Math.max(0,tabs.size()-1)));}clearPrivateIfUnused();rebuildTabs();save();}
+    private void closeTab(Tab tab){if(!tabs.contains(tab))return;if(tab==selected){cancelSiteRequests();cancelUpload();exitFullScreen();}tabs.remove(tab);if(tab.web.getParent() instanceof ViewGroup)((ViewGroup)tab.web.getParent()).removeView(tab.web);tab.web.stopLoading();WebViewTimers.detach(tab.web);tab.web.destroy();if(selected==tab){selected=null;if(tabs.isEmpty())addTab("",false);else select(tabs.get(Math.max(0,tabs.size()-1)));}clearPrivateIfUnused();rebuildTabs();save();}
     private void restoreTabs(){restoring=true;JSONArray saved=data.list("tabs");for(int i=0;i<saved.length()&&i<MAX_TABS;i++){JSONObject item=saved.optJSONObject(i);if(item==null)continue;String url=item.optString("url");if(url.isEmpty()||BrowserUrls.web(url))addTab(url,false);}if(tabs.isEmpty())addTab("",false);else select(tabs.get(Math.max(0,Math.min(tabs.size()-1,data.prefs.getInt("selected",0)))));restoring=false;save();}
     void save(){if(restoring||closed)return;JSONArray saved=new JSONArray();int index=0;for(Tab tab:tabs)if(!tab.privateTab){JSONObject item=new JSONObject();GadgetLayout.put(item,"url",tab.url);saved.put(item);if(tab==selected)index=saved.length()-1;}data.prefs.edit().putString("tabs",saved.toString()).putInt("selected",index).apply();}
-    void active(boolean value){foreground=value;if(!value)dismissMenu();if(selected!=null){if(value&&isShown())selected.web.resumeTimers();else selected.web.pauseTimers();}for(Tab tab:tabs)if(value&&tab==selected&&isShown()&&tab.failure==null&&!tab.url.isEmpty())tab.web.onResume();else tab.web.onPause();if(!value)exitFullScreen();}
+    void active(boolean value){foreground=value;if(!value)dismissMenu();for(Tab tab:tabs)if(value&&tab==selected&&isShown()&&tab.failure==null&&!tab.url.isEmpty())tab.web.onResume();else tab.web.onPause();if(!value)exitFullScreen();}
     @Override protected void onAttachedToWindow(){super.onAttachedToWindow();post(()->{if(!closed)active(foreground);});}
     @Override protected void onVisibilityChanged(View view,int visibility){super.onVisibilityChanged(view,visibility);if(tabs!=null)active(foreground);}
     private void enterFullScreen(Tab tab,View view,WebChromeClient.CustomViewCallback callback){
@@ -202,7 +202,7 @@ final class BrowserPanel extends LinearLayout {
         if(callback!=null)callback.onCustomViewHidden();
     }
     private void clearPrivateIfUnused(){for(Tab tab:tabs)if(tab.privateTab)return;if(privateStorage!=null){WebStorage storage=privateStorage;privateStorage=null;privateName=null;WebStorageCompat.deleteBrowsingData(storage,()->{});}}
-    void close(){if(closed)return;save();closed=true;dismissMenu();cancelSiteRequests();cancelUpload();exitFullScreen();handler.removeCallbacksAndMessages(null);content.removeAllViews();for(Tab tab:tabs){tab.web.stopLoading();tab.web.destroy();}tabs.clear();selected=null;clearPrivateIfUnused();if(transientDialog!=null)transientDialog.cancel();}
+    void close(){if(closed)return;save();closed=true;dismissMenu();cancelSiteRequests();cancelUpload();exitFullScreen();handler.removeCallbacksAndMessages(null);content.removeAllViews();for(Tab tab:tabs){tab.web.stopLoading();WebViewTimers.detach(tab.web);tab.web.destroy();}tabs.clear();selected=null;clearPrivateIfUnused();if(transientDialog!=null)transientDialog.cancel();}
 
     void askNota(){
         if(!(activity instanceof MainActivity)||selected==null)return;Tab source=selected;

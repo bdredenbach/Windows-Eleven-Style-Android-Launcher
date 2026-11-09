@@ -16,6 +16,8 @@ Fresh frames were decoded directly from all three recordings at 15-second interv
 
 Existing 0.3–0.6 implementations are retained: Settings hierarchy/navigation, Explorer commands and file operations, Recycle Bin selection/recovery, Snap, Focus, 23 presets, Transparency effects, notification filters, storage/power controls, Start/search choices, Nota, browser, media and modern Task Manager.
 
+The integration pass also found that minimizing the browser called the process-wide `WebView.pauseTimers()`, which could freeze other WebViews. Timer ownership now belongs to the Activity foreground/background lifecycle; per-window pause/resume remains local. A native regression checks an actual market-display timer continues after the browser window is minimized.
+
 ## Verification
 
 Pending the complete Android 11/API30 and Android 16/API36 matrix. New unit checks cover fixed provider configuration, injection-resistant options, safe navigation, portable settings and honest app-category mapping. Native checks use a separately labeled local document to test display/lifecycle and record the official provider probe independently. A created iframe alone is not proof that all quotes are available; native screenshots must be reviewed.
