@@ -39,8 +39,10 @@ jobs:
           python3 checks/CheckElevenIconAssets.py
       - run: ./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :fixture:assembleDebug :installprobe:assembleDebug --no-daemon
       - name: Keep matching public compile jars
+        if: always()
         run: python3 checks/PrepareCompileKit.py
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: Eleven-compile-kit-api-${{ matrix.api }}
           path: build/compile-kit/

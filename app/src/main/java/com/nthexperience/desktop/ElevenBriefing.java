@@ -1,0 +1,24 @@
+package com.nthexperience.desktop;
+
+import android.os.*;
+import org.json.*;
+import java.io.*;
+import java.net.*;
+import java.nio.charset.StandardCharsets;
+import java.time.*;
+import java.util.*;
+import java.util.concurrent.*;
+
+/** Opt-in, bounded public-provider cards. No bundled scores, prices or historical claims. */
+final class ElevenBriefing {
+    private final DesktopStore store;private final Runnable changed;private final ExecutorService worker=Executors.newSingleThreadExecutor();private final Handler main=new Handler(Looper.getMainLooper());private final Set<String> busy=new HashSet<>();private boolean closed;
+    ElevenBriefing(DesktopStore store,Runnable changed){this.store=store;this.changed=changed;}
+    static String key(String type,String field){return "eleven_brief_"+type+"_"+field;}
+    JSONArray rows(String type){try{if(type.equals("history")&&!LocalDate.now().toString().equals(store.prefs.getString(key(type,"day"),"")))return new JSONArray();return new JSONArray(store.prefs.getString(key(type,"rows"),"[]"));}catch(JSONException e){return new JSONArray();}}
+    boolean enabled(String type){return store.prefs.getBoolean(key(type,"enabled"),false);}boolean loading(String type){return busy.contains(type);}String error(String type){return store.prefs.getString(key(type,"error"),"");}
+    void load(String type,boolean explicit){if(closed||busy.contains(type)||!Arrays.asList("sports","history").contains(type))return;if(explicit)store.prefs.edit().putBoolean(key(type,"enabled"),true).apply();if(!enabled(type)||!explicit&&System.currentTimeMillis()<store.prefs.getLong(key(type,"retry"),0))return;busy.add(type);String day=LocalDate.now().toString();worker.execute(()->{JSONArray result=null;String error="";HttpURLConnection connection=null;try{
+        LocalDate today=LocalDate.parse(day);String address=type.equals("sports")?"https://feeds.bbci.co.uk/sport/rss.xml":String.format(Locale.ROOT,"https://en.wikipedia.org/api/rest_v1/feed/onthisday/selected/%02d/%02d",today.getMonthValue(),today.getDayOfMonth());connection=(HttpURLConnection)new URL(address).openConnection();connection.setConnectTimeout(8000);connection.setReadTimeout(8000);connection.setInstanceFollowRedirects(false);connection.setRequestProperty("User-Agent","NthDesktopEleven/0.5.0 (https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher)");int status=connection.getResponseCode();if(status!=200)throw new IOException("Provider returned HTTP "+status);try(InputStream in=connection.getInputStream()){if(type.equals("sports")){try(FeedXml.Limited limited=new FeedXml.Limited(in)){result=FeedXml.parse(limited,address,null);}}else{ByteArrayOutputStream bytes=new ByteArrayOutputStream();byte[] buffer=new byte[8192];int n;while((n=in.read(buffer))!=-1){if(bytes.size()+n>1_000_000)throw new IOException("Provider response is too large");bytes.write(buffer,0,n);}result=history(bytes.toString(StandardCharsets.UTF_8.name()));}}if(result.length()==0)throw new IOException("No entries are available");
+    }catch(Exception failure){error=failure.getMessage()==null?"Provider is unavailable":failure.getMessage();}finally{if(connection!=null)connection.disconnect();}JSONArray ready=result;String problem=error;main.post(()->{busy.remove(type);if(closed)return;android.content.SharedPreferences.Editor edit=store.prefs.edit().putString(key(type,"error"),problem).putLong(key(type,"retry"),System.currentTimeMillis()+(problem.isEmpty()?type.equals("history")?6*60*60_000:30*60_000:5*60_000));if(problem.isEmpty())edit.putString(key(type,"rows"),ready.toString()).putString(key(type,"day"),day).putLong(key(type,"updated"),System.currentTimeMillis());edit.apply();changed.run();});});}
+    static JSONArray history(String json)throws JSONException{JSONArray input=new JSONObject(json).getJSONArray("selected"),out=new JSONArray();for(int i=0;i<Math.min(10,input.length());i++){JSONObject item=input.optJSONObject(i);if(item==null)continue;JSONArray pages=item.optJSONArray("pages");JSONObject page=pages==null?null:pages.optJSONObject(0);JSONObject urls=page==null?null:page.optJSONObject("content_urls"),desktop=urls==null?null:urls.optJSONObject("desktop");String url=desktop==null?"":desktop.optString("page"),text=item.optString("text");if(!url.startsWith("https://en.wikipedia.org/wiki/")||text.isEmpty()||!item.has("year"))continue;JSONObject row=new JSONObject();row.put("title",item.getInt("year")+" · "+text.substring(0,Math.min(700,text.length())));row.put("url",url);out.put(row);}return out;}
+    void close(){closed=true;worker.shutdownNow();}private ElevenBriefing(){throw new AssertionError();}
+}
