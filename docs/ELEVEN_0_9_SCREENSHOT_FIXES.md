@@ -1,6 +1,6 @@
 # Eleven 0.9.0: complete handoff and owner screenshot corrections
 
-This build branch includes the complete fix commit `a4582b2fd34aa6e8c4fd797bb7c2e9975ef87ecc` on the matching 0.8.2 baseline. The draft review stays separate from `main` pending Brad's approval.
+This update includes the complete fix commit `a4582b2fd34aa6e8c4fd797bb7c2e9975ef87ecc` on the matching 0.8.2 baseline. Brad approved updating `main` and delivering the signed APK on November 9, 2026.
 
 ## Screenshot corrections
 
@@ -23,6 +23,8 @@ The full cache, partial cross-desktop restore/undo, restored-folder repair, opti
 Start's power popover adapts Windows' privileged commands to real Android destinations: Screen lock settings, Screen timeout, Android power settings and Restart Nth Desktop. It does not claim to shut down, lock or restart Android without OS privileges. The recorded account name and portrait remain the user's local profile choice.
 
 ## Validation
+
+The complete Android 11/API30 and Android 16/API36 matrix passed at source `5d4dd4584569c5ab059954332bd936db8c59af73`: [run 42699523081](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42699523081). Each platform passed 106 unit tests and 22 native execution phases, including 147 owner-screenshot assertions, 575 final-usability assertions, 265 purchaser-walkthrough assertions, actual 0.8.2 upgrade/restore/undo and the native ordered setup with approximate-only location. Runtime captures contain no fatal exception. Final documentation updates do not change application or test code.
 
 The new native `ElevenScreenshotSmoke` covers portrait/landscape, Left/Center, magnifier input/results, the upper-row origin, initial 5×9 label clearance, Show desktop touch/restore, full-width footer, Power with all shortcuts enabled, profile options and replacement classic-menu commands. It captures app-view evidence and the Android adaptive application icon. Existing geometry, theme, taskbar stability, real prior-APK upgrade, restore/undo and app suites remain in the workflow. Ordered setup, coarse-only location and uninstall/cancellation continue to have unit coverage.
 
