@@ -22,6 +22,8 @@ The full storage regression also exposed ambiguous test targeting: the Computer 
 
 The Android 11 system image ships an older web engine that rejects the provider’s logical-assignment syntax. The card detects that specific syntax failure and replaces the blank view with a WebView update route and retained report links. The current Android 16 engine displays the ETF quotes. Native tests check both interval timers and animation frames continue after browser minimization.
 
+Actual injected category-list touches caught a Start shortcut issue: focusable-in-touch-mode rows consumed the first tap to focus. Shortcuts now remain keyboard-focusable without requiring touch focus, so the first tap launches the chosen app. The native check opens the full category list and uses injected touch events.
+
 ## Verification
 
 Pending the complete Android 11/API30 and Android 16/API36 matrix. New unit checks cover fixed provider configuration, injection-resistant options, safe navigation, portable settings and honest app-category mapping. Native checks use a separately labeled local document to test display/lifecycle and record the official provider probe independently. A created iframe alone is not proof that all quotes are available; native screenshots must be reviewed.
