@@ -33,7 +33,13 @@ Completion checks use real document-provider files and compare restored bytes, p
 
 Every independent native suite is run before failures are reported, so one failed area does not hide the rest. Emulator screenshots and an area-visit ledger are collected. Android 16 headless system screenshots may be black; app-view captures and behavior assertions are used there, alongside Android 11 system screenshots.
 
-Final run results and delivered APK verification will be recorded after the matrix completes.
+Final matrix: [42555998124](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/actions/runs/42555998124), application/validation source `646575d61533f36ae5ca5995f1006d74a4946df7`. **Both API30 and API36 jobs passed all 15 native suites and all 37 unit tests**, plus 157,840 geometry checks, Nota command boundaries, 46 pinned icon checks and identity validation. Each API passed 265 purchaser, 94 completion, 4,417 appearance, 216 shell, 109 recording-gap and 171 Nota assertions, alongside the browser, feed, storage, photo and media suites.
+
+Both APIs connected to NHL (6 actual rows), Wikipedia (10 entries), BBC News and TechRadar (12 headlines each). Android 11 native screenshots and Android 16 app-view captures were reviewed. No captured FATAL EXCEPTION was found. Physical Pixel 10 and production cloud-writing calls were not exercised.
+
+Delivered APK: code 7, `11769657` bytes, SHA-256 `c4b884d1cfe4fadb1eb6d5a83bf2c03a0c9bb90eb163be019419bc453dc1bc38`. The retained preview certificate is `b704c7a2da2d0d4425fa5fe61c122483389b07be327ad565ff198064af696265`; v2/v3 signing and 16 KiB ZIP alignment pass. All 537 non-signing entries match both independent CI builds and the delivered APK.
+
+Minor cosmetic follow-up: singular/plural item counts and a few secondary menu glyph choices. These do not reopen the functional controls completed here.
 
 ## Provider references
 
