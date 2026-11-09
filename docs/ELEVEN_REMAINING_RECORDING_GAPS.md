@@ -4,6 +4,10 @@ Original audit: November 8, 2026 against application source [`3366104c343dd662c8
 
 The remaining work is chiefly deeper controls, page composition and interaction details. The broad 0.2.0 reference mapping establishes that a destination exists; it does not establish that every control inside the recorded destination is reproduced. The thirty items below identify that difference explicitly.
 
+## Appearance follow-up in 0.4.0
+
+Rechecked the three supplied videos for the theme/material round. See [0.4.0 implementation and current gap status](ELEVEN_0_4_THEMES_AND_AUDIT.md) for the recorded theme counterparts, transparency, menu colors, Personalization controls and Widgets settings. The original findings below remain the historical baseline.
+
 ## Progress in 0.3.0
 
 The original observations below remain a historical baseline. The [0.3.0 implementation notes](ELEVEN_0_3_RECORDING_GAPS.md) supersede their descriptions of current code. This is an incremental implementation, not completion of all thirty items.

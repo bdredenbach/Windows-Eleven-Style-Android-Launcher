@@ -12,12 +12,10 @@ final class ElevenPersonalization {
         switch(page){
             case "colors":colors(s);return true;
             case "background":background(s);return true;
-            case "background-slideshow":s.body.addView(new BackgroundPicker(s.getContext(),s.store,new JSONObject(),()->s.open.accept("setting:wallpaper-browse"),()->s.open.accept("setting:wallpaper-folder"),s::appearanceChanged),new LinearLayout.LayoutParams(-1,-2));return true;
+            case "background-slideshow":s.body.addView(new BackgroundPicker(s.getContext(),s.store,s.backgroundDraft,()->s.open.accept("setting:wallpaper-browse"),()->s.open.accept("setting:wallpaper-folder"),s::appearanceChanged),new LinearLayout.LayoutParams(-1,-2));return true;
             case "themes":
                 preview(s);s.detail("Current theme",TenThemes.currentName(s.store));
-                s.card("Background",backgroundName(s),"pictures",()->s.navigate("background"));
-                s.card("Color",ElevenColors.hex(TenStyle.accent(s.getContext())),"personalization",()->s.navigate("colors"));
-                s.card("Sounds",DesktopSounds.scheme(s.store),"sound",()->s.open.accept("setting:page:sounds"));
+                themeLinks(s);
                 s.body.addView(new TenThemeGallery(s.getContext(),s.store,Math.max(s.dp(180),s.width-s.navWidth-s.dp(32)),s.open,s::appearanceChanged),new LinearLayout.LayoutParams(-1,-2));return true;
             default:return false;
         }
@@ -28,12 +26,13 @@ final class ElevenPersonalization {
         LinearLayout window=Aero.column(s.getContext());window.setPadding(s.dp(8),s.dp(5),s.dp(8),s.dp(8));int fill=s.dark()?0xff262633:0xfffafafa;window.setBackground(ElevenSurface.round(s.getContext(),fill,5));
         for(int i=0;i<3;i++){View line=new View(s.getContext());line.setBackgroundColor(s.dark()?0xffc4c5d0:0xff676779);LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(s.dp(74-i*9),s.dp(2));lp.setMargins(0,s.dp(7),0,s.dp(2));window.addView(line,lp);}
         View accent=new View(s.getContext());accent.setBackground(ElevenSurface.round(s.getContext(),TenStyle.accent(s.getContext()),3));LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(s.dp(32),s.dp(13));ap.gravity=Gravity.END;ap.topMargin=s.dp(12);window.addView(accent,ap);
-        FrameLayout.LayoutParams wp=new FrameLayout.LayoutParams(s.dp(98),s.dp(100),Gravity.CENTER_VERTICAL|Gravity.END);wp.rightMargin=s.dp(16);sample.addView(window,wp);LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(-1,s.dp(150));size.bottomMargin=s.dp(12);s.body.addView(sample,size);
+        FrameLayout.LayoutParams wp=new FrameLayout.LayoutParams(s.dp(98),s.dp(100),Gravity.CENTER_VERTICAL|Gravity.END);wp.rightMargin=s.dp(16);sample.addView(window,wp);LinearLayout.LayoutParams size=new LinearLayout.LayoutParams(-1,s.dp(s.getResources().getConfiguration().orientation==2?90:150));size.bottomMargin=s.dp(12);s.body.addView(sample,size);
     }
     private static void colors(TenSettings s){
         preview(s);s.modeChoice();
-        ElevenSettingsPages.select(s,"Choose your default Windows mode",new String[]{"Light","Dark"},s.store.prefs.getBoolean("ten_light",false)?0:1,n->{s.store.prefs.edit().putBoolean("ten_light",n==0).apply();s.appearanceChanged();});
+        if(s.store.prefs.getBoolean("eleven_custom_mode",false)||s.store.prefs.getBoolean("ten_light",false)==s.dark()){ElevenSettingsPages.select(s,"Choose your default Windows mode",new String[]{"Light","Dark"},s.store.prefs.getBoolean("ten_light",false)?0:1,n->{s.store.prefs.edit().putBoolean("ten_light",n==0).apply();s.appearanceChanged();});
         ElevenSettingsPages.select(s,"Choose your default app mode",new String[]{"Light","Dark"},s.dark()?1:0,n->{s.store.prefs.edit().putBoolean("ten_apps_dark",n==1).apply();s.appearanceChanged();});
+        }
         s.appearanceToggle("Transparency effects","ten_transparency",false);
         s.detail("","Windows and surfaces use a softly tinted glass effect. Turn this off for solid surfaces.");
         String mode=s.store.prefs.getString(ElevenColors.MODE,"Manual");
@@ -41,7 +40,7 @@ final class ElevenPersonalization {
         List<Integer> recent=ElevenColors.recent(s.store);if(!recent.isEmpty()){s.detail("Recent colors","");s.body.addView(swatches(s,recent,false),new LinearLayout.LayoutParams(-1,-2));}
         s.detail("Windows colors","");s.body.addView(new TenAccentPicker(s.getContext(),s.store,s::appearanceChanged),new LinearLayout.LayoutParams(-1,-2));
         s.card("Custom colors",ElevenColors.hex(TenStyle.accent(s.getContext())),"personalization",()->custom(s,false));
-        s.appearanceToggle("Show accent color on Start and taskbar","ten_accent_shell",false);
+        s.appearanceToggle("Show accent color on Start and taskbar","ten_accent_shell",false);s.body.getChildAt(s.body.getChildCount()-1).setEnabled(!TenStyle.light(s.getContext()));
         s.appearanceToggle("Show accent color on title bars and window borders","ten_accent_titles",false);
         ElevenSettingsPages.select(s,"Window finish",new String[]{"Eleven","Classic Aero"},TenThemes.aero(s.store.prefs)?1:0,n->{s.store.prefs.edit().putString("ten_shell_style",n==1?"Aero":"Ten").apply();s.appearanceChanged();});
         if(TenThemes.aero(s.store.prefs))s.body.addView(new TenAeroColors(s.getContext(),s.store,s::appearanceChanged),new LinearLayout.LayoutParams(-1,-2));
@@ -66,6 +65,9 @@ final class ElevenPersonalization {
         Runnable preview=()->{try{int color=ElevenColors.parse(hex.getText().toString());sample.setBackgroundColor(color);sample.setTextColor(TenAccent.on(color));}catch(IllegalArgumentException ignored){}};hex.addTextChangedListener(new android.text.TextWatcher(){public void beforeTextChanged(CharSequence a,int b,int c,int d){}public void onTextChanged(CharSequence a,int b,int c,int d){preview.run();}public void afterTextChanged(android.text.Editable e){}});preview.run();
         android.app.AlertDialog dialog=Aero.dialog(s.getContext()).setTitle(background?"Custom background color":"Custom accent color").setView(content).setPositiveButton("Done",null).setNegativeButton("Cancel",null).show();dialog.getButton(-1).setOnClickListener(v->{try{int color=ElevenColors.parse(hex.getText().toString());if(background)s.store.prefs.edit().putInt("eleven_solid_color",color).putString("eleven_background_mode","Solid color").apply();else ElevenColors.choose(s.store,color);dialog.dismiss();s.appearanceChanged();}catch(IllegalArgumentException invalid){hex.setError(invalid.getMessage());}});
     }
+
+    static void restoreDraft(JSONObject destination,JSONObject source){if(source==null)return;try{for(String key:new String[]{"selected","photos"})if(source.has(key)){org.json.JSONArray rows=source.getJSONArray(key);DesktopBackgrounds.parse(rows.toString());destination.put(key,new org.json.JSONArray(rows.toString()));}String position=source.optString("position","Fill");destination.put("position",Arrays.asList(BackgroundPicker.POSITIONS).contains(position)?position:"Fill");destination.put("background",Math.max(0,Math.min(5,source.optInt("background",0))));int interval=source.optInt("interval",1800);destination.put("interval",DesktopBackgrounds.intervalValid(interval)?interval:1800);destination.put("shuffle",source.optBoolean("shuffle",false));destination.put("location",Math.max(0,Math.min(4,source.optInt("location",0))));}catch(Exception ignored){java.util.Iterator<String> keys=destination.keys();while(keys.hasNext()){keys.next();keys.remove();}}}
+    private static void themeLinks(TenSettings s){GridLayout grid=new GridLayout(s.getContext());grid.setColumnCount(2);String[][] labels={{"Background",backgroundName(s),"background"},{"Color",ElevenColors.hex(TenStyle.accent(s.getContext())),"colors"},{"Sounds",DesktopSounds.scheme(s.store),"sounds"}};for(int i=0;i<labels.length;i++){String[] row=labels[i];TextView link=Aero.text(s.getContext(),row[0]+"\n"+row[1],12,TenAppearance.ink(s.getContext()));link.setPadding(s.dp(8),s.dp(7),s.dp(8),s.dp(7));link.setMinHeight(s.dp(48));link.setBackground(TenStyle.appHover(s.getContext(),Color.TRANSPARENT));link.setFocusable(true);link.setContentDescription("Theme "+row[0]);link.setOnClickListener(v->{if(row[2].equals("sounds"))s.open.accept("setting:page:sounds");else s.navigate(row[2]);});GridLayout.LayoutParams lp=new GridLayout.LayoutParams(GridLayout.spec(i/2),GridLayout.spec(i%2,1f));lp.width=0;lp.height=-2;grid.addView(link,lp);}s.body.addView(grid,new LinearLayout.LayoutParams(-1,-2));}
     private static String backgroundName(TenSettings s){if("Solid color".equals(s.store.prefs.getString("eleven_background_mode","Picture")))return "Solid color · "+ElevenColors.hex(s.store.prefs.getInt("eleven_solid_color",0xff0a263b));List<String> values=DesktopBackgrounds.current(s.store.prefs);int id=DesktopBackgrounds.stockId(values.get(0));return values.size()>1?"Slideshow · "+values.size()+" pictures":id>=0?DesktopBackgrounds.NAMES[id]:"Your picture";}
     private ElevenPersonalization(){}
 }

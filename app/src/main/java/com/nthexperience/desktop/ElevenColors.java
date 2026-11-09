@@ -20,9 +20,9 @@ final class ElevenColors {
     }
     static void validate(JSONObject values)throws JSONException{
         if(values.has(MODE)&&!Arrays.asList("Manual","Automatic").contains(values.get(MODE)))throw new JSONException("Invalid accent mode");
-        if(values.has(RECENT)){if(!(values.get(RECENT) instanceof String))throw new JSONException("Invalid recent colors");JSONArray rows=new JSONArray(values.getString(RECENT));if(rows.length()>5)throw new JSONException("Too many recent colors");for(int i=0;i<rows.length();i++)if(!(rows.get(i) instanceof Integer))throw new JSONException("Invalid recent color");}
+        if(values.has(RECENT)){if(!(values.get(RECENT) instanceof String))throw new JSONException("Invalid recent colors");JSONArray rows=new JSONArray(values.getString(RECENT));if(rows.length()>5)throw new JSONException("Too many recent colors");for(int i=0;i<rows.length();i++)if(!(rows.get(i) instanceof Integer)||(rows.getInt(i)>>>24)!=255)throw new JSONException("Invalid recent color");}
         if(values.has("eleven_background_mode")&&!Arrays.asList("Picture","Solid color","Slideshow").contains(values.get("eleven_background_mode")))throw new JSONException("Invalid background mode");
-        if(values.has("eleven_solid_color")&&!(values.get("eleven_solid_color") instanceof Integer))throw new JSONException("Invalid solid color");
+        if(values.has("eleven_solid_color")&&(!(values.get("eleven_solid_color") instanceof Integer)||(values.getInt("eleven_solid_color")>>>24)!=255))throw new JSONException("Invalid solid color");
     }
     private ElevenColors(){}
 }

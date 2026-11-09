@@ -38,12 +38,12 @@ final class ThemeProfiles {
     }
     static JSONObject capture(DesktopStore store,String title)throws JSONException{
         JSONObject profile=new JSONObject().put("name",title.trim())
-                .put("backgrounds",new JSONArray(DesktopBackgrounds.current(store.prefs)))
+                .put("backgrounds",new JSONArray("Solid color".equals(store.prefs.getString("eleven_background_mode","Picture"))?java.util.Collections.singletonList(DesktopBackgrounds.stock(13)):DesktopBackgrounds.current(store.prefs)))
                 .put("eleven_background_mode",store.prefs.getString("eleven_background_mode",DesktopBackgrounds.current(store.prefs).size()>1?"Slideshow":"Picture")).put("eleven_solid_color",store.prefs.getInt("eleven_solid_color",0xff0a263b)).put(ElevenColors.MODE,store.prefs.getString(ElevenColors.MODE,"Manual"))
                 .put("position",store.prefs.getString("wallpaper_position","Fill")).put(DesktopSounds.SCHEME,DesktopSounds.scheme(store));
         for(int i=0;i<SWITCHES.length;i++)profile.put(SWITCHES[i],store.prefs.getBoolean(SWITCHES[i],SWITCH_DEFAULTS[i]));
         for(int i=0;i<NUMBERS.length;i++)profile.put(NUMBERS[i],store.prefs.getInt(NUMBERS[i],DEFAULTS[i]));
-        for(String key:new String[]{"ten_apps_dark","ten_light","ten_transparency","ten_accent_shell","ten_accent_titles"})profile.put(key,store.prefs.getBoolean(key,false));profile.put("ten_accent",store.prefs.getInt("ten_accent",TenStyle.ACCENT)).put("ten_shell_style",store.prefs.getString("ten_shell_style","Ten"));
+        for(String key:new String[]{"eleven_custom_mode","ten_apps_dark","ten_light","ten_transparency","ten_accent_shell","ten_accent_titles"})profile.put(key,store.prefs.getBoolean(key,false));profile.put("ten_accent",store.prefs.getInt("ten_accent",TenStyle.ACCENT)).put("ten_shell_style",store.prefs.getString("ten_shell_style","Ten"));
         validate(profile);
         return profile;
     }
@@ -93,7 +93,7 @@ final class ThemeProfiles {
         edit.putString("wallpaper_position",profile.getString("position")).putString(DesktopSounds.SCHEME,profile.optString(DesktopSounds.SCHEME,"classic"));
         for(String key:SWITCHES)edit.putBoolean(key,profile.getBoolean(key));
         for(String key:NUMBERS)edit.putInt(key,profile.getInt(key));
-        edit.putBoolean("ten_apps_dark",profile.optBoolean("ten_apps_dark",false)).putString("ten_shell_style",profile.optString("ten_shell_style","Aero")).putInt("ten_accent",profile.optInt("ten_accent",AeroGlass.TINTS[profile.getInt("aero_color")])).putBoolean("ten_light",profile.optBoolean("ten_light",false)).putBoolean("ten_transparency",profile.optBoolean("ten_transparency",profile.getBoolean("aero_transparency"))).putBoolean("ten_accent_shell",profile.optBoolean("ten_accent_shell",false)).putBoolean("ten_accent_titles",profile.optBoolean("ten_accent_titles",false));
+        edit.putBoolean("eleven_custom_mode",profile.optBoolean("eleven_custom_mode",false)).putBoolean("ten_apps_dark",profile.optBoolean("ten_apps_dark",false)).putString("ten_shell_style",profile.optString("ten_shell_style","Aero")).putInt("ten_accent",profile.optInt("ten_accent",AeroGlass.TINTS[profile.getInt("aero_color")])).putBoolean("ten_light",profile.optBoolean("ten_light",false)).putBoolean("ten_transparency",profile.optBoolean("ten_transparency",profile.getBoolean("aero_transparency"))).putBoolean("ten_accent_shell",profile.optBoolean("ten_accent_shell",false)).putBoolean("ten_accent_titles",profile.optBoolean("ten_accent_titles",false));
         edit.apply();
     }
     static byte[] pack(Context context,JSONObject profile)throws Exception{
