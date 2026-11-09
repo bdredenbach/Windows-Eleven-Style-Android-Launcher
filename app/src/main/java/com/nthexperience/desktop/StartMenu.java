@@ -126,6 +126,7 @@ final class StartMenu extends LinearLayout {
         menu.item("Open",item.kind,()->openResult(item.id));boolean pinned=store.startPins().contains(item.id);
         if(item.shortcut)menu.item(pinned?"Unpin from Start":"Pin to Start","programs",()->{List<String> ids=new ArrayList<>(store.startPins());if(pinned)ids.remove(item.id);else if(ids.size()<32)ids.add(item.id);store.startPins(ids);render();});
         if(pinned){menu.item("Move earlier","empty",()->move(item.id,-1));menu.item("Move later","empty",()->move(item.id,1));}
+        AppUninstaller.add(menu,getContext(),item.id);
         menu.item("More options","control",()->actions.options(anchor,item.id));ContextMenus.centered(anchor,(x,y)->ContextMenus.show(menu,anchor,x,y));
     }
     private void renderApps(){
