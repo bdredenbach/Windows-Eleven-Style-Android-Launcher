@@ -28,4 +28,6 @@ The new native `ElevenScreenshotSmoke` covers portrait/landscape, Left/Center, m
 
 The update regression uses the actual 0.8.2/code12 APK and the new 0.9.0/code13 APK. It checks retained preferences and saved coordinates; the one-time grid-height recalibration for taskbar clearance is an intentional visual change. Production delivery is externally aligned and signed with the retained Eleven preview key, then verified against its established certificate. Disposable CI signing is limited to emulator update checks.
 
+The inherited storage/purchaser setup tests now follow the ordered flow rather than waiting for the superseded automatic Home/Explorer prompts. Native setup exercises the actual Android Home request and cancellation, file-step recreation, optional permission deferrals, the native approximate-only location grant and completed Welcome/no-repeat behavior. Existing manual Usage Access recovery, denied-file recovery and native resize checks remain.
+
 Private reference recordings `224513.mp4` (Start 3–51s, Search 57–69s) and `224515.mp4` (desktop menu 111–123s) were revisited. Recordings and reference frames are excluded from public source and delivery. This is a native regression and visual comparison, with physical Pixel 10 confirmation remaining on the owner's device.
