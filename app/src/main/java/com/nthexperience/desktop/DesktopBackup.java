@@ -163,6 +163,7 @@ final class DesktopBackup {
         // A restored layout is already initialized; first-run defaults must not overwrite it on restart.
         edit.putBoolean("desktop_v41",true).putBoolean("desktop_recycle_added",true).putBoolean("eleven_initialized",true).putBoolean("ten_initialized",true).putBoolean("ten_v2_defaults",true).putBoolean("ten_v13_taskbar_defaults",true).putBoolean("seven_taskbar_grouping_set",true);
         if(!edit.commit()){SharedPreferences.Editor rollback=store.prefs.edit().clear();for(Map.Entry<String,?> e:old.entrySet())put(rollback,e.getKey(),e.getValue());rollback.commit();throw new IOException("The desktop could not be saved. Your previous setup was kept.");}
+        InitializationState.restored(context);
         discard(context,PENDING);if(undo)discard(context,UNDO);
     }
     private static void put(SharedPreferences.Editor edit,String key,Object value){if(value instanceof Boolean)edit.putBoolean(key,(Boolean)value);else if(value instanceof Integer)edit.putInt(key,(Integer)value);else if(value instanceof Long)edit.putLong(key,(Long)value);else if(value instanceof Float)edit.putFloat(key,(Float)value);else if(value instanceof String)edit.putString(key,(String)value);}
