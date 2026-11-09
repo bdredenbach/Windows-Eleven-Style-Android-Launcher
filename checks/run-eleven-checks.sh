@@ -38,6 +38,7 @@ adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
 run_native StorageSmoke StorageDevice -e suite storage -e phase device
 run_native PhotoSmoke PhotoSmoke
 run_native MediaSmoke MediaSmoke
+run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
 if [ "${#failures[@]}" -ne 0 ]; then
  echo "Failed native suites: ${failures[*]}"
  exit 1

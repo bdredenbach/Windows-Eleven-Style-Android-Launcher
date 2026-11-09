@@ -1,10 +1,12 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.7.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.8.0**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
 ## Recording-based update
+
+0.8.0 adds an optional second taskbar row with fixed desktop spacing and stable task-button ordering. Use its hold menu, Taskbar Settings or Advanced Desktop Settings. See [expanded taskbar details](docs/ELEVEN_0_8_EXPANDED_TASKBAR.md).
 
 0.7.0 adds embedded market quotes/charts, recorded Start Category view and per-card Widgets controls. See [this round](docs/ELEVEN_0_7_MARKETS_AND_RECORDING_PASS.md).
 
