@@ -45,4 +45,5 @@
     <instrumentation android:name="com.nthexperience.desktop.TenAuditSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
     <instrumentation android:name="com.nthexperience.desktop.TenInteractionSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
     <instrumentation android:name="com.nthexperience.desktop.TenDarkModeSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
+    <instrumentation android:name="com.nthexperience.desktop.ElevenMarketSmoke" android:targetPackage="${launcherApplicationId}" android:functionalTest="true" />
 </manifest>

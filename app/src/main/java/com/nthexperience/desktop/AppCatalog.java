@@ -15,9 +15,10 @@ import java.util.Set;
 final class AppCatalog {
     static final class Entry {
         final String id, label;
-        final Drawable icon;final long installed;
+        final Drawable icon;final long installed;final int category;
         Entry(String id,String label,Drawable icon){this(id,label,icon,0);}
-        Entry(String id,String label,Drawable icon,long installed){this.id=id;this.label=label;this.icon=icon;this.installed=installed;}
+        Entry(String id,String label,Drawable icon,long installed){this(id,label,icon,installed,-1);}
+        Entry(String id,String label,Drawable icon,long installed,int category){this.id=id;this.label=label;this.icon=icon;this.installed=installed;this.category=category;}
     }
     static List<Entry> load(Context context) {
         PackageManager manager = context.getPackageManager();
@@ -30,7 +31,7 @@ final class AppCatalog {
             String id = component.flattenToString();
             if (!seen.add(id)) continue;
             try {
-                long installed=0;try{installed=manager.getPackageInfo(info.activityInfo.packageName,0).firstInstallTime;}catch(PackageManager.NameNotFoundException ignored){}entries.add(new Entry(id,info.loadLabel(manager).toString(),info.loadIcon(manager),installed));
+                long installed=0;try{installed=manager.getPackageInfo(info.activityInfo.packageName,0).firstInstallTime;}catch(PackageManager.NameNotFoundException ignored){}entries.add(new Entry(id,info.loadLabel(manager).toString(),info.loadIcon(manager),installed,info.activityInfo.applicationInfo.category));
             } catch (RuntimeException ignored) { /* Package may be changing during this scan. */ }
         }
         Collator collator = Collator.getInstance();
