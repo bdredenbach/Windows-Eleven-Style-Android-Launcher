@@ -103,7 +103,7 @@ final class RecycleBin {
             }else try(InputStream in=read(context,source.uri,cancel)){
                 if(!checksum.equals(hash(in,null,available,cancel)))throw changedSource();
             }
-            JSONObject item=new JSONObject().put("id",id).put("name",before.name).put("mime",before.mime).put("uri",source.uri.toString()).put("parent",source.parent.toString()).put("date",System.currentTimeMillis()).put("size",copy.length()).put("hash",checksum).put("deleted",false).put("location",location==null?DocumentOps.stat(context,source.parent,cancel).name:location);
+            JSONObject item=new JSONObject().put("id",id).put("name",before.name).put("mime",before.mime).put("modified",before.modified).put("uri",source.uri.toString()).put("parent",source.parent.toString()).put("date",System.currentTimeMillis()).put("size",copy.length()).put("hash",checksum).put("deleted",false).put("location",location==null?DocumentOps.stat(context,source.parent,cancel).name:location);
             metadata(context,item);recorded=true;cancel.check();
             if(!DocumentsContract.deleteDocument(context.getContentResolver(),source.uri))throw new IOException("Original could not be deleted. A recovery copy was kept in Recycle Bin.");
             item.put("deleted",true);metadata(context,item);
@@ -145,6 +145,7 @@ final class RecycleBin {
             verified=true;remove(context,item);return destination;
         }finally{if(!verified)try{DocumentsContract.deleteDocument(context.getContentResolver(),destination);}catch(Exception ignored){}}
     }
+    static java.io.InputStream preview(Context context,JSONObject item)throws IOException{String id=item.optString("id");try{java.util.UUID.fromString(id);}catch(IllegalArgumentException e){throw new IOException("Invalid recovery item");}if(!item.optString("mime").startsWith("image/"))throw new IOException("No image preview");return new java.io.FileInputStream(new File(root(context),id+".data"));}
     static synchronized void remove(Context context,JSONObject item)throws Exception{File root=root(context);File payload=new File(root,item.getString("id")+".data");if(payload.exists()&&!payload.delete())throw new IOException("The recovery file could not be removed.");new AtomicFile(new File(root,item.getString("id")+".json")).delete();}
     static synchronized void empty(Context context)throws Exception{for(JSONObject item:list(context))remove(context,item);File[] remaining=root(context).listFiles();if(remaining!=null)for(File file:remaining)if(file.isFile()&&!file.delete())throw new IOException("Some recovery data could not be removed.");}
 }

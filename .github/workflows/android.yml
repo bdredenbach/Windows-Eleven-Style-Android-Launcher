@@ -38,11 +38,17 @@ jobs:
           java -cp build/eleven-checks com.nthexperience.desktop.TenNotaActionsCheck
           python3 checks/CheckElevenIconAssets.py
       - run: ./gradlew :app:testDebugUnitTest :app:assembleDebug :app:assembleDebugAndroidTest :fixture:assembleDebug :installprobe:assembleDebug --no-daemon
+      - name: Keep matching public compile jars
+        run: python3 checks/PrepareCompileKit.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Eleven-compile-kit-api-${{ matrix.api }}
+          path: build/compile-kit/
       - name: Check installed identity and runner
         run: python3 checks/CheckElevenManifest.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Nth-Desktop-Eleven-0.4.0-api-${{ matrix.api }}
+          name: Nth-Desktop-Eleven-0.5.0-api-${{ matrix.api }}
           path: app/build/outputs/apk/debug/app-debug.apk
       - name: Enable emulator acceleration
         run: |

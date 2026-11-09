@@ -55,6 +55,7 @@ final class WeatherClient {
     String city(){return store.prefs.getString("weather_city","Add a location");}
     long updated(){return store.prefs.getLong("weather_updated",0);}
     void active(boolean value){active=value;if(value)refresh(false);}
+    void clear(){generation++;snapshot=null;failed=false;store.prefs.edit().remove("weather_lat").remove("weather_lon").remove("weather_json").remove("weather_expires").remove("weather_updated").putString("weather_city","Add a location").apply();changed.run();}
     void location(String label,double latitude,double longitude){
         generation++;snapshot=null;failed=false;
         store.prefs.edit().putString("weather_city",label).putString("weather_lat",coordinate(latitude)).putString("weather_lon",coordinate(longitude)).remove("weather_json").remove("weather_modified").remove("weather_expires").remove("weather_updated").remove("weather_retry_after").apply();changed.run();refresh(false);

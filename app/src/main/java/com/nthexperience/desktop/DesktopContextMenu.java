@@ -38,6 +38,8 @@ final class DesktopContextMenu {
         TextView label=Aero.text(context,title,rowHeight<36?12:13,0xff151a1f);label.setPadding(dp(9),0,dp(12),0);row.addView(label,new LinearLayout.LayoutParams(0,-1,1));keyboardBack(row);row.setEnabled(enabled);row.setAlpha(enabled?1:.42f);row.setOnClickListener(v->{if(enabled){dismiss();action.run();}});items.addView(row,new LinearLayout.LayoutParams(-1,dp(rowHeight)));
     }
     private void keyboardBack(View row){row.setOnKeyListener((v,key,event)->{if(event.getAction()==KeyEvent.ACTION_DOWN&&key==KeyEvent.KEYCODE_DPAD_LEFT&&parent!=null){closeBranch();if(parentRow!=null)parentRow.requestFocus();return true;}return false;});}
+    void custom(View view){items.addView(view,new LinearLayout.LayoutParams(-1,-2));}
+    void shortcut(String title,String icon,String shortcut,Runnable action){item(title,icon,action);View row=items.getChildAt(items.getChildCount()-1);if(row instanceof LinearLayout){TextView hint=Aero.text(context,shortcut,11,0xff626673);hint.setPadding(dp(4),0,dp(8),0);((LinearLayout)row).addView(hint,new LinearLayout.LayoutParams(-2,-1));}}
     void section(String title){
         TextView label=Aero.text(context,title,11,0xff345974);
         label.setPadding(dp(10),0,dp(6),0);

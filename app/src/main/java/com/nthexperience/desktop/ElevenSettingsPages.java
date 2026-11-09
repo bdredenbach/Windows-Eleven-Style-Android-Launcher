@@ -98,7 +98,7 @@ final class ElevenSettingsPages {
         if(category.equals("home")) {
             deviceHeader(s);
             s.detail("Recommended settings","");
-            for(String id:new String[]{"display","sound","storage","bluetooth"}){TenSettingsCatalog.Page p=TenSettingsCatalog.page(id);s.card(p.title,p.detail,id,()->s.navigate(id));}
+            for(String id:ElevenRemainingPages.recommendations(s)){TenSettingsCatalog.Page p=TenSettingsCatalog.page(id);s.card(p.title,p.detail,id,()->s.navigate(id));}
             s.detail("Personalize your device","");themes(s);
             s.card("Color mode",s.dark()?"Dark":"Light","personalization",()->s.navigate("colors"));
             s.card("Nth Nota","Write, capture and launch apps","nota",()->s.open.accept("@nota"));
@@ -110,7 +110,7 @@ final class ElevenSettingsPages {
         else if(category.equals("network"))s.detail("Connection status",connection(s));
         else if(category.equals("accounts")){
             s.detail(s.store.prefs.getString("desktop_name","Nth Desktop Eleven"),"Local Nth profile");
-            s.card("Profile picture and name","Personalize your local profile","accounts",()->s.navigate("profile"));
+            s.body.addView(ProfilePortrait.view(s.getContext(),s.store),new LinearLayout.LayoutParams(s.dp(64),s.dp(64)));s.card("Profile picture and name","Personalize your local profile","accounts",()->s.navigate("profile"));s.card("Windows backup","Save the local Nth profile and desktop setup","update",()->s.navigate("backup"));
         }else if(category.equals("time")){
             s.detail(android.text.format.DateFormat.getTimeFormat(s.getContext()).format(new Date()),new java.text.SimpleDateFormat("EEEE, MMMM d, yyyy",Locale.getDefault()).format(new Date()));
             s.detail("Time zone & region",TimeZone.getDefault().getDisplayName()+" · "+Locale.getDefault().getDisplayCountry());
