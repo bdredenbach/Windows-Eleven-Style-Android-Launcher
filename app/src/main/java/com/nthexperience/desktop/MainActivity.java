@@ -695,7 +695,6 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         switch(id){case MediaLibrary.PLAYER:return MediaLibrary.PLAYER_TITLE;case MediaLibrary.CENTER:return MediaLibrary.CENTER_TITLE;case "@focus-timer":return "Focus session";case "@run":return "Run";case "@nota":return "Nth Nota";case "@settings":return "Settings";case "@news":return "Widgets";case "@battery":return "Battery";case "@taskview":return "Task View";case "@recycle":return "Recycle Bin";case "@workspaces":return "Saved Workspaces";case "@recent":return "Recent Items";case "@taskmanager":return "Task Manager";case "@actioncenter":return "Action Center";case "@welcome":return "Welcome Center";case "@organize":return "Desktop Organization";case "@quicklaunch":return "Quick Launch";case "@backup":return "Backup and Restore";case "@control":return "Settings";case "@system":return "System";case "@filemanagers":return "File Managers";case "@weather":return "Weather";case "@clock":return "Clock";case "@gadgets":return "Widgets";case "@sticky":return "Notes";case "@calendar":return "Calendar";case "@computer":return "Computer";case "@browser":return BrowserPanel.NAME;case "@photos":return "Photo Gallery";case "@files":return "File Explorer";case "@downloads":return "Downloads";case "@videos":return "Videos";case "@documents":return "Documents";case "@pictures":return "Pictures";case "@music":return "Music";case "@flip3d":return "Task View";case "@notes":return "Notepad";case "@appearance":return "Personalize";default:AppCatalog.Entry app=entries.get(id);return app==null?"Unavailable app":app.label;}
     }
     @Override public void open(String id){
-        ElevenLocalState.launched(store,id);
         if((id.equals("@taskview")||id.equals("@flip3d"))&&tenTasks!=null&&tenTasks.overlay!=null){tenTasks.dismiss();return;}
         if((id.equals("@tenactions")||id.equals("@actioncenter"))&&tenActions!=null&&tenActions.dismiss())return;
         if(tenTasks!=null)tenTasks.dismiss();if(tenActions!=null)tenActions.dismiss();if(tenNews!=null&&!id.equals("@news"))tenNews.dismiss();
@@ -728,7 +727,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             case "@search":showStart(true);return;
             case "@focus-timer":if(!restoreTool(id))window(id,"Focus session",new ElevenFocus.Timer(this,this::open));return;
             case "@battery":vistaAction("android:battery");return;
-            case "@recorder":actionCenter();return;
+            case "@recorder":actionCenter();if(windows.get("@actioncenter")!=null)windows.get("@actioncenter").caption("Steps Recorder");return;
             case "@run":TenRun.show(this,store,this::runCommand);return;
             case "@power":Aero.dialog(this).setTitle("Power").setItems(new String[]{"Show desktop","Restart Nth Desktop","Android power settings"},(d,w)->{if(w==0)showDesktop();else if(w==1)vistaAction("restart-desktop");else vistaAction("android:battery");}).show();return;
             case "@settings":if(!restoreTool(id))window(id,"Settings",new TenSettings(this,store,this::open));return;
@@ -781,7 +780,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         if(tenTasks!=null)tenTasks.dismiss();if(tenActions!=null)tenActions.dismiss();if(tenNews!=null)tenNews.dismiss();startMenu.hide();if(tray!=null)tray.dismiss();
         try{
             Intent launch=Intent.makeMainActivity(component).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_RESET_TASK_IF_NEEDED);
-            if(Aero.motion(this))startActivity(launch,android.app.ActivityOptions.makeCustomAnimation(this,R.anim.ten_app_open,R.anim.ten_shell_exit).toBundle());else startActivity(launch);ExternalTasks.opened(component.flattenToString());store.launched(component.flattenToString());renderTaskbar();return true;
+            if(Aero.motion(this))startActivity(launch,android.app.ActivityOptions.makeCustomAnimation(this,R.anim.ten_app_open,R.anim.ten_shell_exit).toBundle());else startActivity(launch);ExternalTasks.opened(component.flattenToString());ElevenLocalState.launched(store,component.flattenToString());store.launched(component.flattenToString());renderTaskbar();return true;
         }catch(ActivityNotFoundException|SecurityException e){
             Aero.dialog(this).setTitle("App unavailable").setMessage("This app may have been removed or disabled.").setPositiveButton("Remove shortcut",(d,w)->{List<String> ids=store.desktop();ids.remove(component.flattenToString());store.desktop(ids);renderDesktop();}).setNegativeButton("Keep",null).show();scanApps();return false;
         }
