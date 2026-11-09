@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [35]
+        api: [30, 35]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -62,7 +62,7 @@ jobs:
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
-          target: google_apis
+          target: ${{ matrix.api == 30 && 'default' || 'google_apis' }}
           profile: pixel_2
           ram-size: 2048M
           heap-size: 384M
