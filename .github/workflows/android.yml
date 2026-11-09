@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api: [30, 36]
+        api: [35]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -62,13 +62,13 @@ jobs:
         with:
           api-level: ${{ matrix.api }}
           arch: x86_64
-          target: ${{ matrix.api == 30 && 'default' || 'aosp_atd' }}
+          target: google_apis
           profile: pixel_2
           ram-size: 2048M
           heap-size: 384M
           emulator-options: -no-window -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim
           disable-animations: true
-          script: bash checks/run-eleven-checks.sh
+          script: bash checks/run-eleven-visual.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:
