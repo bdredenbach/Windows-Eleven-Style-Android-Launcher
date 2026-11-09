@@ -12,7 +12,7 @@ adb exec-out screencap -p > screenshots/eleven-at-exit.png
 adb shell dumpsys activity top > eleven-activity-top.txt
 adb shell dumpsys activity lastanr > eleven-last-anr.txt
 adb shell dumpsys input_method > eleven-input-method.txt
-for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\|photo-\|ten7-\|storage-\|home-first-run\|vista-usage-\).*\.\(png\|tsv\)$/p'); do
+for file in $(adb shell run-as "$launcher" ls files | tr -d '\r' | sed -n '/^\(eleven-\|aero-snap-\|photo-\|ten7-\|storage-\|home-first-run\|vista-usage-\|nth-media-\).*\.\(png\|tsv\)$/p'); do
  adb exec-out run-as "$launcher" cat "files/$file" > "screenshots/$file"
 done
 }
@@ -37,6 +37,7 @@ done
 adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
 run_native StorageSmoke StorageDevice -e suite storage -e phase device
 run_native PhotoSmoke PhotoSmoke
+run_native MediaSmoke MediaSmoke
 if [ "${#failures[@]}" -ne 0 ]; then
  echo "Failed native suites: ${failures[*]}"
  exit 1
