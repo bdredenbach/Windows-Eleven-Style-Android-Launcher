@@ -11,6 +11,7 @@ final class ToolViewState {
         // Nota restores full ordinary drafts itself; generic snapshots must not copy private passages.
         if(view instanceof BrowserPanel||view instanceof TenNotaPanel)return;
         JSONObject item=new JSONObject();
+        if(view instanceof TenSettings){GadgetLayout.put(item,"settings",((TenSettings)view).state());GadgetLayout.put(result,path,item);return;}
         if(view instanceof TaskManagerPanel){GadgetLayout.put(item,"taskmanager",((TaskManagerPanel)view).state());GadgetLayout.put(result,path,item);return;}
         if(view instanceof PhotoGallery){GadgetLayout.put(item,"photo",((PhotoGallery)view).state());GadgetLayout.put(result,path,item);return;}
         if(view instanceof VistaShell){GadgetLayout.put(item,"shell",((VistaShell)view).state());GadgetLayout.put(result,path,item);return;}
@@ -29,6 +30,7 @@ final class ToolViewState {
         if(view instanceof BrowserPanel||view instanceof TenNotaPanel)return;
         JSONObject item=state.optJSONObject(path);
         if(item!=null){
+            if(view instanceof TenSettings){((TenSettings)view).restoreState(item.optJSONObject("settings"));return;}
             if(view instanceof TaskManagerPanel){((TaskManagerPanel)view).restore(item.optJSONObject("taskmanager"));return;}
             if(view instanceof PhotoGallery){((PhotoGallery)view).restore(item.optJSONObject("photo"));return;}
             if(view instanceof VistaShell){((VistaShell)view).restore(item.optJSONObject("shell"));return;}

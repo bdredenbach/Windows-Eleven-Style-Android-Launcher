@@ -142,15 +142,16 @@ final class DesktopWindow extends LinearLayout {
     void onShake(Runnable action){shake=action;}
     void onPlacement(java.util.function.Consumer<String> action){placementChanged=action;}
     private android.widget.PopupWindow snapMenu;
+    ElevenSnapBar snapBar;
     private final Runnable hoverSnap=this::showElevenSnap;
     void showElevenSnap(){
         if(snapMenu!=null&&snapMenu.isShowing())return;
         LinearLayout panel=Aero.column(getContext());panel.setPadding(dp(12),dp(10),dp(12),dp(10));panel.setBackground(ElevenSurface.round(getContext(),TenStyle.surface(getContext()),8));panel.setContentDescription("Snap layouts");
         TextView heading=Aero.text(getContext(),"Snap layouts",13,TenStyle.text(getContext()));panel.addView(heading,new LinearLayout.LayoutParams(-1,dp(32)));
-        android.widget.GridLayout choices=new android.widget.GridLayout(getContext());choices.setColumnCount(2);Placement[][] groups={{Placement.LEFT,Placement.RIGHT},{Placement.TWO_THIRDS_LEFT,Placement.THIRD_RIGHT},{Placement.THIRD_LEFT,Placement.THIRD_MIDDLE,Placement.THIRD_RIGHT},{Placement.TOP_LEFT,Placement.TOP_RIGHT,Placement.BOTTOM_LEFT,Placement.BOTTOM_RIGHT}};
-        for(int n=0;n<groups.length;n++){FrameLayout diagram=new FrameLayout(getContext());diagram.setContentDescription("Snap layout "+(n+1));int w=100,h=64;for(Placement target:groups[n]){int[] r=AeroSnap.bounds(target,w,h);TextView zone=new TextView(getContext());zone.setContentDescription("Snap "+target.name().toLowerCase(java.util.Locale.ROOT).replace('_',' '));zone.setFocusable(true);boolean allowed=store.prefs.getBoolean("ten_snap",true)&&AeroSnap.canPlace(target,hostWidth(),workHeight(),snapMinWidth,snapMinHeight);zone.setEnabled(allowed);zone.setAlpha(allowed?1:.25f);zone.setBackground(TenStyle.hover(getContext(),TenStyle.light(getContext())?0xffc7d0e0:0xff657087));FrameLayout.LayoutParams zp=new FrameLayout.LayoutParams(dp(Math.max(1,r[2]-3)),dp(Math.max(1,r[3]-3)));zp.leftMargin=dp(r[0]+1);zp.topMargin=dp(r[1]+1);diagram.addView(zone,zp);zone.setOnClickListener(v->{snapMenu.dismiss();restore();snap(target);});}android.widget.GridLayout.LayoutParams gp=new android.widget.GridLayout.LayoutParams(android.widget.GridLayout.spec(n/2),android.widget.GridLayout.spec(n%2));gp.width=dp(w);gp.height=dp(h);gp.setMargins(dp(4),dp(4),dp(4),dp(4));choices.addView(diagram,gp);}panel.addView(choices);
+        android.widget.GridLayout choices=new android.widget.GridLayout(getContext());int pickerColumns=hostWidth()>=dp(600)?3:2;choices.setColumnCount(pickerColumns);Placement[][] groups=ElevenSnapLayouts.groups();
+        for(int n=0;n<groups.length;n++){FrameLayout diagram=new FrameLayout(getContext());diagram.setContentDescription("Snap layout "+(n+1));int w=100,h=64;for(Placement target:groups[n]){int[] r=AeroSnap.bounds(target,w,h);TextView zone=new TextView(getContext());zone.setContentDescription("Snap "+target.name().toLowerCase(java.util.Locale.ROOT).replace('_',' '));zone.setFocusable(true);boolean allowed=store.prefs.getBoolean("ten_snap",true)&&AeroSnap.canPlace(target,hostWidth(),workHeight(),snapMinWidth,snapMinHeight);zone.setEnabled(allowed);zone.setAlpha(allowed?1:.25f);zone.setBackground(TenStyle.hover(getContext(),TenStyle.light(getContext())?0xffc7d0e0:0xff657087));FrameLayout.LayoutParams zp=new FrameLayout.LayoutParams(dp(Math.max(1,r[2]-3)),dp(Math.max(1,r[3]-3)));zp.leftMargin=dp(r[0]+1);zp.topMargin=dp(r[1]+1);diagram.addView(zone,zp);zone.setOnClickListener(v->{snapMenu.dismiss();restore();snap(target);});}android.widget.GridLayout.LayoutParams gp=new android.widget.GridLayout.LayoutParams(android.widget.GridLayout.spec(n/pickerColumns),android.widget.GridLayout.spec(n%pickerColumns));gp.width=dp(w);gp.height=dp(h);gp.setMargins(dp(4),dp(4),dp(4),dp(4));choices.addView(diagram,gp);}panel.addView(choices);
         panel.addView(TenStyle.command(getContext(),"Maximize",()->{snapMenu.dismiss();maximize();}));panel.addView(TenStyle.command(getContext(),"Restore",()->{snapMenu.dismiss();restoreDown();}));
-        snapMenu=new android.widget.PopupWindow(panel,dp(240),-2,true);snapMenu.setBackgroundDrawable(ElevenSurface.round(getContext(),TenStyle.surface(getContext()),8));snapMenu.setOutsideTouchable(true);snapMenu.setElevation(dp(20));snapMenu.setInputMethodMode(android.widget.PopupWindow.INPUT_METHOD_NOT_NEEDED);snapMenu.showAsDropDown(maximizeButton,-dp(176),0);
+        android.widget.ScrollView snapScroll=new android.widget.ScrollView(getContext());snapScroll.addView(panel);snapMenu=new android.widget.PopupWindow(snapScroll,dp(pickerColumns==3?352:240),Math.min(dp(pickerColumns==3?294:366),Math.max(dp(80),workHeight()-dp(12))),true);snapMenu.setBackgroundDrawable(ElevenSurface.round(getContext(),TenStyle.surface(getContext()),8));snapMenu.setOutsideTouchable(true);snapMenu.setElevation(dp(20));snapMenu.setInputMethodMode(android.widget.PopupWindow.INPUT_METHOD_NOT_NEEDED);snapMenu.showAsDropDown(maximizeButton,-dp(176),0);
     }
     private int dp(int n){return Aero.dp(getContext(),n);}
     boolean snap(Placement target){
@@ -361,7 +362,7 @@ final class DesktopWindow extends LinearLayout {
     private void moveCaption(MotionEvent e){
         host.getLocationOnScreen(hostLocation);
         float x=e.getRawX()-hostLocation[0],y=e.getRawY()-hostLocation[1];
-        if(e.getActionMasked()==MotionEvent.ACTION_MOVE&&detectShake(x,y,e.getEventTime())){
+        if(e.getActionMasked()==MotionEvent.ACTION_MOVE&&detectShake(e,x,y)){
             cancelCaptionDrag();
             shake.run();
             return;
@@ -380,9 +381,21 @@ final class DesktopWindow extends LinearLayout {
         }
         setX(clamp(x-gripX,0,Math.max(0,hostWidth()-floatingWidth())));
         setY(clamp(y-gripY,safeTop,Math.max(safeTop,host.getHeight()-floatingHeight())));
-        showSnapPreview(store.prefs.getBoolean("ten_snap",true)?AeroSnap.target(x,y,hostWidth(),safeTop,host.getHeight(),snapEdge,snapMinWidth,snapMinHeight):Placement.FLOATING);
+        Placement target=store.prefs.getBoolean("ten_snap",true)?AeroSnap.target(x,y,hostWidth(),safeTop,host.getHeight(),snapEdge,snapMinWidth,snapMinHeight):Placement.FLOATING;
+        if(store.prefs.getBoolean("ten_snap",true)&&store.prefs.getBoolean("eleven_snap_bar",true)){
+            if(snapBar==null&&y<=safeTop+dp(64)){snapBar=new ElevenSnapBar(getContext(),this,hostWidth(),safeTop,host.getHeight(),snapMinWidth,snapMinHeight);host.addView(snapBar,new FrameLayout.LayoutParams(-1,-1));}
+            if(snapBar!=null){if(snapBar.tooFar(y))hideSnapBar();else{Placement picked=snapBar.point(x,y);if(picked!=Placement.FLOATING)target=picked;}}
+        }else hideSnapBar();
+        showSnapPreview(target);
     }
 
+    private boolean detectShake(MotionEvent event,float x,float y){
+        // Android batches motion samples while a window is busy. They carry the
+        // same view-to-screen transform as the current sample; retain each turn.
+        float offsetX=x-event.getX(),offsetY=y-event.getY();
+        for(int i=0;i<event.getHistorySize();i++)if(detectShake(event.getHistoricalX(i)+offsetX,event.getHistoricalY(i)+offsetY,event.getHistoricalEventTime(i)))return true;
+        return detectShake(x,y,event.getEventTime());
+    }
     private boolean detectShake(float x,float y,long time){
         if(time-shakeTime>1200||Math.abs(y-downY)>Aero.dp(getContext(),96)){
             shakeX=x;shakeTime=time;shakeDirection=0;shakeStrokes=0;return false;
@@ -405,6 +418,7 @@ final class DesktopWindow extends LinearLayout {
         }
         captionTracking=false;
         captionDragging=false;
+        hideSnapBar();
         showSnapPreview(Placement.FLOATING);
         place(target);
     }
@@ -413,7 +427,10 @@ final class DesktopWindow extends LinearLayout {
         if(resetCaptionDrag())fitToHost();
     }
 
+    private void hideSnapBar(){if(snapBar!=null){snapBar.release();snapBar=null;}}
+
     private boolean resetCaptionDrag(){
+        hideSnapBar();
         captionTracking=false;
         if(!captionDragging)return false;
         captionDragging=false;

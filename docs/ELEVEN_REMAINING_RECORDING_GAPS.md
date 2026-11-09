@@ -1,8 +1,24 @@
-# Remaining recording gaps after Eleven 0.2.1
+# Recording gaps and implementation progress
 
-Reviewed November 8, 2026 against application source [`3366104c343dd662c80b0dcf8025114923937715`](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/tree/3366104c343dd662c80b0dcf8025114923937715). This is a remaining-work audit, not a new APK or a claim that the items below have been implemented.
+Original audit: November 8, 2026 against application source [`3366104c343dd662c80b0dcf8025114923937715`](https://github.com/bdredenbach/Windows-Eleven-Style-Android-Launcher/tree/3366104c343dd662c80b0dcf8025114923937715). The observations below describe the 0.2.1 baseline; the progress table tracks subsequent implementation.
 
 The remaining work is chiefly deeper controls, page composition and interaction details. The broad 0.2.0 reference mapping establishes that a destination exists; it does not establish that every control inside the recorded destination is reproduced. The thirty items below identify that difference explicitly.
+
+## Progress in 0.3.0
+
+The original observations below remain a historical baseline. The [0.3.0 implementation notes](ELEVEN_0_3_RECORDING_GAPS.md) supersede their descriptions of current code. This is an incremental implementation, not completion of all thirty items.
+
+| IDs | 0.3.0 result | Remaining work |
+| --- | --- | --- |
+| G01, G03 | Back/Forward and Android/Alt-key traversal; restored page/query/scroll/expanded state; deep ancestors; revised System/Apps hierarchy. | Continue composition review as further pages gain controls. |
+| G02, G04 | Expandable/link cards, child dividers, selectors, related links, device/network header, wallpaper and six theme previews. | Migrate the remaining older Settings pages. |
+| G05–G08 | Actual type filters, overflow selection commands, eight views, Show switches, distinct Details/Preview panes, staged General/View/Search options and privacy-controlled recent/favorites Home. Independent tab state is retained. | Cloud/account suggestions and Windows filesystem internals use Android/Nth adaptations. |
+| G09 | Saved desktop View switches, compact grouping and adjacent touch/hover/keyboard submenus with adaptive phone widths. | Broaden edge-position and physical-pointer review. |
+| G10 | Existing recovery behavior retained. | Multi-selection, added metadata and Recycle Bin View/Show remain. |
+| G11–G12 | Top drag strip, target highlight/privacy-aware preview, release/cancel and mixed half-plus-stacked-quarter groups shared with maximize picker. | Small workspaces suppress arrangements below minimum dimensions. |
+| G13 | Adjustable monotonic session, start/stop/countdown/expiry/recreation and temporary Nth feed suppression preserving manual quiet state. Expired Stop cannot restart a session. | Android owns system DND; no unsupported badge/flashing controls are advertised. |
+| G14, G17, G24–G29 | Grouped Sound/Display information, installed-app search/sort, fuller Apps/input/Advanced/Recovery destinations and profile/time summaries; remaining visible Ten identity text corrected. | Deeper notification, battery, appearance, account, gaming and privacy controls remain. |
+| G15–G16, G18–G23, G30 | Existing behavior retained. | Sender controls, power details, appearance depth, Widgets and browser presentation remain substantial next batches. |
 
 ## Review method
 
@@ -105,4 +121,4 @@ OS-owned differences remain deliberate: Windows account/Store/Update/activation/
 4. **Settings depth:** G14–G22 and G24–G29, building useful local controls first and preserving clear Android destinations.
 5. **Widgets and browser presentation:** G23 and G30, with provider-backed content only where a real source exists.
 
-After each behavioral batch, validate the affected behavior natively and keep the established Android 11/16 shell/Nota/browser checks. Appearance-only changes need screenshot review at phone/tablet density, portrait/landscape and both themes. This list records remaining work, so none of G01–G30 is marked complete by this audit commit.
+After each behavioral batch, validate the affected behavior natively and keep the established Android 11/16 shell/Nota/browser checks. Appearance-only changes need screenshot review at phone/tablet density, portrait/landscape and both themes. The initial audit marked no item complete. Use the progress table and release-specific validation notes for subsequent implementation status.

@@ -190,8 +190,8 @@ public final class SnapSmoke extends Instrumentation {
                     && bounds(left).bottom == workspace.getHeight(), "Top snap works in portrait; actual="+bounds(left)+", geometry="+left.geometry());
             shake(left);
             check(left.isShown()&&!right.isShown(),"Aero Shake minimizes the other visible window");
-            shake(left);
-            check(left.isShown()&&right.isShown(),"The second Aero Shake restores the same window");
+            shakeBatched(left);
+            check(left.isShown()&&right.isShown(),"A batched second Aero Shake restores the same window");
             runOnMainSync(()->left.restore());
             runOnMainSync(()->home.dispatchKeyEvent(new KeyEvent(0,0,KeyEvent.ACTION_DOWN,KeyEvent.KEYCODE_DPAD_RIGHT,0,KeyEvent.META_META_ON)));
             settle();
@@ -245,17 +245,27 @@ public final class SnapSmoke extends Instrumentation {
     }
 
     private void shake(DesktopWindow window)throws Exception{
-        begin(window);
+        // As with tap(), queue the gesture before a synchronous delivery can
+        // turn its initial DOWN into the separate title-bar long-press action.
+        begin(window,false);
         int start=pointerX,y=pointerY;
         int right=start+dp(49),left=start-dp(49);
         long gestureTime=down;
         for(int x:new int[]{right,left,right,left}){
             // Preserve the user's gesture cadence when synchronous emulator delivery is slow.
             Thread.sleep(35);gestureTime+=35;
-            inputAt(MotionEvent.ACTION_MOVE,x,y,gestureTime);
+            inputAt(MotionEvent.ACTION_MOVE,x,y,gestureTime,false);
         }
         inputAt(MotionEvent.ACTION_UP,left,y,gestureTime+1);
         settle();
+    }
+
+    private void shakeBatched(DesktopWindow window)throws Exception{
+        begin(window,false);int start=pointerX,y=pointerY,right=start+dp(49),left=start-dp(49);int[] origin=new int[2];workspace.getLocationOnScreen(origin);
+        Thread.sleep(150);
+        MotionEvent batch=MotionEvent.obtain(down,down+35,MotionEvent.ACTION_MOVE,origin[0]+right,origin[1]+y,0);
+        try{batch.setSource(InputDevice.SOURCE_TOUCHSCREEN);batch.addBatch(down+70,origin[0]+left,origin[1]+y,1,1,0);batch.addBatch(down+105,origin[0]+right,origin[1]+y,1,1,0);batch.addBatch(down+140,origin[0]+left,origin[1]+y,1,1,0);check(batch.getHistorySize()==3,"Shake carries three historical turns");check(getUiAutomation().injectInputEvent(batch,true),"Batched Shake was injected");}finally{batch.recycle();}
+        inputAt(MotionEvent.ACTION_UP,left,y,down+141);settle();
     }
 
     private void moveTo(int x, int y) throws Exception {
@@ -268,13 +278,14 @@ public final class SnapSmoke extends Instrumentation {
         input(MotionEvent.ACTION_MOVE, x, y);
     }
 
-    private void begin(DesktopWindow window) throws Exception {
+    private void begin(DesktopWindow window) throws Exception {begin(window,true);}
+    private void begin(DesktopWindow window,boolean synchronous) throws Exception {
         Thread.sleep(320);
         Rect rect = screenBounds(title(window));
         int[] origin = new int[2];
         workspace.getLocationOnScreen(origin);
         down = SystemClock.uptimeMillis();
-        input(MotionEvent.ACTION_DOWN, rect.centerX() - origin[0], rect.centerY() - origin[1]);
+        inputAt(MotionEvent.ACTION_DOWN, rect.centerX() - origin[0], rect.centerY() - origin[1],down,synchronous);
     }
 
     private void tap(View view) throws Exception {
@@ -305,14 +316,15 @@ public final class SnapSmoke extends Instrumentation {
     }
 
     private void input(int action, int x, int y) {inputAt(action,x,y,SystemClock.uptimeMillis());}
-    private void inputAt(int action,int x,int y,long eventTime){
+    private void inputAt(int action,int x,int y,long eventTime){inputAt(action,x,y,eventTime,true);}
+    private void inputAt(int action,int x,int y,long eventTime,boolean synchronous){
         int[] origin = new int[2];
         workspace.getLocationOnScreen(origin);
         MotionEvent event = MotionEvent.obtain(down, eventTime, action,
                 origin[0] + x, origin[1] + y, 0);
         try {
             event.setSource(InputDevice.SOURCE_TOUCHSCREEN);
-            check(getUiAutomation().injectInputEvent(event, true), "Touch event " + action + " was injected");
+            check(getUiAutomation().injectInputEvent(event, synchronous), "Touch event " + action + " was injected");
             pointerX = x;
             pointerY = y;
             pointerDown = action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE;
