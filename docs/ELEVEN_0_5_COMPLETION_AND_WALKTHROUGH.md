@@ -1,6 +1,6 @@
 # Eleven 0.5.0 — remaining controls and purchaser walkthrough
 
-This is the current status of the 0.3.0 recording audit and the 0.4.0 appearance follow-up. Earlier audit documents preserve the state of those releases. The original recordings and extracted personal frames remain outside the repository.
+This records the 0.5.0 status of the 0.3.0 recording audit and the 0.4.0 appearance follow-up. See [0.6.0 Task Manager and polish](ELEVEN_0_6_TASK_MANAGER.md) for the subsequent round. Earlier audit documents preserve the state of those releases. The original recordings and extracted personal frames remain outside the repository.
 
 ## Implemented in this round
 

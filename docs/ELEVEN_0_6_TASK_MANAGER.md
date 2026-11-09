@@ -23,7 +23,7 @@ The polish pass also corrects singular recovery/file counts and replaces generic
 
 ## Validation
 
-Six new unit tests cover CPU/rate arithmetic, missing-data sorting, legacy migration, bounded state round trips and invalid portable choices. The new native suite covers all pages, real Nth window actions and Run, live samples, pause/manual refresh, animation/visibility/background behavior, all 23 presets in both orientations, local palette isolation, backup, recreation, reopening and scoped external/restart behavior. It is added to the complete Android 11/API30 and Android 16/API36 matrix.
+Six new unit tests cover CPU/rate arithmetic, missing-data sorting, legacy migration, bounded state round trips and invalid portable choices. The new native suite covers all pages, real Nth window actions and Run, live samples, pause/manual refresh, animation/visibility/background behavior, all 23 presets in both orientations, local palette isolation, backup, recreation, reopening, external App info routing and restart confirmation/callback scope. It is added to the complete Android 11/API30 and Android 16/API36 matrix.
 
 Final matrix and APK verification will be recorded after completion. The market card still opens reports; embedded market values/graphs remain outside this update pending a suitable data provider. No private recording frames are included.
 
