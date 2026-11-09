@@ -49,3 +49,7 @@ Built-in Nth tools use launcher windows. Installed Android apps use Android task
 Based on [Ten 0.19.0](https://github.com/bdredenbach/Windows-Ten-Style-Android-Launcher/tree/e31109dd202b88d1476c4ba35b35d49cca1a7f62). See [Windows 11 research](docs/WINDOWS_11_RESEARCH.md), [implementation plan](docs/IMPLEMENTATION_PLAN.md), [acceptance checklist](docs/ACCEPTANCE_CHECKLIST.md), [references](research/SOURCES.md), [notices](THIRD_PARTY_NOTICES.md) and [asset provenance](ASSETS.md).
 
 Independent Nth project; not affiliated with Microsoft. Windows is a Microsoft trademark.
+
+## Shared desktop consistency update
+
+See [desktop caching, restore compatibility and Task Manager changes](docs/DESKTOP_CONSISTENCY.md) for the current source changes and validation scope.
