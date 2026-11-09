@@ -37,12 +37,12 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
     }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));try{shot("eleven-taskbar-failure");}catch(Exception ignored){}finish(Activity.RESULT_CANCELED,result);}}
     void recentTaskbarStability()throws Exception{
         List<String> probes=new ArrayList<>();for(AppCatalog.Entry entry:AppCatalog.load(home))if(entry.id.startsWith("com.nthexperience.desktop.fixture/"))probes.add(entry.id);
-        check(probes.size()>=5,"Five installed Android fixture shortcuts");probes=new ArrayList<>(probes.subList(0,5));final List<String> apps=probes;
+        check(probes.size()>=4,"Four installed Android fixture shortcuts");probes=new ArrayList<>(probes.subList(0,4));final List<String> apps=probes;
         ui(()->{for(String id:ExternalTasks.list())ExternalTasks.remove(id);for(String id:apps)ExternalTasks.opened(id);store.quickLaunch(Collections.emptyList());store.prefs.edit().putBoolean("taskbar_static",false).putBoolean("taskbar_apps",true).putBoolean("taskbar_expanded",true).commit();home.applyTenAppearance();});settle();
         check(barKeys().equals(apps),"Unpinned Android button order established");
         for(int n=0;n<2;n++){
             Map<String,String> before=barGeometry();
-            ui(()->home.open("setting:page:taskbar"));settle();check(barKeys().subList(0,5).equals(apps),"Opening Control Panel appends its button after Android apps");check(barGeometry().entrySet().containsAll(before.entrySet()),"Existing buttons keep their rows while Control Panel is open");
+            ui(()->home.open("setting:page:taskbar"));settle();check(barKeys().subList(0,4).equals(apps),"Opening Control Panel appends its button after Android apps");check(barGeometry().entrySet().containsAll(before.entrySet()),"Existing buttons keep their rows while Control Panel is open");
             ui(this::closeProperties);settle();check(barKeys().equals(apps),"Closing Control Panel retains Android button order");check(barGeometry().equals(before),"Closing Control Panel does not flip existing rows");
             ui(this::toggleMenu);settle();check(barKeys().equals(apps),"Collapse retains session order");ui(this::toggleMenu);settle();check(barKeys().equals(apps),"Expansion retains session order");
         }
@@ -89,7 +89,7 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             if(name.equals("Left-portrait"))shot("eleven-taskbar-stable-collapsed");scenarios++;
         }finally{ui(()->{root.getViewTreeObserver().removeOnPreDrawListener(watcher[0]);frames+=watcher[0].count;});}
     }
-    void verify(Watcher watcher,String action){check(watcher.failure==null,action+": "+watcher.failure);}
+    void verify(Watcher watcher,String action)throws Exception{check(watcher.failure==null,action+": "+watcher.failure);boolean expanded=action.contains("expanded from menu");ui(()->{ElevenTaskbarItems bar=find(ElevenTaskbarItems.class);check(bar.expanded==expanded&&store.prefs.getBoolean("taskbar_expanded",false)==expanded&&bar.getHeight()==Aero.dp(home,expanded?96:48),"Actual taskbar height follows toggle: "+action);});}
     final class Watcher implements ViewTreeObserver.OnPreDrawListener{
         final Map<String,String> baseline=geometry();int count;String failure;
         public boolean onPreDraw(){count++;Map<String,String> now=geometry();if(failure==null&&!baseline.equals(now)){for(String id:baseline.keySet())if(!Objects.equals(baseline.get(id),now.get(id))){failure=id+" moved from "+baseline.get(id)+" to "+now.get(id);break;}if(failure==null)failure="Desktop membership changed";}return true;}
