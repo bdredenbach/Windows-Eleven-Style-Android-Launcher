@@ -35,7 +35,8 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         keyboardAndRows();
         runningPlacement();
         fixedControls();
-        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
+        narrowRestore();
+        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; narrow 320/360/411dp task buttons receive real restore touches with either alignment and battery preference; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
     }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));try{shot("eleven-taskbar-failure");}catch(Exception ignored){}finish(Activity.RESULT_CANCELED,result);}}
     void recentTaskbarStability()throws Exception{
         List<String> probes=new ArrayList<>();for(AppCatalog.Entry entry:AppCatalog.load(home))if(entry.id.startsWith("com.nthexperience.desktop.fixture/"))probes.add(entry.id);
@@ -84,6 +85,22 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             Map<String,View> controls=fixedViews();Map<String,String> before=new LinkedHashMap<>();for(Map.Entry<String,View> entry:controls.entrySet())before.put(entry.getKey(),bounds(entry.getValue()));String[] failure={null};int[] count={0};ViewTreeObserver.OnPreDrawListener watcher=()->{count[0]++;Map<String,View> current=fixedViews();for(String id:controls.keySet())if(failure[0]==null&&(current.get(id)!=controls.get(id)||!before.get(id).equals(bounds(controls.get(id)))))failure[0]=id+" changed from "+before.get(id)+" to "+bounds(controls.get(id));return true;};
             ui(()->root.getViewTreeObserver().addOnPreDrawListener(watcher));try{for(int n=0;n<2;n++){ui(this::toggleMenu);settle();check(failure[0]==null,"Fixed controls stay put: "+alignment+"/"+landscape+"/"+fit+": "+failure[0]);}}finally{ui(()->root.getViewTreeObserver().removeOnPreDrawListener(watcher));fixedFrames+=count[0];}fixedScenarios++;
         }
+    }
+    void narrowRestore()throws Exception{
+        ui(()->{closeAll();for(String id:ExternalTasks.list())ExternalTasks.remove(id);store.quickLaunch(Collections.singletonList("@notes"));home.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);});settle();
+        for(int width:new int[]{320,360,411})for(String alignment:new String[]{"Left","Center"})for(boolean percentage:new boolean[]{false,true}){
+            float density=home.getResources().getDisplayMetrics().density;shell("wm size "+Math.round(width*density)+"x"+Math.round(780*density));settle();
+            ui(()->{store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("eleven_battery_percent",percentage).putBoolean("taskbar_static",false).putBoolean("taskbar_expanded",false).putBoolean("taskbar_show_labels",false).commit();home.applyTenAppearance();home.open("@notes");});settle();
+            DesktopWindow window=find(DesktopWindow.class);ui(window::minimize);settle();
+            ui(()->((HorizontalScrollView)find(ElevenTaskbarItems.class).getParent()).scrollTo(0,0));settle();
+            View button=slot("@notes");Rect touch=new Rect();check(button.getGlobalVisibleRect(touch)&&touch.width()>=Aero.dp(home,32),"Usable restore target at "+width+"dp/"+alignment+"/battery="+percentage);
+            for(Map.Entry<String,View> control:fixedViews().entrySet()){
+                Rect fixed=new Rect();check(control.getValue().getGlobalVisibleRect(fixed),"Fixed control visible: "+control.getKey());check(!Rect.intersects(touch,fixed),"Restore target avoids "+control.getKey());
+            }
+            long now=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(now,SystemClock.uptimeMillis(),action,touch.exactCenterX(),touch.exactCenterY(),0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,true),"Restore touch accepted");event.recycle();Thread.sleep(70);}settle();check(window.isShown(),"Actual narrow taskbar touch restores Notepad");
+            if(width==360&&percentage)shot("eleven-taskbar-narrow-"+alignment.toLowerCase(Locale.ROOT));ui(window::closeWindow);settle();
+        }
+        shell("wm size reset");settle();
     }
     List<String> barKeys()throws Exception{List<String> ids=new ArrayList<>();ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int n=0;n<items.getChildCount();n++){String id=TaskbarReorder.key(items.getChildAt(n));if(id!=null)ids.add(id);}});return ids;}
     Map<String,String> barGeometry()throws Exception{Map<String,String> values=new LinkedHashMap<>();ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int n=0;n<items.getChildCount();n++){View child=items.getChildAt(n);String id=TaskbarReorder.key(child);if(id!=null)values.put(id,child.getLeft()+","+child.getTop()+","+child.getWidth()+","+child.getHeight());}});return values;}
