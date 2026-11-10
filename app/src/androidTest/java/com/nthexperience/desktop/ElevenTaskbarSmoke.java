@@ -119,6 +119,7 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             check(Math.abs(ink.centerY()-icon.getHeight()/2)<=Aero.dp(home,2),"Fixed icon artwork is vertically centered");
         }
         for(String name:new String[]{"Start menu","Search","Task View","Nth Nota"})check(fixed.get(name).getWidth()==Aero.dp(home,ElevenLayout.controlWidth(width)),"Uniform fixed button width: "+name);
+        ViewGroup widgets=(ViewGroup)fixed.get("Widgets");View widgetIcon=widgets.getChildAt(0);check(widgetIcon.getWidth()==edge&&widgetIcon.getHeight()==edge&&Math.abs(widgetIcon.getLeft()+edge/2-widgets.getWidth()/2)<=1,"Widgets icon uses the common centered canvas");
         ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int i=0;i<items.getChildCount();i++){
             ViewGroup button=(ViewGroup)items.getChildAt(i);View icon=button.getChildAt(0);check(button.getWidth()==Aero.dp(home,ElevenLayout.taskButtonWidth(width)),"Pinned/running button uses common spacing");check(icon.getWidth()==edge&&icon.getHeight()==edge,"App icon shares the fixed icon canvas size");check(Math.abs(icon.getTop()+icon.getHeight()/2-button.getHeight()/2)<=1,"App icon centered vertically");
         }
