@@ -58,7 +58,7 @@ final class SystemTray extends LinearLayout {
         actionCenter.setVisibility(GONE);
         compactStatus=new LinearLayout(c);compactStatus.setGravity(Gravity.CENTER);compactStatus.setContentDescription("Quick Settings");compactStatus.setFocusable(true);compactStatus.setBackground(Aero.selection(c));
         compactStatus.addView(new TenStyle.Glyph(c,"network",TenStyle.text(c)),new LayoutParams(dp(20),dp(24)));compactStatus.addView(new TenStyle.Glyph(c,"volume",TenStyle.text(c)),new LayoutParams(dp(20),dp(24)));
-        batteryPercentage=Aero.text(c,"",10,TenStyle.text(c));batteryPercentage.setContentDescription("Taskbar battery percentage");batteryPercentage.setGravity(Gravity.CENTER);compactStatus.addView(batteryPercentage,new LayoutParams(dp(34),dp(26)));batteryPercentage.setVisibility(prefs.getBoolean("eleven_battery_percent",false)?VISIBLE:GONE);
+        batteryPercentage=Aero.text(c,"",10,TenStyle.text(c));batteryPercentage.setContentDescription("Taskbar battery percentage");batteryPercentage.setGravity(Gravity.CENTER);compactStatus.addView(batteryPercentage,new LayoutParams(dp(34),dp(26)));batteryPercentage.setVisibility(showBatteryPercentage()?VISIBLE:GONE);
         compactStatus.setOnClickListener(v->show("controls"));compactStatus.setOnLongClickListener(v->{show("controls");return true;});addView(compactStatus,0,new LayoutParams(dp(48),dp(48)));updateIconVisibility();
     }
     @Override protected void onMeasure(int widthSpec,int heightSpec){
@@ -66,7 +66,10 @@ final class SystemTray extends LinearLayout {
         super.onMeasure(widthSpec,heightSpec);
     }
     void fitWidth(int workspaceWidth){workspaceBudget=workspaceWidth;sizeIcons();}
+    // Keep the preference, but reserve a real app touch target on narrow phones.
+    private boolean showBatteryPercentage(){return prefs.getBoolean("eleven_battery_percent",false)&&Math.min(workspaceBudget>0?workspaceBudget:Integer.MAX_VALUE,dp(getResources().getConfiguration().screenWidthDp))>=dp(400);}
     private void sizeIcons(){
+        batteryPercentage.setVisibility(showBatteryPercentage()?VISIBLE:GONE);
         int configured=dp(getResources().getConfiguration().screenWidthDp);
         // Use one budget in measure and layout, including narrower inset/IME transitions.
         int workspaceWidth=workspaceBudget>0?Math.min(workspaceBudget,configured):configured;
@@ -74,7 +77,7 @@ final class SystemTray extends LinearLayout {
         int width = Math.min(dp(44), Math.max(dp(24), (workspaceWidth - dp(200)) / getChildCount()));
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
-            int childWidth = child == compactStatus ? dp(prefs.getBoolean("eleven_battery_percent",false)?84:48) : dp(28);
+            int childWidth = child == compactStatus ? dp(showBatteryPercentage()?84:48) : dp(28);
             ViewGroup.LayoutParams params = child.getLayoutParams();
             if (params.width != childWidth) {
                 params.width = childWidth;
@@ -157,7 +160,7 @@ final class SystemTray extends LinearLayout {
     private void update(){
         int count=ActionCenter.alerts(getContext(),new DesktopStore(getContext())).size();
         if(count!=alertCount){alertCount=count;actionCenter.invalidate();actionCenter.setTooltipText(count==0?"Action Center: no recent Nth alerts":"Action Center: "+count+" Nth alert"+(count==1?"":"s"));if(Build.VERSION.SDK_INT>=30)actionCenter.setStateDescription(count==0?"No recent Nth alerts":count+" Nth alert"+(count==1?"":"s"));}
-        clockNow();for(TrayIcon icon:icons)icon.invalidate();int percentage=percent();if(batteryPercentage!=null){batteryPercentage.setText(percentage<0?"—":percentage+"%");batteryPercentage.setTextColor(TenStyle.text(getContext()));batteryPercentage.setVisibility(prefs.getBoolean("eleven_battery_percent",false)?VISIBLE:GONE);}icons.get(0).setContentDescription("Battery status"+(percentage<0?"":", "+percentage+"%"));icons.get(1).setContentDescription("Network status");
+        clockNow();for(TrayIcon icon:icons)icon.invalidate();int percentage=percent();if(batteryPercentage!=null){batteryPercentage.setText(percentage<0?"—":percentage+"%");batteryPercentage.setTextColor(TenStyle.text(getContext()));batteryPercentage.setVisibility(showBatteryPercentage()?VISIBLE:GONE);}icons.get(0).setContentDescription("Battery status"+(percentage<0?"":", "+percentage+"%"));icons.get(1).setContentDescription("Network status");
         if(summary==null)return;
         switch(page){case "actioncenter":summary.setText(alertCount==0?"No recent Nth alerts.":alertCount+" Nth alert"+(alertCount==1?"":"s"));break;case "battery":summary.setText((percentage<0?"Battery level unavailable":percentage+"% remaining")+"\n"+(charging()?"Plugged in":"On battery")+"\nBattery Saver: "+(power!=null&&power.isPowerSaveMode()?"On":"Off"));break;case "network":summary.setText(network());break;case "volume":int current=audio==null?0:audio.getStreamVolume(AudioManager.STREAM_MUSIC),max=audio==null?0:audio.getStreamMaxVolume(AudioManager.STREAM_MUSIC);summary.setText("Media volume: "+current+" / "+max+(audio!=null&&audio.isVolumeFixed()?"\nVolume is controlled by your output device":"\nRinger and Do Not Disturb follow Android settings."));if(volume!=null&&!tracking)volume.setProgress(current);break;case "brightness":summary.setText("Screen brightness");break;case "controls":if(quickBattery!=null)quickBattery.setText((percentage<0?"Battery":percentage+"%")+(charging()?" · Charging":""));if(volume!=null&&!tracking&&audio!=null)volume.setProgress(audio.getStreamVolume(AudioManager.STREAM_MUSIC));quickFace("Wi-Fi",wifiConnected());quickFace("Energy saver",power!=null&&power.isPowerSaveMode());quickFace("Airplane mode",android.provider.Settings.Global.getInt(getContext().getContentResolver(),android.provider.Settings.Global.AIRPLANE_MODE_ON,0)!=0);break;case "calendar":summary.setText(java.text.DateFormat.getDateInstance(java.text.DateFormat.FULL).format(new Date())+"\n"+TimeZone.getDefault().getDisplayName());break;}
     }

@@ -11,6 +11,6 @@ public class ElevenReferenceTest {
   }
  }
  @Test public void lettersUseUnicodeAndNumbersGroup(){assertEquals("C",ElevenLayout.initial("calculator"));assertEquals("É",ElevenLayout.initial("écriture"));assertEquals("#",ElevenLayout.initial("7-Zip"));assertEquals("#",ElevenLayout.initial(""));}
- @Test public void taskbarReservesActualSearchWidth(){assertEquals(168,ElevenLayout.taskbarFixed(411,"Auto"));assertEquals(168,ElevenLayout.taskbarFixed(700,"Auto"));assertEquals(288,ElevenLayout.taskbarFixed(1100,"Auto"));assertEquals(168,ElevenLayout.taskbarFixed(1100,"Icon"));assertEquals(128,ElevenLayout.taskbarFixed(1100,"Hidden"));}
+ @Test public void taskbarReservesActualSearchWidth(){assertEquals(96,ElevenLayout.taskbarFixed(320,"Auto"));assertEquals(112,ElevenLayout.taskbarFixed(360,"Auto"));assertEquals(112,ElevenLayout.taskbarFixed(411,"Auto"));assertEquals(168,ElevenLayout.taskbarFixed(700,"Auto"));assertEquals(288,ElevenLayout.taskbarFixed(1100,"Auto"));assertEquals(168,ElevenLayout.taskbarFixed(1100,"Icon"));assertEquals(128,ElevenLayout.taskbarFixed(1100,"Hidden"));}
  @Test public void referenceChoicesValidate()throws Exception{Map<String,Object> p=new HashMap<>();p.put("eleven_taskbar_alignment","Left");p.put("eleven_start_view","Grid");p.put("eleven_start_size","Large");TenPreferences.validate(p);p.put("eleven_taskbar_alignment","Bottom");try{TenPreferences.validate(p);fail("Bad alignment accepted");}catch(JSONException expected){}}
 }

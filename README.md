@@ -1,10 +1,12 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.9.0**. Android 8.0+; targets Android 16.
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.9.1**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 
 ## Recording-based update
+
+0.9.1 retains the illustrated Usage Access guide after returning without a grant, keeps App info recovery available, and preserves Eleven’s Welcome Center behind setup. Portrait taskbar controls adapt to narrow screens so app restore targets stay clear of Widgets and the tray. See [the recovery update and validation coverage](docs/ELEVEN_0_9_1_USAGE_ACCESS.md).
 
 0.9.0 integrates the complete desktop-consistency handoff (caching, compatible restore/undo, ordered optional setup, approximate location and Start uninstall) and corrects the owner's seven shell screenshots: mask-safe N¹¹ branding, left-aligned upper taskbar apps, portrait Search, classic desktop options, full-width Start footer, reachable Show desktop and bottom-label clearance. All 106 unit tests and 22 native execution phases passed on both Android 11 and 16, including actual upgrade/restore, setup deferral/recreation and approximate-only location. See [the screenshot corrections and validation](docs/ELEVEN_0_9_SCREENSHOT_FIXES.md).
 
