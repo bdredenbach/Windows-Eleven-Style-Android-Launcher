@@ -248,7 +248,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             // The tray only occupies the bottom row. Upper tasks can span the whole bar.
             int appX=twoRows?outer:x+fixed,appWidth=twoRows?Math.max(1,elevenBar.getWidth()-2*outer):Math.max(1,w-fixed);
             ElevenTaskbarItems rows=(ElevenTaskbarItems)taskItems;
-            boolean rowBoundsChanged=rows.bottomBounds(twoRows?x+fixed-appX:0,twoRows?elevenBar.getWidth()-right-appX:appWidth);
+            boolean rowBoundsChanged=rows.bottomBounds(twoRows?x+fixed-appX:0,twoRows?elevenBar.getWidth()-right-appX:appWidth,appWidth);
             if(rowBoundsChanged&&store.prefs.getBoolean("taskbar_static",false)){main.removeCallbacks(taskbarRender);main.post(taskbarRender);}
             if(app.width!=appWidth||app.leftMargin!=appX){app.width=appWidth;app.leftMargin=appX;taskClip.setLayoutParams(app);}
         };
