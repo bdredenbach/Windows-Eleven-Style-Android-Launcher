@@ -7,7 +7,7 @@ import android.widget.LinearLayout;
 /** Running app buttons use the upper row; idle pinned shortcuts use the lower row. */
 final class ElevenTaskbarItems extends LinearLayout {
     boolean expanded;
-    private int bottomOffset;
+    private int bottomOffset,bottomEnd=Integer.MAX_VALUE,bottomTrailing;
     private static final class Slot extends LinearLayout.LayoutParams {
         final boolean running;final int preferredWidth;
         Slot(LinearLayout.LayoutParams source,boolean running){super(source);this.running=running;preferredWidth=source.width;}
@@ -17,7 +17,8 @@ final class ElevenTaskbarItems extends LinearLayout {
     static boolean running(View child){return child.getLayoutParams() instanceof Slot&&((Slot)child.getLayoutParams()).running;}
     void expanded(boolean value){if(expanded!=value){expanded=value;requestLayout();}}
     int bottomOffset(){return bottomOffset;}
-    void bottomOffset(int value){if(bottomOffset!=value){bottomOffset=value;requestLayout();}}
+    int bottomRoom(int viewport){return Math.max(0,Math.min(viewport,bottomEnd)-bottomOffset);}
+    boolean bottomBounds(int start,int end,int viewport){int trailing=Math.max(0,viewport-end);if(bottomOffset==start&&bottomEnd==end&&bottomTrailing==trailing)return false;bottomOffset=start;bottomEnd=end;bottomTrailing=trailing;requestLayout();invalidate();return true;}
     int singleRowWidth(){int total=0;for(int i=0;i<getChildCount();i++){View child=getChildAt(i);if(child.getVisibility()==GONE)continue;LinearLayout.LayoutParams p=(LinearLayout.LayoutParams)child.getLayoutParams();total+=(p instanceof Slot?((Slot)p).preferredWidth:p.width)+p.rightMargin;}return total;}
     @Override protected void onMeasure(int width,int height){
         if(!expanded){super.onMeasure(width,height);return;}
@@ -27,6 +28,8 @@ final class ElevenTaskbarItems extends LinearLayout {
             child.measure(MeasureSpec.makeMeasureSpec(Math.max(0,p.width),MeasureSpec.EXACTLY),MeasureSpec.makeMeasureSpec(Aero.dp(getContext(),48),MeasureSpec.EXACTLY));
             widths[running(child)?0:1]+=child.getMeasuredWidth()+p.rightMargin;
         }
+        // Include the lower tray reservation in scroll range so the final idle pin can clear it.
+        widths[1]+=bottomTrailing;
         setMeasuredDimension(Math.max(Math.max(widths[0],widths[1]),MeasureSpec.getMode(width)==MeasureSpec.EXACTLY?MeasureSpec.getSize(width):getSuggestedMinimumWidth()),resolveSize(Aero.dp(getContext(),96),height));
     }
     @Override protected void onLayout(boolean changed,int left,int top,int right,int bottom){
@@ -41,6 +44,6 @@ final class ElevenTaskbarItems extends LinearLayout {
         if(!expanded||running(child))return super.drawChild(canvas,child,time);
         // Bottom pins scroll behind the fixed controls without painting through their transparent faces.
         int save=canvas.save(),scroll=getParent() instanceof View?((View)getParent()).getScrollX():0;
-        canvas.clipRect(bottomOffset+scroll,0,getWidth(),getHeight());boolean drawn=super.drawChild(canvas,child,time);canvas.restoreToCount(save);return drawn;
+        canvas.clipRect(bottomOffset+scroll,0,Math.min(getWidth(),bottomEnd+scroll),getHeight());boolean drawn=super.drawChild(canvas,child,time);canvas.restoreToCount(save);return drawn;
     }
 }

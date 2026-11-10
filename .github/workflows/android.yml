@@ -51,15 +51,15 @@ jobs:
         run: python3 checks/CheckElevenManifest.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Nth-Desktop-Eleven-0.9.2-api-${{ matrix.api }}
+          name: Nth-Desktop-Eleven-0.9.3-api-${{ matrix.api }}
           path: app/build/outputs/apk/debug/app-debug.apk
       - name: Download preceding release for upgrade check
         id: upgrade_baseline
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
-          name: Nth-Desktop-Eleven-0.9.1-api-${{ matrix.api }}
-          run-id: 42731669182
+          name: Nth-Desktop-Eleven-0.9.2-api-${{ matrix.api }}
+          run-id: 42736781370
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: build/upgrade-seed
       - name: Match disposable emulator signing for upgrade check
