@@ -1,6 +1,8 @@
 # Nth Desktop Eleven
 
-A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.9.2**. Android 8.0+; targets Android 16.
+**0.9.3:** Expanded running apps use the full taskbar width; bottom pins retain separate tray clearance. Clock/date/notifications sit closer to the right edge. A layered blue N¹¹ icon is shared throughout the app. [Details](docs/ELEVEN_0_9_3_TASKBAR_AND_BRAND.md).
+
+A Windows 11 inspired Android launcher by **An Nth Experience**. Current source preview: **0.9.3**. Android 8.0+; targets Android 16.
 
 Package: `com.nthexperience.desktop.eleven`. Installs alongside Nth Desktop Ten, Seven and Eight.
 

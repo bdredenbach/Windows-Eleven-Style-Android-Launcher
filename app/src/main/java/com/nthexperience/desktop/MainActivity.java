@@ -230,7 +230,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         tray=new SystemTray(this,workspace,wallpaper,new SystemTray.Host(){public void action(String id){vistaAction(id);}public void open(String id){MainActivity.this.open(id);}public void layout(){main.post(()->{layoutWorkspace();renderTaskbar();});}public void opening(){if(tenActions!=null)tenActions.dismiss();if(tenTasks!=null)tenTasks.dismiss();if(tenNews!=null)tenNews.dismiss();if(previews!=null)previews.dismiss();startMenu.hide();((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(root.getWindowToken(),0);}});indicators.addView(tray,new LinearLayout.LayoutParams(-2,dp(48)));
         clock=Aero.text(this,"",10,TenStyle.text(this));clock.setGravity(Gravity.CENTER);clock.setMaxLines(2);clock.setIncludeFontPadding(false);clock.setPadding(dp(5),0,dp(5),0);clock.setMinWidth(dp(screenDp<360?48:52));if(screenDp<480){clock.setTextSize(screenDp<360?9:screenDp<400?10:11);clock.setHorizontallyScrolling(false);clock.setAutoSizeTextTypeUniformWithConfiguration(8,screenDp<400?10:11,1,android.util.TypedValue.COMPLEX_UNIT_SP);}clock.setBackground(TenStyle.hover(this,Color.TRANSPARENT));clock.setOnClickListener(v->open("@tenactions"));clock.setContentDescription("Clock and calendar");indicators.addView(clock,new LinearLayout.LayoutParams(screenDp<480?dp(screenDp<360?56:screenDp<400?64:72):-2,dp(44)));
         TenStyle.Glyph actionButton=new TenStyle.Glyph(this,"actions",TenStyle.text(this));actionButton.setContentDescription("Notifications and calendar");actionButton.setPadding(dp(4),dp(12),dp(4),dp(12));actionButton.setTooltipText("Notifications and calendar");actionButton.setFocusable(true);actionButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));actionButton.setOnClickListener(v->open("@tenactions"));indicators.addView(actionButton,new LinearLayout.LayoutParams(dp(screenDp<480?24:28),dp(48)));
-        FrameLayout peek=new FrameLayout(this);desktopToggle=peek;View peekStrip=new View(this);peekStrip.setBackgroundColor(0xff777777);peek.addView(peekStrip,new FrameLayout.LayoutParams(dp(1),-1,Gravity.END));peek.setContentDescription("Show desktop");peek.setFocusable(true);peek.setTooltipText("Show desktop");peek.setBackground(TenStyle.hover(this,Color.TRANSPARENT));peek.setOnClickListener(v->{previews.dismiss();showDesktop();});ContextMenus.bind(peek,(x,y)->taskbarMenu(peek,x,y));previews.bindDesktopPeek(peek);indicators.addView(peek,new LinearLayout.LayoutParams(dp(24),dp(48)));
+        FrameLayout peek=new FrameLayout(this);desktopToggle=peek;View peekStrip=new View(this);peekStrip.setBackgroundColor(0xff777777);peek.addView(peekStrip,new FrameLayout.LayoutParams(dp(1),-1,Gravity.END));peek.setContentDescription("Show desktop");peek.setFocusable(true);peek.setTooltipText("Show desktop");peek.setBackground(TenStyle.hover(this,Color.TRANSPARENT));peek.setOnClickListener(v->{previews.dismiss();showDesktop();});ContextMenus.bind(peek,(x,y)->taskbarMenu(peek,x,y));previews.bindDesktopPeek(peek);indicators.addView(peek,new LinearLayout.LayoutParams(dp(8),dp(48)));
         Runnable align=()->{
             if(elevenBar.getWidth()==0)return;
             boolean twoRows=((ElevenTaskbarItems)taskItems).expanded;
@@ -243,9 +243,13 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             int x=leftAligned?left:ElevenLayout.taskbarLeft(elevenBar.getWidth(),left,right,desired);
             FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)taskbar.getLayoutParams();
             if(pos.width!=fixed||pos.leftMargin!=x){pos.width=fixed;pos.leftMargin=x;taskbar.setLayoutParams(pos);}
-            ((ElevenTaskbarItems)taskItems).bottomOffset(twoRows?fixed:0);
+
             FrameLayout.LayoutParams app=(FrameLayout.LayoutParams)taskClip.getLayoutParams();
-            int appX=x+(twoRows?0:fixed),appWidth=twoRows?w:Math.max(1,w-fixed);
+            // The tray only occupies the bottom row. Upper tasks can span the whole bar.
+            int appX=twoRows?outer:x+fixed,appWidth=twoRows?Math.max(1,elevenBar.getWidth()-2*outer):Math.max(1,w-fixed);
+            ElevenTaskbarItems rows=(ElevenTaskbarItems)taskItems;
+            boolean rowBoundsChanged=rows.bottomBounds(twoRows?x+fixed-appX:0,twoRows?elevenBar.getWidth()-right-appX:appWidth);
+            if(rowBoundsChanged&&store.prefs.getBoolean("taskbar_static",false)){main.removeCallbacks(taskbarRender);main.post(taskbarRender);}
             if(app.width!=appWidth||app.leftMargin!=appX){app.width=appWidth;app.leftMargin=appX;taskClip.setLayoutParams(app);}
         };
         taskbarAlign=align;
@@ -658,7 +662,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         for(int row=0;row<(expanded?2:1);row++){
             List<LinearLayout> buttons=new ArrayList<>();int preferred=0;
             for(int i=first;i<taskItems.getChildCount();i++){LinearLayout button=(LinearLayout)taskItems.getChildAt(i);if(expanded&&(ElevenTaskbarItems.running(button)?0:1)!=row)continue;buttons.add(button);LinearLayout.LayoutParams p=(LinearLayout.LayoutParams)button.getLayoutParams();preferred+=p.width+p.rightMargin;}
-            int rowRoom=expanded&&row==1?Math.max(1,room-((ElevenTaskbarItems)taskItems).bottomOffset()):room;
+            int rowRoom=expanded&&row==1?Math.max(1,((ElevenTaskbarItems)taskItems).bottomRoom(room)):room;
             int count=buttons.size();if(count==0||preferred<=rowRoom)continue;
             int gap=rowRoom/count>=dp(32)?dp(3):0,width=Math.max(0,rowRoom-count*gap);
             for(int i=0;i<count;i++){

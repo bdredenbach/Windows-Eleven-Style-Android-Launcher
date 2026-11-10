@@ -37,6 +37,7 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         fixedControls();
         narrowRestore();
         proportionScreenshots();
+        fullWidthUpperRow();
         result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; narrow 320/360/411dp task buttons receive real restore touches with either alignment and battery preference; actual drawn Start/Search/Task View/Nota icon bounds share the app icon scale; uniform fixed/pinned button spacing; light/dark collapsed/expanded Left/Center proportion captures; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
     }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));try{shot("eleven-taskbar-failure");}catch(Exception ignored){}finish(Activity.RESULT_CANCELED,result);}}
     void recentTaskbarStability()throws Exception{
@@ -101,6 +102,31 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             }
             long now=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(now,SystemClock.uptimeMillis(),action,touch.exactCenterX(),touch.exactCenterY(),0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,true),"Restore touch accepted");event.recycle();Thread.sleep(70);}settle();check(window.isShown(),"Actual narrow taskbar touch restores Notepad");
             if(width==360&&percentage)shot("eleven-taskbar-narrow-"+alignment.toLowerCase(Locale.ROOT));ui(window::closeWindow);settle();
+        }
+        shell("wm size reset");settle();
+    }
+    /** The owner's recording had a half-width upper row even with free space above the tray. */
+    void fullWidthUpperRow()throws Exception{
+        float density=home.getResources().getDisplayMetrics().density;
+        shell("wm size "+Math.round(411*density)+"x"+Math.round(860*density));settle();
+        String[] tools={"@notes","@calendar","@recycle","@settings","@welcome","@recent","@backup","@taskmanager"};
+        for(String alignment:new String[]{"Left","Center"})for(boolean fit:new boolean[]{false,true}){
+            ui(()->{closeAll();for(String id:ExternalTasks.list())ExternalTasks.remove(id);store.quickLaunch(Arrays.asList("@photos","@browser"));store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("taskbar_static",fit).putBoolean("taskbar_expanded",true).putBoolean("taskbar_show_labels",false).putBoolean("eleven_battery_percent",false).commit();home.applyTenAppearance();for(String tool:tools)home.open(tool);});settle();
+            ui(()->{
+                ElevenTaskbarItems items=find(ElevenTaskbarItems.class);HorizontalScrollView strip=(HorizontalScrollView)items.getParent();View bar=TenSmoke.description(root,"Eleven taskbar");
+                check(strip.getWidth()>=bar.getWidth()-Aero.dp(home,10),"Upper row uses the whole bar including the space above the tray");
+                Rect last=new Rect();check(slot("@taskmanager").getGlobalVisibleRect(last)&&last.width()>=Aero.dp(home,32),"Eighth upper app is fully visible beyond the old half-width cutoff");
+                View clock=TenSmoke.description(root,"Clock and calendar"),notification=TenSmoke.description(root,"Notifications and calendar"),peek=TenSmoke.description(root,"Show desktop");int[] edge=new int[2],end=new int[2];bar.getLocationOnScreen(edge);notification.getLocationOnScreen(end);
+                check(edge[0]+bar.getWidth()-(end[0]+notification.getWidth())==Aero.dp(home,8),"Notification sits next to the narrow right-edge desktop strip");
+                check(clock.getTop()+clock.getHeight()<=((View)clock.getParent()).getHeight(),"Clock remains on the lower row");
+                check(peek.getWidth()==Aero.dp(home,8),"No unused 24dp gap on the right");
+                check(items.bottomRoom(strip.getWidth())<strip.getWidth()-items.bottomOffset(),"Idle pins keep their own lower-row tray reservation");
+                try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("windows");field.setAccessible(true);((DesktopWindow)((Map<?,?>)field.get(home)).get("@taskmanager")).minimize();}catch(Exception error){throw new RuntimeException(error);}
+            });settle();
+            View target=slot("@taskmanager");Rect hit=new Rect();check(target.getGlobalVisibleRect(hit),"Right-side task target visible");
+            long now=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(now,SystemClock.uptimeMillis(),action,hit.exactCenterX(),hit.exactCenterY(),0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,true),"Right-side app touch accepted");event.recycle();}settle();
+            ui(()->{try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("windows");field.setAccessible(true);check(((DesktopWindow)((Map<?,?>)field.get(home)).get("@taskmanager")).isShown(),"Right-side upper-row app restores through real input");}catch(Exception error){throw new RuntimeException(error);}});
+            shot("eleven-taskbar-fullwidth-"+alignment.toLowerCase(Locale.ROOT)+(fit?"-static":"-scrollable"));
         }
         shell("wm size reset");settle();
     }
