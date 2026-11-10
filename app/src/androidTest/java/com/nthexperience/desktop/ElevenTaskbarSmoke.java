@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.concurrent.*;
 
 /** Recording regression: changing taskbar height must not resnap the desktop behind it. */
-public final class ElevenTaskbarSmoke extends Instrumentation {
+public class ElevenTaskbarSmoke extends Instrumentation {
     MainActivity home;View root;DesktopStore store;int scenarios,frames,fixedScenarios,fixedFrames;
     @Override public void onCreate(Bundle args){super.onCreate(args);start();}
     @Override public void onStart(){Bundle result=new Bundle();try{
@@ -62,7 +62,8 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);check(items.expanded&&items.getHeight()==Aero.dp(home,96),"Two full-height rows");
                 for(int i=0;i<items.getChildCount();i++){View child=items.getChildAt(i);check(child.getHeight()==Aero.dp(home,48)&&child.getTop()==(ElevenTaskbarItems.running(child)?0:1)*Aero.dp(home,48),"Normal touch height on correct row");if(fit)check(child.getRight()<=((HorizontalScrollView)items.getParent()).getWidth(),"Static buttons fit the visible strip");}
                 try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("taskbarReorder");field.setAccessible(true);Object reorder=field.get(home);java.lang.reflect.Method hit=TaskbarReorder.class.getDeclaredMethod("indexAt",float.class,float.class,String.class);hit.setAccessible(true);
-                    for(boolean running:new boolean[]{false,true}){List<View> row=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(ElevenTaskbarItems.running(items.getChildAt(i))==running)row.add(items.getChildAt(i));check(row.size()>=2,"Multiple buttons in each actual row");View target=row.get(0),moving=row.get(row.size()-1);List<String> keys=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(items.getChildAt(i)!=moving)keys.add(TaskbarReorder.key(items.getChildAt(i)));int index=(Integer)hit.invoke(reorder,target.getLeft()+target.getWidth()/2f-1,(running?72:24)*home.getResources().getDisplayMetrics().density,TaskbarReorder.key(moving));check(index==keys.indexOf(TaskbarReorder.key(target)),"Drag stays in the source row even over the other row");}
+                    for(int rowIndex:new int[]{0,1}){List<View> row=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(ElevenTaskbarItems.row(items.getChildAt(i))==rowIndex)row.add(items.getChildAt(i));check(row.size()>=2,"Multiple buttons in each actual row");View target=row.get(0),moving=row.get(row.size()-1);List<String> keys=new ArrayList<>();for(int i=0;i<items.getChildCount();i++)if(items.getChildAt(i)!=moving)keys.add(TaskbarReorder.key(items.getChildAt(i)));int index=(Integer)hit.invoke(reorder,target.getLeft()+target.getWidth()/2f-1,(rowIndex*48+24)*home.getResources().getDisplayMetrics().density,TaskbarReorder.key(moving));check(index==keys.indexOf(TaskbarReorder.key(target)),"Drag chooses the target row insertion point");}
+
                 }catch(Exception e){throw new RuntimeException(e);}
 
             });
@@ -135,7 +136,7 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         for(String alignment:new String[]{"Left","Center"}){
             List<String> pins=Arrays.asList("@notes","@calendar","@recycle","@settings","@welcome","@recent","@backup","@taskmanager","@photos","@browser","@focus-timer");
             ui(()->{closeAll();for(String id:ExternalTasks.list())ExternalTasks.remove(id);store.quickLaunch(pins);store.taskbarOrder(pins);store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("taskbar_expanded",true).putBoolean("taskbar_static",false).commit();home.applyTenAppearance();});settle();
-            ui(()->((HorizontalScrollView)find(ElevenTaskbarItems.class).getParent()).fullScroll(View.FOCUS_RIGHT));settle();
+            ui(()->find(ElevenTaskbarItems.class).scrollRowTo(1,Integer.MAX_VALUE));settle();
             Rect hit=new Rect();ui(()->{ElevenTaskbarItems items=find(ElevenTaskbarItems.class);View pin=slot("@focus-timer");int[] at=new int[2];((View)items.getParent()).getLocationOnScreen(at);check(pin.getGlobalVisibleRect(hit)&&hit.width()>=Aero.dp(home,32),"Final lower pin has a complete touch target");check(hit.right<=at[0]+items.bottomOffset()+items.bottomRoom(((View)items.getParent()).getWidth()),"Final lower pin scrolls fully clear of the tray");});
             long now=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(now,SystemClock.uptimeMillis(),action,hit.exactCenterX(),hit.exactCenterY(),0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,true),"Last idle pin touch accepted");event.recycle();}settle();
             ui(()->{try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("windows");field.setAccessible(true);DesktopWindow timer=(DesktopWindow)((Map<?,?>)field.get(home)).get("@focus-timer");check(timer!=null&&timer.isShown(),"Scrolled final idle pin launches its actual tool");}catch(Exception error){throw new RuntimeException(error);}});

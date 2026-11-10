@@ -5,6 +5,7 @@ import java.util.*;
 /** Validate new portable settings before the existing atomic backup restore. */
 final class TenPreferences {
     static void validate(Map<String,Object> values)throws JSONException{
+        if(values.containsKey(TaskbarRows.KEY)){Object raw=values.get(TaskbarRows.KEY);if(!(raw instanceof String))throw new JSONException("Invalid taskbar rows");TaskbarRows.parse((String)raw);}
         ElevenLocalState.validate(new JSONObject(values));TaskManagerState.validate(values);ElevenMarket.validate(values);
         if(values.containsKey("eleven_start_folders")){Object raw=values.get("eleven_start_folders");if(!(raw instanceof String)||((String)raw).length()>100)throw new JSONException("Invalid Start folders");for(String name:((String)raw).split(","))if(!Arrays.asList("","Settings","Documents","Downloads","Music","Pictures","Videos").contains(name))throw new JSONException("Invalid Start folder");}
         for(String key:new String[]{"eleven_taskbar_alignment","eleven_start_view","eleven_start_size"})if(values.containsKey(key)){List<String> valid=key.endsWith("alignment")?Arrays.asList("Left","Center"):key.endsWith("view")?Arrays.asList("Category","Grid","List"):Arrays.asList("Automatic","Small","Large");if(!valid.contains(values.get(key)))throw new JSONException("Invalid "+key);}

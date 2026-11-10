@@ -34,6 +34,12 @@ XML
  fi
  failures+=("$label")
 }
+if [ "$native_suite" = TaskbarRows ]; then
+ adb shell pm clear "$launcher"
+ run_native ElevenTaskbarRowsSmoke ElevenTaskbarRowsSmoke
+ if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+ exit 0
+fi
 if [ "$native_suite" = PhotoSmoke ]; then
  adb shell pm clear "$launcher"
  adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
@@ -61,6 +67,9 @@ if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect
 adb shell pm clear "$launcher"
 run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
+if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
+adb shell pm clear "$launcher"
+run_native ElevenTaskbarRowsSmoke ElevenTaskbarRowsSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect
 adb shell wm size reset
