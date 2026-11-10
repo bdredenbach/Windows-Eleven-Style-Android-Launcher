@@ -150,7 +150,9 @@ public final class StorageSmoke extends ExplorerSmoke {
             systemClick("Open App info");
             await(()->androidSettingsVisible()&&node("App info")!=null,"App info opens for the launcher");
             back();
-            await(()->androidSettingsVisible()&&node("App info")==null,"Back from App info resumes Usage Access settings");
+            await(this::usageGuideVisible,"Back from App info returns to the guide for an explicit retry");
+            systemClick("OK");
+            await(this::androidSettingsVisible,"Retry from the returned guide opens Usage Access");
         }else{
             check(node("Open App info")==null,"Older Android omits restricted-settings recovery");
             systemClick("OK");
@@ -265,7 +267,7 @@ public final class StorageSmoke extends ExplorerSmoke {
         await(()->node("Enable File Browsing")!=null,"File access follows the canceled Home request");
         check(!home.isHome(),"Cancel preserves Android's selected launcher");recreate(MainActivity.class);
         await(()->node("Enable File Browsing")!=null,"File setup survives Activity recreation without repeating Home");shot("storage-ordered-files.png");systemClick("Later");
-        for(String title:new String[]{"Enable Usage Access","Allow Notifications Access","Modify System Settings (Brightness)"}){
+        for(String title:new String[]{"Set up Usage Access","Allow Notifications Access","Modify System Settings (Brightness)"}){
             await(()->node(title)!=null,"Next ordered setup step: "+title);systemClick("Later");
         }
         await(()->node("Allow Location")!=null,"Location follows brightness");

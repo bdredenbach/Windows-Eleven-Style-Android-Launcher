@@ -173,7 +173,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         setContentView(root);shell.requestApplyInsets();renderDesktop();refreshRecycleIcon();
     }
     private void layoutWorkspace(){
-        if(destroyed||workspace==null||workspace.getWidth()==0)return;int width=workspace.getWidth(),height=workspace.getHeight();if(tray!=null){tray.fitWidth(width);tray.bounds(desktopCutoutLeft,desktopCutoutRight,windowTopInset);}if(tenTasks!=null)tenTasks.safeInsets(desktopCutoutLeft,desktopCutoutRight,windowTopInset);if(tenActions!=null)tenActions.safeInsets(desktopCutoutLeft,desktopCutoutRight,windowTopInset);if(tenNews!=null)tenNews.bounds(desktopCutoutLeft,desktopCutoutRight,windowTopInset);
+        if(destroyed||workspace==null||workspace.getWidth()==0)return;if(usageGuide!=null)InitializationFlow.fitDialog(this,usageGuide);int width=workspace.getWidth(),height=workspace.getHeight();if(tray!=null){tray.fitWidth(width);tray.bounds(desktopCutoutLeft,desktopCutoutRight,windowTopInset);}if(tenTasks!=null)tenTasks.safeInsets(desktopCutoutLeft,desktopCutoutRight,windowTopInset);if(tenActions!=null)tenActions.safeInsets(desktopCutoutLeft,desktopCutoutRight,windowTopInset);if(tenNews!=null)tenNews.bounds(desktopCutoutLeft,desktopCutoutRight,windowTopInset);
             WindowInsets current=root.getRootWindowInsets();java.util.List<android.graphics.Rect> holes=new ArrayList<>();
             if(current!=null&&Build.VERSION.SDK_INT>=28&&current.getDisplayCutout()!=null)holes.addAll(current.getDisplayCutout().getBoundingRects());
             // Reserve the maximum taskbar footprint in both modes so automatic rows fit without moving on expansion.
@@ -1333,10 +1333,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         Aero.pad(content,16);
         content.addView(Aero.text(this,message,14,Aero.INK));
         if(showAppInfo){
-            String steps="In App info, tap the three dots (⋮) and choose Allow restricted settings if shown. "
-                    +"Then press Back to return to the Usage Access switch.";
-            if(!returning)steps="If Android says ‘App was denied access’, tap Close, then press Back to "+appName+". "
-                    +"This guide will reopen. Tap Open App info below. "+steps;
+            String steps="If Android says ‘App was denied access’, tap Close, then press Back to return to this guide. Tap Open App info below, open the three-dot menu (⋮), and choose Allow restricted settings if shown. Then press Back to return here and tap OK to try Usage Access again.";
             TextView recovery=Aero.text(this,steps,14,Aero.INK);
             recovery.setPadding(0,dp(12),0,dp(10));
             content.addView(recovery);
@@ -1356,6 +1353,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             if(!destroyed)refreshUsageAccess();
         });
         usageGuide.show();
+        InitializationFlow.fitDialog(this,usageGuide);
     }
 
     private void requestTaskbarUsage(){
@@ -1402,8 +1400,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         int request=usageSettingsRequest;
         usageSettingsRequest=0;
         usageSettingsLeft=false;
-        if(request==REQUEST_USAGE_APP_INFO)requestTaskbarUsage();
-        else if(request==REQUEST_USAGE_ACCESS&&!ExternalTasks.permitted(this))showTaskbarUsageGuide(UsageGuide.RETURN);
+        if((request==REQUEST_USAGE_ACCESS||request==REQUEST_USAGE_APP_INFO)&&!ExternalTasks.permitted(this))showTaskbarUsageGuide(UsageGuide.RETURN);
     }
 
     private void setTaskbarUsage(boolean enabled){
