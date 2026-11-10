@@ -197,11 +197,11 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     private void buildTaskbar(){
         shell.setClipChildren(false);shell.setClipToPadding(false);
         boolean expanded=store.prefs.getBoolean("taskbar_expanded",false);int taskbarHeight=dp(expanded?96:48);
-        int screenDp=getResources().getConfiguration().screenWidthDp,controlWidth=dp(ElevenLayout.controlWidth(screenDp));
+        int screenDp=getResources().getConfiguration().screenWidthDp,controlWidth=dp(ElevenLayout.controlWidth(screenDp)),iconSize=ElevenLayout.iconSize(screenDp);
         LinearLayout taskbar=new LinearLayout(this);taskbar.setContentDescription("Desktop taskbar");taskbar.setGravity(Gravity.BOTTOM);taskbar.setClipChildren(false);taskbar.setPadding(0,0,0,0);taskbar.setBackgroundColor(Color.TRANSPARENT);taskbar.setElevation(dp(2));
-        TenBrandMark orb=new TenBrandMark(this);tenStartButton=orb;orb.setContentDescription("Start menu");orb.setFocusable(true);orb.setBackground(TenStyle.hover(this,Color.TRANSPARENT));orb.setPadding(dp(1),dp(4),dp(1),dp(4));orb.setTooltipText("Start");orb.setOnClickListener(v->{if(startMenu.getVisibility()==View.VISIBLE)startMenu.hide();else showStart(false);});ContextMenus.bind(orb,(x,y)->startOrbMenu(orb,x,y));taskbar.addView(orb,new LinearLayout.LayoutParams(controlWidth,dp(48)));
-        String searchMode=store.prefs.getString("ten_search_mode","Auto");if(!searchMode.equals("Hidden")){boolean box=searchMode.equals("Auto")&&getResources().getConfiguration().screenWidthDp>=900;View searchButton;if(box){LinearLayout field=new LinearLayout(this);field.setGravity(Gravity.CENTER_VERTICAL);field.setBackground(ElevenSurface.round(this,TenStyle.light(this)?0xfff2f2f8:0xff303442,20));TenStyle.Glyph symbol=new TenStyle.Glyph(this,"search",TenStyle.text(this));field.addView(symbol,new LinearLayout.LayoutParams(dp(36),dp(38)));TextView hint=Aero.text(this,"Search",12,TenStyle.text(this));field.addView(hint);searchButton=field;}else searchButton=new TenStyle.Glyph(this,"search",TenStyle.text(this));searchButton.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);searchButton.setContentDescription("Search");searchButton.setFocusable(true);if(!box){searchButton.setPadding(dp(6),dp(12),dp(6),dp(12));searchButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));}searchButton.setTooltipText("Search");searchButton.setOnClickListener(v->open("@search"));taskbar.addView(searchButton,new LinearLayout.LayoutParams(dp(ElevenLayout.searchWidth(screenDp,searchMode)),dp(48)));}
-        TenStyle.Glyph taskViewButton=new TenStyle.Glyph(this,"taskview",TenStyle.text(this));taskViewButton.setContentDescription("Task View");taskViewButton.setPadding(dp(6),dp(12),dp(6),dp(12));taskViewButton.setTooltipText("Task View");taskViewButton.setFocusable(true);taskViewButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));taskViewButton.setOnClickListener(v->open("@taskview"));taskbar.addView(taskViewButton,new LinearLayout.LayoutParams(controlWidth,dp(48)));
+        TenBrandMark orb=new TenBrandMark(this);tenStartButton=orb;orb.setContentDescription("Start menu");orb.setFocusable(true);orb.setBackground(TenStyle.hover(this,Color.TRANSPARENT));int brandSide=Math.min(ElevenLayout.controlWidth(screenDp),Math.round(iconSize*108f/92));orb.setPadding((controlWidth-dp(brandSide))/2,dp((48-brandSide)/2),(controlWidth-dp(brandSide))/2,dp((48-brandSide)/2));orb.setTooltipText("Start");orb.setOnClickListener(v->{if(startMenu.getVisibility()==View.VISIBLE)startMenu.hide();else showStart(false);});ContextMenus.bind(orb,(x,y)->startOrbMenu(orb,x,y));taskbar.addView(orb,new LinearLayout.LayoutParams(controlWidth,dp(48)));
+        String searchMode=store.prefs.getString("ten_search_mode","Auto");if(!searchMode.equals("Hidden")){boolean box=searchMode.equals("Auto")&&getResources().getConfiguration().screenWidthDp>=900;View searchButton;if(box){LinearLayout field=new LinearLayout(this);field.setGravity(Gravity.CENTER_VERTICAL);field.setBackground(ElevenSurface.round(this,TenStyle.light(this)?0xfff2f2f8:0xff303442,20));TenStyle.Glyph symbol=new TenStyle.Glyph(this,"search",TenStyle.text(this));field.addView(symbol,new LinearLayout.LayoutParams(dp(36),dp(38)));TextView hint=Aero.text(this,"Search",12,TenStyle.text(this));field.addView(hint);searchButton=field;}else searchButton=new TenStyle.Glyph(this,"search",TenStyle.text(this)).taskbar();searchButton.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);searchButton.setContentDescription("Search");searchButton.setFocusable(true);if(!box){searchButton.setPadding((controlWidth-dp(iconSize))/2,dp((48-iconSize)/2),(controlWidth-dp(iconSize))/2,dp((48-iconSize)/2));searchButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));}searchButton.setTooltipText("Search");searchButton.setOnClickListener(v->open("@search"));taskbar.addView(searchButton,new LinearLayout.LayoutParams(dp(ElevenLayout.searchWidth(screenDp,searchMode)),dp(48)));}
+        TenStyle.Glyph taskViewButton=new TenStyle.Glyph(this,"taskview",TenStyle.text(this));taskViewButton.setContentDescription("Task View");taskViewButton.setPadding((controlWidth-dp(iconSize))/2,dp((48-iconSize)/2),(controlWidth-dp(iconSize))/2,dp((48-iconSize)/2));taskViewButton.setTooltipText("Task View");taskViewButton.setFocusable(true);taskViewButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));taskViewButton.setOnClickListener(v->open("@taskview"));taskbar.addView(taskViewButton,new LinearLayout.LayoutParams(controlWidth,dp(48)));
 
 
         tenNotaButton=taskButton("@nota","Nth Nota",false);tenNotaButton.setTag(R.id.taskbar_order_key,"@nota");tenNotaButton.setContentDescription("Open Nth Nota");tenNotaButton.setTooltipText("Nth Nota");tenNotaButton.setOnClickListener(v->{boolean overview=(tenTasks!=null&&tenTasks.overlay!=null)||startMenu.getVisibility()==View.VISIBLE;if(tenTasks!=null)tenTasks.dismiss();startMenu.hide();previews.dismiss();if(tray!=null)tray.dismiss();if(tenNews!=null)tenNews.dismiss();DesktopWindow nota=notaTaskWindow();if(!overview&&nota!=null&&nota.active()&&nota.getVisibility()==View.VISIBLE&&!nota.minimizing())nota.minimize();else open("@nota");});taskbar.addView(tenNotaButton,new LinearLayout.LayoutParams(dp(ElevenLayout.notaWidth(screenDp)),dp(48)));
@@ -234,10 +234,11 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         Runnable align=()->{
             if(elevenBar.getWidth()==0)return;
             boolean twoRows=((ElevenTaskbarItems)taskItems).expanded;
-            int left=leftAligned||newsButton.getVisibility()==View.GONE?dp(4):newsButton.getWidth()+dp(4),right=indicators.getWidth()+dp(4);
+            int outer=dp(screenDp<400?3:4);
+            int left=leftAligned||newsButton.getVisibility()==View.GONE?outer:newsButton.getWidth()+outer,right=indicators.getWidth()+outer;
             int fixed=dp(ElevenLayout.taskbarFixed(screenDp,searchMode));
             // Use the same cluster width in either height, preserving fixed control positions.
-            int desired=fixed+Math.max(dp(48),((ElevenTaskbarItems)taskItems).singleRowWidth());
+            int desired=fixed+Math.max(dp(ElevenLayout.taskButtonWidth(screenDp)),((ElevenTaskbarItems)taskItems).singleRowWidth());
             int room=Math.max(1,elevenBar.getWidth()-left-right),w=ElevenLayout.taskbarWidth(room,desired);
             int x=leftAligned?left:ElevenLayout.taskbarLeft(elevenBar.getWidth(),left,right,desired);
             FrameLayout.LayoutParams pos=(FrameLayout.LayoutParams)taskbar.getLayoutParams();
@@ -329,7 +330,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         boolean compactTasks=getResources().getConfiguration().screenWidthDp<480&&(!taskIds.isEmpty()||!ExternalTasks.list().isEmpty());
         boolean fit=store.prefs.getBoolean("taskbar_static",false);
         boolean showLabels=store.prefs.getBoolean("taskbar_show_labels",false);
-        int buttonWidth=dp(showLabels?152:48), gap=0;
+        int buttonWidth=dp(showLabels?152:ElevenLayout.taskButtonWidth(getResources().getConfiguration().screenWidthDp)), gap=0;
         List<String> pins=new ArrayList<>(store.quickLaunch());pins.remove("@nota");
         Map<String,LinearLayout> buttons=new LinkedHashMap<>();
         int viewport=taskViewportWidth>0?taskViewportWidth:dp(240);
@@ -686,9 +687,10 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         if(showLabel)button.setPadding(dp(6),0,dp(5),0);
         button.setFocusable(true);
         DesktopWindow window=windows.get(id);
-        int side=showLabel?22:24;
+        int side=showLabel?22:ElevenLayout.iconSize(getResources().getConfiguration().screenWidthDp);
         View image=window!=null&&window.body instanceof VistaExplorer&&((VistaExplorer)window.body).page().startsWith("folder:")
                 ?new AeroIcon(this,"files"):icon(id,side);
+        if(image instanceof TenStyle.Glyph)((TenStyle.Glyph)image).taskbar();
         button.addView(image,new LinearLayout.LayoutParams(dp(side),dp(side)));
         TextView name=Aero.text(this,title,12,TenStyle.text(this));
         name.setSingleLine(true);
