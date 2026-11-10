@@ -36,7 +36,8 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
         runningPlacement();
         fixedControls();
         narrowRestore();
-        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; narrow 320/360/411dp task buttons receive real restore touches with either alignment and battery preference; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
+        proportionScreenshots();
+        result.putString("stream","PASS: "+scenarios+" taskbar height scenarios / "+frames+" actual pre-draw frames; 21 desktop icons retain screen positions, cell sizes and icon sizes across repeated menu, Settings and Control Panel expansion/collapse; 5x9 imported-style grid at 80% icon size, left/center alignment, portrait/landscape, automatic unsaved layout, free placement and scrolled sheet; saved coordinates unchanged; unpinned Android task buttons retain order and row positions when Control Panel opens/closes; manual drag order and pin edits honored; taller taskbar only reduces visible scroll area; running and minimized apps on top, closed pins on bottom; narrow 320/360/411dp task buttons receive real restore touches with either alignment and battery preference; actual drawn Start/Search/Task View/Nota icon bounds share the app icon scale; uniform fixed/pinned button spacing; light/dark collapsed/expanded Left/Center proportion captures; fixed controls preserve identities and complete screen bounds in "+fixedScenarios+" scenarios / "+fixedFrames+" pre-draw frames\n");finish(Activity.RESULT_OK,result);
     }catch(Throwable error){result.putString("stream","FAIL: "+android.util.Log.getStackTraceString(error));try{shot("eleven-taskbar-failure");}catch(Exception ignored){}finish(Activity.RESULT_CANCELED,result);}}
     void recentTaskbarStability()throws Exception{
         List<String> probes=new ArrayList<>();for(AppCatalog.Entry entry:AppCatalog.load(home))if(entry.id.startsWith("com.nthexperience.desktop.fixture/"))probes.add(entry.id);
@@ -93,12 +94,41 @@ public final class ElevenTaskbarSmoke extends Instrumentation {
             ui(()->{store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("eleven_battery_percent",percentage).putBoolean("taskbar_static",false).putBoolean("taskbar_expanded",false).putBoolean("taskbar_show_labels",false).commit();home.applyTenAppearance();home.open("@notes");});settle();
             DesktopWindow window=find(DesktopWindow.class);ui(window::minimize);settle();
             ui(()->((HorizontalScrollView)find(ElevenTaskbarItems.class).getParent()).scrollTo(0,0));settle();
+            ui(this::assertProportions);
             View button=slot("@notes");Rect touch=new Rect();check(button.getGlobalVisibleRect(touch)&&touch.width()>=Aero.dp(home,32),"Usable restore target at "+width+"dp/"+alignment+"/battery="+percentage);
             for(Map.Entry<String,View> control:fixedViews().entrySet()){
                 Rect fixed=new Rect();check(control.getValue().getGlobalVisibleRect(fixed),"Fixed control visible: "+control.getKey());check(!Rect.intersects(touch,fixed),"Restore target avoids "+control.getKey());
             }
             long now=SystemClock.uptimeMillis();for(int action:new int[]{MotionEvent.ACTION_DOWN,MotionEvent.ACTION_UP}){MotionEvent event=MotionEvent.obtain(now,SystemClock.uptimeMillis(),action,touch.exactCenterX(),touch.exactCenterY(),0);event.setSource(InputDevice.SOURCE_TOUCHSCREEN);check(getUiAutomation().injectInputEvent(event,true),"Restore touch accepted");event.recycle();Thread.sleep(70);}settle();check(window.isShown(),"Actual narrow taskbar touch restores Notepad");
             if(width==360&&percentage)shot("eleven-taskbar-narrow-"+alignment.toLowerCase(Locale.ROOT));ui(window::closeWindow);settle();
+        }
+        shell("wm size reset");settle();
+    }
+    Rect iconInk(View view){
+        Bitmap bitmap=Bitmap.createBitmap(view.getWidth(),view.getHeight(),Bitmap.Config.ARGB_8888);Canvas canvas=new Canvas(bitmap);
+        if(view instanceof TenStyle.Glyph)((TenStyle.Glyph)view).onDraw(canvas);else if(view instanceof TenBrandMark)((TenBrandMark)view).onDraw(canvas);else view.draw(canvas);
+        int left=bitmap.getWidth(),top=bitmap.getHeight(),right=0,bottom=0;
+        for(int y=0;y<bitmap.getHeight();y++)for(int x=0;x<bitmap.getWidth();x++)if(Color.alpha(bitmap.getPixel(x,y))>32){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+1);bottom=Math.max(bottom,y+1);}
+        bitmap.recycle();return new Rect(left,top,right,bottom);
+    }
+    void assertProportions(){
+        int width=home.getResources().getConfiguration().screenWidthDp,edge=Aero.dp(home,ElevenLayout.iconSize(width));
+        Map<String,View> fixed=fixedViews();View nota=((ViewGroup)fixed.get("Nth Nota")).getChildAt(0);
+        for(View icon:new View[]{fixed.get("Start menu"),fixed.get("Search"),fixed.get("Task View"),nota}){
+            Rect ink=iconInk(icon);int size=Math.max(ink.width(),ink.height());check(size>=edge-Aero.dp(home,4)&&size<=edge+Aero.dp(home,2),"Actual fixed icon scale: "+icon.getContentDescription()+"="+ink);
+            check(Math.abs(ink.centerY()-icon.getHeight()/2)<=Aero.dp(home,2),"Fixed icon artwork is vertically centered");
+        }
+        for(String name:new String[]{"Start menu","Search","Task View","Nth Nota"})check(fixed.get(name).getWidth()==Aero.dp(home,ElevenLayout.controlWidth(width)),"Uniform fixed button width: "+name);
+        ViewGroup widgets=(ViewGroup)fixed.get("Widgets");View widgetIcon=widgets.getChildAt(0);check(widgetIcon.getWidth()==edge&&widgetIcon.getHeight()==edge&&Math.abs(widgetIcon.getLeft()+edge/2-widgets.getWidth()/2)<=1,"Widgets icon uses the common centered canvas");
+        ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int i=0;i<items.getChildCount();i++){
+            ViewGroup button=(ViewGroup)items.getChildAt(i);View icon=button.getChildAt(0);check(button.getWidth()==Aero.dp(home,ElevenLayout.taskButtonWidth(width)),"Pinned/running button uses common spacing");check(icon.getWidth()==edge&&icon.getHeight()==edge,"App icon shares the fixed icon canvas size");check(Math.abs(icon.getTop()+icon.getHeight()/2-button.getHeight()/2)<=1,"App icon centered vertically");
+        }
+    }
+    void proportionScreenshots()throws Exception{
+        float density=home.getResources().getDisplayMetrics().density;shell("wm size "+Math.round(411*density)+"x"+Math.round(880*density));settle();
+        for(String alignment:new String[]{"Left","Center"})for(boolean expanded:new boolean[]{false,true})for(boolean light:new boolean[]{false,true}){
+            ui(()->{closeAll();store.quickLaunch(Arrays.asList("@browser","@files"));store.prefs.edit().putString("eleven_taskbar_alignment",alignment).putBoolean("taskbar_expanded",expanded).putBoolean("taskbar_static",false).putBoolean("taskbar_show_labels",false).putBoolean("ten_light",light).putBoolean("eleven_battery_percent",false).commit();home.applyTenAppearance();if(expanded)home.open("@notes");});settle();ui(this::assertProportions);
+            shot("eleven-taskbar-proportions-"+alignment.toLowerCase(Locale.ROOT)+(expanded?"-expanded":"-collapsed")+(light?"-light":"-dark"));
         }
         shell("wm size reset");settle();
     }
