@@ -10,8 +10,8 @@ android {
         buildConfigField 'String', 'AI_GATEWAY_URL', '"https://nth-nota-free-ai.bdredenbach.workers.dev/v1/write"'
         minSdk 26
         targetSdk 36
-        versionCode 16
-        versionName '0.9.3'
+        versionCode 17
+        versionName '0.9.4'
         testInstrumentationRunner 'com.nthexperience.desktop.ElevenSmoke'
     }
     compileOptions {
