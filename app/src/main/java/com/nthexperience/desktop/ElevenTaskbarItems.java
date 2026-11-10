@@ -86,6 +86,7 @@ final class ElevenTaskbarItems extends LinearLayout {
     @Override public boolean performClick(){return super.performClick();}
     @Override public boolean onGenericMotionEvent(MotionEvent event){if(expanded&&scrollable&&event.getAction()==MotionEvent.ACTION_SCROLL){float axis=event.getAxisValue(MotionEvent.AXIS_HSCROLL);if(axis==0)axis=event.getAxisValue(MotionEvent.AXIS_VSCROLL);return scrollRowBy(rowAt(event.getY()),Math.round(-axis*Aero.dp(getContext(),48)));}return super.onGenericMotionEvent(event);}
     @Override public void computeScroll(){super.computeScroll();if(!expanded)return;boolean active=false;for(int row=0;row<2;row++)if(fling[row].computeScrollOffset()){scrollRowTo(row,fling[row].getCurrX());active=true;}if(active)postInvalidateOnAnimation();}
+    @Override public void requestChildFocus(View child,View focused){super.requestChildFocus(child,focused);if(expanded)post(()->{if(child.getParent()==this&&child.hasFocus())requestChildRectangleOnScreen(child,new android.graphics.Rect(0,0,child.getWidth(),child.getHeight()),true);});}
     @Override public boolean requestChildRectangleOnScreen(View child,android.graphics.Rect rect,boolean immediate){if(expanded){int row=row(child),left=child.getLeft()+rect.left,right=child.getLeft()+rect.right;int dx=left<rowStart(row)?left-rowStart(row):right>rowEnd(row)?right-rowEnd(row):0;return scrollRowBy(row,dx);}return super.requestChildRectangleOnScreen(child,rect,immediate);}
     @Override protected void onDetachedFromWindow(){stopScrolling();recycleVelocity();super.onDetachedFromWindow();}
 }
