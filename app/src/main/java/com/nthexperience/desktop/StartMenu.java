@@ -20,6 +20,34 @@ final class StartMenu extends LinearLayout {
     final ScrollView landing,apps,tiles;
     boolean searchMode,showApps,expanded; String searchFilter="All";
     private final LinearLayout footer; private int columns;private DesktopContextMenu footerMenu;
+    private boolean updatingSearch;
+    private Map<String,Object> landingSnapshot,footerSnapshot;
+    private int renderedColumns=-1;
+    private List<StartSearch.Result> toolRows,sortedApps;
+    private String sortedNames;
+    private final Map<String,AppCatalog.Entry> appIndex=new HashMap<>();
+    private final Set<String> newApps=new HashSet<>();
+
+    // Retain the actual rows between openings. Only Start-related preferences invalidate them.
+    private Map<String,Object> snapshot(boolean profile){
+        Map<String,Object> out=new HashMap<>();
+        for(Map.Entry<String,?> e:store.prefs.getAll().entrySet()){
+            String key=e.getKey();
+            boolean relevant=profile?key.equals("desktop_name")||key.equals("profile_portrait")||key.equals("eleven_start_folders")||key.equals("eleven_start_hide_profile")
+                :key.startsWith("eleven_start_")||key.equals("start_pins")||key.equals("shortcut_names")||key.equals("app_folders")||key.equals("folder_links")||key.equals(ElevenLocalState.SEEN)
+                ||store.prefs.getBoolean("eleven_start_recent",false)&&key.equals("recents")
+                ||store.prefs.getBoolean("eleven_start_files",false)&&(key.equals("recent_files")||key.equals("recent_items_enabled"));
+            if(relevant)out.put(key,e.getValue());
+        }
+        if(!profile)out.put("badge_day",System.currentTimeMillis()/86400000L);
+        return out;
+    }
+    private void refreshBadges(){
+        newApps.clear();Set<String> seen=new HashSet<>(ElevenLocalState.strings(store,ElevenLocalState.SEEN));
+        long cutoff=System.currentTimeMillis()-7L*24*3600000;
+        for(AppCatalog.Entry app:all)if(app.installed>cutoff&&!seen.contains(app.id))newApps.add(app.id);
+    }
+    void prepareWidth(int width){int n=ElevenLayout.pinColumns(Math.round(width/getResources().getDisplayMetrics().density)-40);if(n!=columns){columns=n;render();}}
 
     StartMenu(Context c,Actions actions,DesktopStore store,AeroWallpaper wallpaper) {
         super(c);this.actions=actions;this.store=store;data=new TenStartData(store);
@@ -37,25 +65,25 @@ final class StartMenu extends LinearLayout {
         apps=new ScrollView(c);appList=Aero.column(c);apps.addView(appList);apps.setContentDescription("All apps");content.addView(apps,new LayoutParams(-1,0,1));
         rail=Aero.column(c);rail.setVisibility(GONE);footer=new LinearLayout(c);footer.setGravity(Gravity.CENTER_VERTICAL);LayoutParams footerBounds=new LayoutParams(-1,dp(60));footerBounds.leftMargin=-dp(24);footerBounds.rightMargin=-dp(24);addView(footer,footerBounds);footer.setContentDescription("Start profile and power");
         search.setOnClickListener(v->{searchMode=true;render();});
-        search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int count,int after){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int before,int count){render();}});
-        addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{int n=ElevenLayout.pinColumns(Math.round((r-l)/getResources().getDisplayMetrics().density)-40);if(n!=columns){columns=n;render();}});
+        search.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int st,int count,int after){}public void afterTextChanged(Editable e){}public void onTextChanged(CharSequence s,int st,int before,int count){if(!updatingSearch)render();}});
+        addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{prepareWidth(r-l);});
         appearanceChanged();
     }
     private int dp(int value){return Aero.dp(getContext(),value);}
     void appearanceChanged(){
-        int fg=TenStyle.text(getContext());search.setTextColor(fg);search.setHintTextColor(TenStyle.light(getContext())?0xff596371:0xffb2b7bf);
+        landingSnapshot=footerSnapshot=null;int fg=TenStyle.text(getContext());search.setTextColor(fg);search.setHintTextColor(TenStyle.light(getContext())?0xff596371:0xffb2b7bf);
         search.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xfffafbff:0xff2b303d,20));render();
     }
-    void entries(List<AppCatalog.Entry> entries){all.clear();all.addAll(entries);render();}
+    void entries(List<AppCatalog.Entry> entries){all.clear();all.addAll(entries);appIndex.clear();for(AppCatalog.Entry app:entries)appIndex.put(app.id,app);sortedApps=null;landingSnapshot=null;render();}
     void refreshName(){renderFooter();} void refreshHome(){renderFooter();}
     private List<StartSearch.Result> tools(){
-        List<StartSearch.Result> out=new ArrayList<>();
+        if(toolRows!=null)return toolRows;List<StartSearch.Result> out=new ArrayList<>();
         String[][] rows={{"@nota","Nth Nota","notes"},{"@files","File Explorer","file-explorer"},{"@settings","Settings","settings"},{"@browser",BrowserPanel.NAME,"browser"},{"@notes","Notepad","notes"},{"@sticky","Sticky Notes","notes"},{"@gadget:calculator","Calculator","calculator"},{"@calendar","Calendar","calendar"},{"@weather","Weather","weather"},{"@news","Widgets","widgets"},{"@photos","Photos","pictures-app"},{MediaLibrary.PLAYER,"Nth Media Player","mediaplayer"},{"@taskview","Task View","taskview"},{"@taskmanager","Task Manager","taskmanager"},{"@recycle","Recycle Bin","recycle"},{"@run","Run","run"},{"@events","Event Viewer","notes"},{"@devices","Device Manager","computer"},{"@management","Computer Management","computer"},{"@powershell","Nth PowerShell","run"}};
-        for(String[] r:rows)out.add(new StartSearch.Result(r[0],r[1],"Nth tools",r[2],null,true));return out;
+        for(String[] r:rows)out.add(new StartSearch.Result(r[0],r[1],"Nth tools",r[2],null,true));toolRows=Collections.unmodifiableList(out);return toolRows;
     }
     private StartSearch.Result resolve(String id){
         for(StartSearch.Result r:tools())if(r.id.equals(id))return r;
-        for(AppCatalog.Entry a:all)if(a.id.equals(id))return new StartSearch.Result(a.id,store.name(a.id,a.label),"Installed apps","programs",a.icon,true);
+        AppCatalog.Entry a=appIndex.get(id);if(a!=null)return new StartSearch.Result(a.id,store.name(a.id,a.label),"Installed apps","programs",a.icon,true);
         JSONObject link=FolderLinks.get(store,id);if(link!=null)return new StartSearch.Result(id,link.optString("title","Folder"),"Folders","files",null,true);
         if(store.isFolder(id))return new StartSearch.Result(id,store.name(id,"Folder"),"Folders","folderapps",null,true);return null;
     }
@@ -65,11 +93,14 @@ final class StartMenu extends LinearLayout {
         searchTabs.removeAllViews();searchTabs.setVisibility(results?VISIBLE:GONE);
         if(results){TextView back=command("‹ Back",()->{searchMode=false;showApps=false;search.setText("");render();});searchTabs.addView(back,new LayoutParams(dp(76),-1));
             for(String f:new String[]{"All","Apps","Settings"}){TextView tab=command(f,()->{searchFilter=f;render();});tab.setContentDescription("Search tab "+f);if(f.equals(searchFilter))tab.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffdae6fa:0xff394154,4));searchTabs.addView(tab,new LayoutParams(0,-1,1));}}
-        renderPins();renderApps();renderFooter();footer.setVisibility(searchMode?GONE:VISIBLE);
+        if(results)renderApps();else renderPins();renderFooter();footer.setVisibility(searchMode?GONE:VISIBLE);
     }
     private TextView command(String title,Runnable run){TextView v=TenStyle.command(getContext(),title,run);v.setTextColor(TenStyle.text(getContext()));return v;}
     private void heading(String title,String action,Runnable click){LinearLayout line=new LinearLayout(getContext());line.setGravity(Gravity.CENTER_VERTICAL);TextView label=Aero.text(getContext(),title,14,TenStyle.text(getContext()));Aero.bold(label);line.addView(label,new LayoutParams(0,dp(52),1));if(action!=null)line.addView(command(action,click),new LayoutParams(dp(136),dp(40)));dashboard.addView(line);}
     private void renderPins(){
+        Map<String,Object> current=snapshot(false);
+        if(current.equals(landingSnapshot)&&renderedColumns==columns)return;
+        landingSnapshot=current;renderedColumns=columns;refreshBadges();
         String focused=null;for(Map.Entry<String,View> e:tileViews.entrySet())if(e.getValue().hasFocus())focused=e.getKey();
         tileViews.clear();dashboard.removeAllViews();
         if(store.prefs.getBoolean("eleven_start_pinned",true)){
@@ -100,8 +131,10 @@ final class StartMenu extends LinearLayout {
         if(focused!=null&&tileViews.containsKey(focused))tileViews.get(focused).requestFocus();
     }
     private List<StartSearch.Result> allApps(){
+        String names=store.prefs.getString("shortcut_names","{}");
+        if(sortedApps!=null&&names.equals(sortedNames))return sortedApps;
         List<StartSearch.Result> rows=new ArrayList<>(tools());for(AppCatalog.Entry a:all)rows.add(new StartSearch.Result(a.id,store.name(a.id,a.label),"Installed apps","programs",a.icon,true));
-        rows.sort(Comparator.comparing(r->r.title.toLowerCase(Locale.ROOT)));Set<String> seen=new HashSet<>();rows.removeIf(r->!seen.add(r.id));return rows;
+        rows.sort(Comparator.comparing(r->r.title.toLowerCase(Locale.ROOT)));Set<String> seen=new HashSet<>();rows.removeIf(r->!seen.add(r.id));sortedNames=names;sortedApps=Collections.unmodifiableList(rows);return sortedApps;
     }
     private void viewMenu(){String[] modes={"Category","Grid","List"};Aero.dialog(getContext()).setTitle("View all apps").setSingleChoiceItems(modes,java.util.Arrays.asList(modes).indexOf(store.prefs.getString("eleven_start_view","List")),(d,n)->{store.prefs.edit().putString("eleven_start_view",modes[n]).apply();d.dismiss();renderPins();}).setNegativeButton("Cancel",null).show();}
     private void categories(List<StartSearch.Result> rows){java.util.Map<String,Integer> declared=new java.util.HashMap<>();for(AppCatalog.Entry app:all)declared.put(app.id,app.category);java.util.Map<String,List<StartSearch.Result>> grouped=new java.util.TreeMap<>();for(StartSearch.Result row:rows)grouped.computeIfAbsent(ElevenCategories.group(row.id,declared.getOrDefault(row.id,-1)),key->new ArrayList<>()).add(row);GridLayout tiles=new GridLayout(getContext());int cols=columns>=5?3:2;tiles.setColumnCount(cols);tiles.setContentDescription("All apps categories");int n=0;for(java.util.Map.Entry<String,List<StartSearch.Result>> entry:grouped.entrySet()){LinearLayout tile=Aero.column(getContext());tile.setPadding(dp(7),dp(7),dp(7),dp(7));tile.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffe9edf5:0xff30384b,6));tile.setContentDescription("Start category "+entry.getKey());tile.setFocusable(true);GridLayout icons=new GridLayout(getContext());icons.setColumnCount(2);List<StartSearch.Result> items=entry.getValue();for(int i=0;i<Math.min(4,items.size());i++){StartSearch.Result item=items.get(i);View icon;if(item.icon!=null){ImageView image=new ImageView(getContext());image.setImageDrawable(item.icon);icon=image;}else icon=new AeroIcon(getContext(),item.kind);icon.setPadding(dp(9),dp(9),dp(9),dp(9));icon.setContentDescription("Category app "+item.title);icon.setOnClickListener(v->openResult(item.id));ContextMenus.bind(icon,(x,y)->options(icon,item));GridLayout.LayoutParams ip=new GridLayout.LayoutParams(GridLayout.spec(i/2),GridLayout.spec(i%2,1f));ip.width=0;ip.height=dp(52);icons.addView(icon,ip);}tile.addView(icons,new LayoutParams(-1,dp(104)));TextView label=Aero.text(getContext(),entry.getKey()+" · "+items.size(),12,TenStyle.text(getContext()));label.setGravity(Gravity.CENTER);label.setMaxLines(2);tile.addView(label,new LayoutParams(-1,dp(40)));tile.setOnClickListener(v->{ScrollView scroll=new ScrollView(getContext());LinearLayout list=Aero.column(getContext());scroll.addView(list);android.app.AlertDialog dialog=Aero.dialog(getContext()).setTitle(entry.getKey()).setView(scroll).setNegativeButton("Close",null).create();for(StartSearch.Result item:items){View row=shortcut(item,false);row.setOnClickListener(w->{dialog.dismiss();openResult(item.id);});list.addView(row,new LayoutParams(-1,dp(52)));}dialog.show();});GridLayout.LayoutParams lp=new GridLayout.LayoutParams(GridLayout.spec(n/cols),GridLayout.spec(n%cols,1f));lp.width=0;lp.height=dp(166);lp.setMargins(dp(4),dp(4),dp(4),dp(4));tiles.addView(tile,lp);n++;}dashboard.addView(tiles,new LayoutParams(-1,-2));}
@@ -118,7 +151,7 @@ final class StartMenu extends LinearLayout {
         row.setOnKeyListener((v,key,event)->{if(ContextMenus.requestsMenu(event)){options(row,item);return true;}if(pin&&event.getAction()==KeyEvent.ACTION_DOWN&&event.isCtrlPressed()&&(key==KeyEvent.KEYCODE_DPAD_LEFT||key==KeyEvent.KEYCODE_DPAD_RIGHT)){move(item.id,key==KeyEvent.KEYCODE_DPAD_LEFT?-1:1);return true;}return false;});
         return row;
     }
-    private boolean newApp(String id){if(ElevenLocalState.strings(store,ElevenLocalState.SEEN).contains(id))return false;for(AppCatalog.Entry app:all)if(app.id.equals(id))return app.installed>System.currentTimeMillis()-7L*24*3600000;return false;}
+    private boolean newApp(String id){return newApps.contains(id);}
     private void openResult(String id){ElevenLocalState.searched(store,search.getText().toString());actions.open(id);}
     private void move(String id,int direction){List<String> pins=new ArrayList<>(store.startPins());int from=pins.indexOf(id),to=from+direction;if(from<0||to<0||to>=pins.size())return;Collections.swap(pins,from,to);store.startPins(pins);renderPins();View p=tileViews.get(id);if(p!=null)p.requestFocus();}
     private void options(View anchor,StartSearch.Result item){
@@ -130,7 +163,7 @@ final class StartMenu extends LinearLayout {
         menu.item("More options","control",()->actions.options(anchor,item.id));ContextMenus.centered(anchor,(x,y)->ContextMenus.show(menu,anchor,x,y));
     }
     private void renderApps(){
-        appList.removeAllViews();String query=search.getText().toString().trim();List<StartSearch.Result> found=new ArrayList<>();
+        refreshBadges();appList.removeAllViews();String query=search.getText().toString().trim();List<StartSearch.Result> found=new ArrayList<>();
         if(query.isEmpty()){if(searchMode&&!showApps){for(String id:store.recents()){StartSearch.Result r=resolve(id);if(r!=null)found.add(r);if(found.size()==6)break;}if(found.isEmpty())found.addAll(tools().subList(0,6));hint(appList,"Suggested");}else found.addAll(allApps());}
         else{found.addAll(StartSearch.find(store,all,query));for(StartSearch.Result r:tools())if(r.title.toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT))&&found.stream().noneMatch(i->i.id.equals(r.id)))found.add(r);}
         if(query.isEmpty()&&searchMode&&!showApps&&store.prefs.getBoolean("eleven_search_history_enabled",true)){List<String> history=ElevenLocalState.strings(store,ElevenLocalState.SEARCHES);if(!history.isEmpty()){hint(appList,"Recent searches");for(String entry:history)appList.addView(command(entry,()->search.setText(entry)),new LayoutParams(-1,dp(44)));}}
@@ -144,6 +177,7 @@ final class StartMenu extends LinearLayout {
         if(!query.isEmpty()){appList.addView(command("Ask Nth Nota",()->openResult("nota-query:"+android.net.Uri.encode(query))));appList.addView(command("Search linked files and folders",()->openResult("start-search:"+android.net.Uri.encode(query))));appList.addView(command("Search the web",()->openResult("web-search:"+android.net.Uri.encode(query))));}
     }
     private void renderFooter(){
+        Map<String,Object> current=snapshot(true);if(current.equals(footerSnapshot))return;footerSnapshot=current;
         footer.removeAllViews();footer.setPadding(dp(24),0,dp(20),0);
         footer.setBackground(ElevenSurface.round(getContext(),TenStyle.light(getContext())?0xffe4e9f3:0xff202532,0));
         LinearLayout profile=new LinearLayout(getContext());profile.setGravity(Gravity.CENTER_VERTICAL);
@@ -180,7 +214,7 @@ final class StartMenu extends LinearLayout {
         menu.separator();menu.item("Android power settings","power",()->actions.open("setting:android:battery"));
         menu.item("Restart Nth Desktop","refresh",()->actions.open("setting:restart-desktop"));showFooterMenu(menu,anchor);
     }
-    void show(boolean keyboard){searchMode=keyboard;showApps=false;landing.scrollTo(0,0);searchFilter="All";search.setText("");render();setVisibility(VISIBLE);bringToFront();requestFocus();if(!store.prefs.getBoolean("reduce_motion",false)){setAlpha(0);setTranslationY(dp(14));animate().alpha(1).translationY(0).setDuration(180).start();}}
+    void show(boolean keyboard){searchMode=keyboard;showApps=false;landing.scrollTo(0,0);searchFilter="All";updatingSearch=true;try{if(search.length()>0)search.setText("");}finally{updatingSearch=false;}render();setVisibility(VISIBLE);bringToFront();requestFocus();if(!store.prefs.getBoolean("reduce_motion",false)){setAlpha(0);setTranslationY(dp(14));animate().alpha(1).translationY(0).setDuration(180).start();}}
     void hide(){if(footerMenu!=null)footerMenu.dismiss();animate().cancel();setAlpha(1);setTranslationY(0);((InputMethodManager)getContext().getSystemService(Context.INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(getWindowToken(),0);search.clearFocus();setVisibility(GONE);}
     JSONObject state(){JSONObject s=new JSONObject();GadgetLayout.put(s,"visible",getVisibility()==VISIBLE);GadgetLayout.put(s,"query",search.getText().toString());GadgetLayout.put(s,"apps",showApps);GadgetLayout.put(s,"searchMode",searchMode);GadgetLayout.put(s,"filter",searchFilter);return s;}
     void restore(JSONObject s){if(s==null||!s.optBoolean("visible"))return;show(s.optBoolean("searchMode"));showApps=s.optBoolean("apps");searchFilter=s.optString("filter","All");search.setText(s.optString("query"));render();}

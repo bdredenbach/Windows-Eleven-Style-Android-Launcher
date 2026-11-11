@@ -65,7 +65,7 @@ final class ElevenTaskbarItems extends LinearLayout {
         switch(event.getActionMasked()){
             case MotionEvent.ACTION_DOWN:touchRow=rowAt(event.getY());downX=lastX=event.getX();downY=event.getY();panning=false;fling[touchRow].abortAnimation();track(event);return false;
             case MotionEvent.ACTION_MOVE:
-                if(Math.abs(event.getX()-downX)>Aero.dp(getContext(),12)&&Math.abs(event.getX()-downX)>Math.abs(event.getY()-downY)*1.35f){panning=true;getParent().requestDisallowInterceptTouchEvent(true);return true;}return false;
+                if(Math.abs(event.getX()-downX)>Aero.dp(getContext(),12)&&Math.abs(event.getX()-downX)>Math.abs(event.getY()-downY)*1.35f){panning=true;cancelLongPress();setPressed(false);getParent().requestDisallowInterceptTouchEvent(true);return true;}return false;
             case MotionEvent.ACTION_UP:case MotionEvent.ACTION_CANCEL:recycleVelocity();panning=false;return false;
             default:return false;
         }
@@ -75,11 +75,14 @@ final class ElevenTaskbarItems extends LinearLayout {
     @Override public boolean onTouchEvent(MotionEvent event){
         if(!expanded||!scrollable)return super.onTouchEvent(event);track(event);
         switch(event.getActionMasked()){
-            case MotionEvent.ACTION_DOWN:touchRow=rowAt(event.getY());downX=lastX=event.getX();downY=event.getY();panning=false;fling[touchRow].abortAnimation();return true;
-            case MotionEvent.ACTION_MOVE:scrollRowBy(touchRow,Math.round(lastX-event.getX()));lastX=event.getX();panning=true;return true;
+            case MotionEvent.ACTION_DOWN:touchRow=rowAt(event.getY());downX=lastX=event.getX();downY=event.getY();panning=false;fling[touchRow].abortAnimation();super.onTouchEvent(event);return true;
+            case MotionEvent.ACTION_MOVE:
+                if(!panning&&Math.abs(event.getX()-downX)>Aero.dp(getContext(),12)&&Math.abs(event.getX()-downX)>Math.abs(event.getY()-downY)*1.35f){panning=true;cancelLongPress();setPressed(false);}
+                if(panning){scrollRowBy(touchRow,Math.round(lastX-event.getX()));}else super.onTouchEvent(event);
+                lastX=event.getX();return true;
             case MotionEvent.ACTION_UP:
-                if(panning){velocity.computeCurrentVelocity(1000,ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity());int speed=Math.round(-velocity.getXVelocity());if(Math.abs(speed)>ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity()){fling[touchRow].fling(rowScroll[touchRow],0,speed,0,0,rowRange(touchRow),0,0);postInvalidateOnAnimation();}}else performClick();recycleVelocity();panning=false;return true;
-            case MotionEvent.ACTION_CANCEL:recycleVelocity();panning=false;return true;
+                if(panning){velocity.computeCurrentVelocity(1000,ViewConfiguration.get(getContext()).getScaledMaximumFlingVelocity());int speed=Math.round(-velocity.getXVelocity());if(Math.abs(speed)>ViewConfiguration.get(getContext()).getScaledMinimumFlingVelocity()){fling[touchRow].fling(rowScroll[touchRow],0,speed,0,0,rowRange(touchRow),0,0);postInvalidateOnAnimation();}}else super.onTouchEvent(event);recycleVelocity();panning=false;return true;
+            case MotionEvent.ACTION_CANCEL:super.onTouchEvent(event);recycleVelocity();panning=false;return true;
             default:return true;
         }
     }
