@@ -36,6 +36,7 @@ XML
 }
 if [ "$native_suite" = TaskbarRows ]; then
  adb shell pm clear "$launcher"
+ run_native ElevenStartTaskbarSmoke ElevenStartTaskbarSmoke
  run_native ElevenTaskbarRowsSmoke ElevenTaskbarRowsSmoke
  if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
  exit 0
@@ -69,6 +70,7 @@ adb shell pm clear "$launcher"
 run_native ElevenTaskbarSmoke ElevenTaskbarSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 adb shell pm clear "$launcher"
+run_native ElevenStartTaskbarSmoke ElevenStartTaskbarSmoke
 run_native ElevenTaskbarRowsSmoke ElevenTaskbarRowsSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect

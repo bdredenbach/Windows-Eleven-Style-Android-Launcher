@@ -192,6 +192,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
                     params.width = menuWidth;
                     startMenu.setLayoutParams(params);
                 }
+                startMenu.prepareWidth(menuWidth);
             }
     }
     private void buildTaskbar(){
@@ -227,7 +228,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             renderTaskbar();
         });
         FrameLayout elevenBar=new FrameLayout(this);taskbarSurface=elevenBar;FrameLayout.LayoutParams appBounds=new FrameLayout.LayoutParams(dp(240),taskbarHeight,Gravity.BOTTOM);appBounds.bottomMargin=dp(2);elevenBar.addView(taskClip,appBounds);elevenBar.setContentDescription("Eleven taskbar");elevenBar.setBackground(new AeroGlass(wallpaper,AeroGlass.TASKBAR));FrameLayout.LayoutParams rowBounds=new FrameLayout.LayoutParams(dp(ElevenLayout.taskbarFixed(screenDp,searchMode)),dp(48),Gravity.BOTTOM);rowBounds.bottomMargin=dp(2);elevenBar.addView(taskbar,rowBounds);ContextMenus.bind(elevenBar,(x,y)->taskbarMenu(elevenBar,x,y));
-        LinearLayout indicators=new LinearLayout(this);indicators.setGravity(Gravity.CENTER_VERTICAL);FrameLayout.LayoutParams indicatorBounds=new FrameLayout.LayoutParams(-2,dp(48),Gravity.END|Gravity.BOTTOM);indicatorBounds.bottomMargin=dp(2);elevenBar.addView(indicators,indicatorBounds);
+        LinearLayout indicators=new LinearLayout(this);indicators.setGravity(Gravity.CENTER_VERTICAL);ContextMenus.bind(indicators,(x,y)->taskbarMenu(indicators,x,y));FrameLayout.LayoutParams indicatorBounds=new FrameLayout.LayoutParams(-2,dp(48),Gravity.END|Gravity.BOTTOM);indicatorBounds.bottomMargin=dp(2);elevenBar.addView(indicators,indicatorBounds);
         newsButton=new LinearLayout(this);newsButton.setGravity(screenDp<720?Gravity.CENTER:Gravity.CENTER_VERTICAL);newsButton.setPadding(screenDp<720?0:dp(6),0,screenDp<720?0:dp(6),0);newsButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));newsButton.setFocusable(true);newsButton.setContentDescription("Widgets");newsButton.setTooltipText("Widgets");newsButton.addView(new TenStyle.Glyph(this,"news",TenStyle.text(this)),new LinearLayout.LayoutParams(dp(iconSize),dp(iconSize)));newsText=Aero.text(this,"News",12,TenStyle.text(this));newsText.setSingleLine();newsText.setEllipsize(TextUtils.TruncateAt.END);newsButton.addView(newsText,new LinearLayout.LayoutParams(-2,-2));newsButton.setOnClickListener(v->open("@news"));newsButton.setOnHoverListener((v,event)->{if(event.getActionMasked()==MotionEvent.ACTION_HOVER_ENTER&&store.prefs.getBoolean("ten_news_hover",false)){v.postDelayed(()->{if(v.isHovered()&&tenNews!=null&&!tenNews.shown())open("@news");},450);}return false;});ContextMenus.bind(newsButton,(x,y)->newsMenu(newsButton,x,y));boolean leftAligned=store.prefs.getString("eleven_taskbar_alignment","Left").equals("Left");if(leftAligned)indicators.addView(newsButton,0,new LinearLayout.LayoutParams(dp(screenDp>=720?130:screenDp<360?28:screenDp<480?32:44),dp(48)));else {FrameLayout.LayoutParams newsBounds=new FrameLayout.LayoutParams(dp(screenDp>=720?130:screenDp<360?28:screenDp<480?32:44),dp(48),Gravity.START|Gravity.BOTTOM);newsBounds.bottomMargin=dp(2);elevenBar.addView(newsButton,newsBounds);}updateNewsChip();
         tray=new SystemTray(this,workspace,wallpaper,new SystemTray.Host(){public void action(String id){vistaAction(id);}public void open(String id){MainActivity.this.open(id);}public void layout(){main.post(()->{layoutWorkspace();renderTaskbar();});}public void opening(){if(tenActions!=null)tenActions.dismiss();if(tenTasks!=null)tenTasks.dismiss();if(tenNews!=null)tenNews.dismiss();if(previews!=null)previews.dismiss();startMenu.hide();((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).hideSoftInputFromWindow(root.getWindowToken(),0);}});indicators.addView(tray,new LinearLayout.LayoutParams(-2,dp(48)));
         clock=Aero.text(this,"",10,TenStyle.text(this));clock.setGravity(Gravity.CENTER);clock.setMaxLines(2);clock.setIncludeFontPadding(false);clock.setPadding(dp(5),0,dp(5),0);clock.setMinWidth(dp(screenDp<360?48:52));if(screenDp<480){clock.setTextSize(screenDp<360?9:screenDp<400?10:11);clock.setHorizontallyScrolling(false);clock.setAutoSizeTextTypeUniformWithConfiguration(8,screenDp<400?10:11,1,android.util.TypedValue.COMPLEX_UNIT_SP);}clock.setBackground(TenStyle.hover(this,Color.TRANSPARENT));clock.setOnClickListener(v->open("@tenactions"));clock.setContentDescription("Clock and calendar");indicators.addView(clock,new LinearLayout.LayoutParams(screenDp<480?dp(screenDp<360?56:screenDp<400?64:72):-2,dp(44)));
@@ -958,6 +959,14 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     private void taskbarMenu(View anchor,float x,float y){
         previews.dismiss();
         if(desktopMenu!=null)desktopMenu.dismiss();startMenu.hide();if(tray!=null)tray.dismiss();desktopMenu=new DesktopContextMenu(this,"Taskbar context menu");
+        desktopMenu.item("Task Manager","taskmanager",()->open("@taskmanager"));
+        desktopMenu.item("Taskbar settings","settings",()->open("ten-setting:taskbar"));
+        desktopMenu.separator();
+        desktopMenu.submenu("Nth Desktop options","control",()->taskbarExtras(anchor,x,y));
+        desktopMenu.aboveAnchor();ContextMenus.show(desktopMenu,anchor,x,y);
+    }
+    private void taskbarExtras(View anchor,float x,float y){
+        desktopMenu=new DesktopContextMenu(this,"Nth Desktop taskbar options");
         desktopMenu.item("Widgets","news",()->open("@news"));desktopMenu.item("Nth Nota","notes",()->open("@nota"));desktopMenu.item("Pinned taskbar apps…","programs",()->open("@quicklaunch"));desktopMenu.separator();
         desktopMenu.checked("Expand taskbar",store.prefs.getBoolean("taskbar_expanded",false),()->{store.prefs.edit().putBoolean("taskbar_expanded",!store.prefs.getBoolean("taskbar_expanded",false)).apply();syncTaskbarHeight();workspace.post(this::layoutWorkspace);});
         boolean fit=store.prefs.getBoolean("taskbar_static",false);
@@ -966,7 +975,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         desktopMenu.separator();boolean visible=false;for(DesktopWindow window:orderedWindows())if(window.getVisibility()==View.VISIBLE&&!window.minimizing())visible=true;
         for(String[] mode:new String[][]{{"Cascade Windows","cascade"},{"Show Windows Stacked","stacked"},{"Show Windows Side by Side","side"}})desktopMenu.item(mode[0],"empty",visible,()->arrangeWindows(mode[1]));
         if(!arrangementUndo.isEmpty())desktopMenu.item("Undo Window Arrangement","empty",this::undoArrangement);
-        desktopMenu.item(desktopHidden.isEmpty()?"Show the Desktop":"Show Open Windows","computer",this::showDesktop);desktopMenu.separator();desktopMenu.item("Switch Windows","computer",()->previews.show());desktopMenu.item("Task View","computer",this::showTenTasks);desktopMenu.item("Saved Workspaces…","computer",this::showWorkspaces);desktopMenu.item("Start Task Manager","taskmanager",()->open("@taskmanager"));desktopMenu.separator();desktopMenu.item("Taskbar settings","control",()->open("ten-setting:taskbar"));ContextMenus.show(desktopMenu,anchor,x,y);
+        desktopMenu.item(desktopHidden.isEmpty()?"Show the Desktop":"Show Open Windows","computer",this::showDesktop);desktopMenu.separator();desktopMenu.item("Switch Windows","computer",()->previews.show());desktopMenu.item("Task View","computer",this::showTenTasks);desktopMenu.item("Saved Workspaces…","computer",this::showWorkspaces);ContextMenus.show(desktopMenu,anchor,x,y);
     }
     private void setTaskbarStatic(boolean fit){
         store.prefs.edit().putBoolean("taskbar_static",fit).apply();
