@@ -47,6 +47,11 @@ final class NotaDraftStore {
     }
     private static JSONObject entry(JSONObject ordinary,boolean privateNow){JSONObject value=new JSONObject();GadgetLayout.put(value,"ordinary",ordinary);GadgetLayout.put(value,"private",privateNow);return value;}
     static JSONObject read(DesktopStore store,String scope){migrate(store);JSONObject entry=map(store).optJSONObject(scope);if(entry==null)return empty();return entry.optBoolean("private")?privatePlaceholder():entry.optJSONObject("ordinary");}
+    static JSONObject ordinary(DesktopStore store,String scope) {
+        migrate(store);
+        JSONObject entry=map(store).optJSONObject(scope);
+        return entry==null?empty():entry.optJSONObject("ordinary");
+    }
     static void write(DesktopStore store,String scope,JSONObject state){
         migrate(store);JSONObject map=map(store);boolean privateNow=state.optBoolean("private");JSONObject previous=map.optJSONObject(scope);
         JSONObject normal=privateNow?(previous==null?empty():previous.optJSONObject("ordinary")):state;

@@ -26,7 +26,7 @@ import java.util.concurrent.Executors;
 import org.json.*;
 
 @androidx.media3.common.util.UnstableApi
-public final class MainActivity extends Activity implements StartMenu.Actions {
+public final class MainActivity extends Activity implements StartMenu.Actions, ElevenNotaChat.Desktop {
     private DesktopStore store;private TenDesktops tenDesktops;
     private LinearLayout tenNotaButton;
     private TenTaskView tenTasks;private TenActionCenter tenActions;private TenNewsFlyout tenNews;private LinearLayout newsButton;private TextView newsText;
@@ -205,8 +205,8 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
         TenStyle.Glyph taskViewButton=new TenStyle.Glyph(this,"taskview",TenStyle.text(this));taskViewButton.setContentDescription("Task View");taskViewButton.setPadding((controlWidth-dp(iconSize))/2,dp((48-iconSize)/2),(controlWidth-dp(iconSize))/2,dp((48-iconSize)/2));taskViewButton.setTooltipText("Task View");taskViewButton.setFocusable(true);taskViewButton.setBackground(TenStyle.hover(this,Color.TRANSPARENT));taskViewButton.setOnClickListener(v->open("@taskview"));taskbar.addView(taskViewButton,new LinearLayout.LayoutParams(controlWidth,dp(48)));
 
 
-        tenNotaButton=taskButton("@nota","Nth Nota",false);tenNotaButton.setTag(R.id.taskbar_order_key,"@nota");tenNotaButton.setContentDescription("Open Nth Nota");tenNotaButton.setTooltipText("Nth Nota AI");tenNotaButton.setOnClickListener(v->{boolean overview=(tenTasks!=null&&tenTasks.overlay!=null)||startMenu.getVisibility()==View.VISIBLE;if(tenTasks!=null)tenTasks.dismiss();startMenu.hide();previews.dismiss();if(tray!=null)tray.dismiss();if(tenNews!=null)tenNews.dismiss();DesktopWindow nota=notaTaskWindow();if(!overview&&nota!=null&&nota.active()&&nota.getVisibility()==View.VISIBLE&&!nota.minimizing())nota.minimize();else open("@nota");});taskbar.addView(tenNotaButton,new LinearLayout.LayoutParams(dp(ElevenLayout.notaWidth(screenDp)),dp(48)));
-        ContextMenus.bind(tenNotaButton,(x,y)->{DesktopContextMenu menu=new DesktopContextMenu(this,"Nth Nota taskbar menu");menu.item("Open Nth Nota","notes",()->open("@nota"));DesktopWindow nota=notaTaskWindow();if(nota!=null)menu.item("Close Nth Nota","close",nota::closeWindow);ContextMenus.show(menu,tenNotaButton,x,y);});
+        tenNotaButton=taskButton("@nota","Nth Nota AI",false);tenNotaButton.setTag(R.id.taskbar_order_key,"@nota");tenNotaButton.setContentDescription("Open Nth Nota AI");tenNotaButton.setTooltipText("Nth Nota AI");tenNotaButton.setOnClickListener(v->{boolean overview=(tenTasks!=null&&tenTasks.overlay!=null)||startMenu.getVisibility()==View.VISIBLE;if(tenTasks!=null)tenTasks.dismiss();startMenu.hide();previews.dismiss();if(tray!=null)tray.dismiss();if(tenNews!=null)tenNews.dismiss();DesktopWindow nota=notaTaskWindow();if(!overview&&nota!=null&&nota.active()&&nota.getVisibility()==View.VISIBLE&&!nota.minimizing())nota.minimize();else open("@nota");});taskbar.addView(tenNotaButton,new LinearLayout.LayoutParams(dp(ElevenLayout.notaWidth(screenDp)),dp(48)));
+        ContextMenus.bind(tenNotaButton,(x,y)->{DesktopContextMenu menu=new DesktopContextMenu(this,"Nth Nota taskbar menu");menu.item("Open Nth Nota AI","notes",()->open("@nota"));DesktopWindow nota=notaTaskWindow();if(nota!=null)menu.item("Close Nth Nota","close",nota::closeWindow);ContextMenus.show(menu,tenNotaButton,x,y);});
 
         HorizontalScrollView strip=new HorizontalScrollView(this){
             private float downX,downY;
@@ -448,7 +448,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             if(taskStrip.getScrollX()!=0)taskStrip.scrollTo(0,0);
         }
 
-        if(tenNotaButton!=null){DesktopWindow nota=notaTaskWindow();boolean active=nota!=null&&nota.active()&&nota.getVisibility()==View.VISIBLE&&!nota.minimizing();AeroGlass surface=new AeroGlass(wallpaper,AeroGlass.TASKBUTTON);surface.active(active);surface.idle(nota==null);tenNotaButton.setBackground(surface);tenNotaButton.setSelected(active);tenNotaButton.setContentDescription(nota==null?"Open Nth Nota":(active?"Minimize ":"Restore ")+"Nth Nota");}
+        if(tenNotaButton!=null){DesktopWindow nota=notaTaskWindow();boolean active=nota!=null&&nota.active()&&nota.getVisibility()==View.VISIBLE&&!nota.minimizing();AeroGlass surface=new AeroGlass(wallpaper,AeroGlass.TASKBUTTON);surface.active(active);surface.idle(nota==null);tenNotaButton.setBackground(surface);tenNotaButton.setSelected(active);tenNotaButton.setContentDescription(nota==null?"Open Nth Nota AI":(active?"Minimize ":"Restore ")+"Nth Nota AI");}
         desktopHidden.entrySet().removeIf(item->item.getValue().getParent()==null||windows.get(item.getKey())!=item.getValue());if(desktopToggle!=null){String hint=desktopHidden.isEmpty()?"Show desktop":"Restore desktop windows";desktopToggle.setContentDescription(hint);desktopToggle.setTooltipText(hint+". Hold to peek.");}
         main.removeCallbacks(taskProgressTick);
         if(!taskProgressSurfaces.isEmpty())main.post(taskProgressTick);
@@ -827,11 +827,11 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
             Aero.dialog(this).setTitle("App unavailable").setMessage("This app may have been removed or disabled.").setPositiveButton("Remove shortcut",(d,w)->{List<String> ids=store.desktop();ids.remove(component.flattenToString());store.desktop(ids);renderDesktop();}).setNegativeButton("Keep",null).show();scanApps();return false;
         }
     }
-    View notaActionIcon(TenNotaActions.Action action){
+    @Override public View notaActionIcon(TenNotaActions.Action action){
         switch(action.kind){case OPEN:return action.value.startsWith("setting:")||action.value.startsWith("ten-setting:")?new AeroIcon(this,"settings"):icon(action.value,32);case WEB_SEARCH:case WEBSITE:return new AeroIcon(this,"browser");case FILE_SEARCH:return new AeroIcon(this,"files");default:return new TenStyle.Glyph(this,"taskview",TenAppearance.ink(this));}
     }
-    List<TenNotaActions.Target> notaAppTargets(){List<TenNotaActions.Target> apps=new ArrayList<>();for(AppCatalog.Entry app:entries.values())apps.add(new TenNotaActions.Target(store.name(app.id,app.label),app.id,app.label));return apps;}
-    String performNotaAction(TenNotaActions.Action action){
+    @Override public List<TenNotaActions.Target> notaAppTargets(){List<TenNotaActions.Target> apps=new ArrayList<>();for(AppCatalog.Entry app:entries.values())apps.add(new TenNotaActions.Target(store.name(app.id,app.label),app.id,app.label));return apps;}
+    @Override public String performNotaAction(TenNotaActions.Action action){
         switch(action.kind){
             case WEB_SEARCH:open("web-search:"+Uri.encode(action.value));return "Opening web search";
             case FILE_SEARCH:open("start-search:"+Uri.encode(action.value));return "Searching linked files";
@@ -978,7 +978,7 @@ public final class MainActivity extends Activity implements StartMenu.Actions {
     }
     private void taskbarExtras(View anchor,float x,float y){
         desktopMenu=new DesktopContextMenu(this,"Nth Desktop taskbar options");
-        desktopMenu.item("Widgets","news",()->open("@news"));desktopMenu.item("Nth Nota","notes",()->open("@nota"));desktopMenu.item("Pinned taskbar apps…","programs",()->open("@quicklaunch"));desktopMenu.separator();
+        desktopMenu.item("Widgets","news",()->open("@news"));desktopMenu.item("Nth Nota AI","notes",()->open("@nota"));desktopMenu.item("Pinned taskbar apps…","programs",()->open("@quicklaunch"));desktopMenu.separator();
         desktopMenu.checked("Expand taskbar",store.prefs.getBoolean("taskbar_expanded",false),()->{store.prefs.edit().putBoolean("taskbar_expanded",!store.prefs.getBoolean("taskbar_expanded",false)).apply();syncTaskbarHeight();workspace.post(this::layoutWorkspace);});
         boolean fit=store.prefs.getBoolean("taskbar_static",false);
         desktopMenu.checked("Scrollable",!fit,()->setTaskbarStatic(false));

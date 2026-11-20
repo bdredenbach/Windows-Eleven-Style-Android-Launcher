@@ -15,6 +15,13 @@ import java.util.*;
 
 /** The desktop owns the window. This view owns one desktop's transcript and composer. */
 final class ElevenNotaChat extends LinearLayout {
+    interface Desktop {
+        List<TenNotaActions.Target> notaAppTargets();
+        String performNotaAction(TenNotaActions.Action action);
+        View notaActionIcon(TenNotaActions.Action action);
+        void open(String id);
+    }
+
     final ElevenChatStore store;
     final EditText question;
     final Button send, web;
@@ -141,7 +148,7 @@ final class ElevenNotaChat extends LinearLayout {
         if(pending!=null) { stop(); return; }
         String text=question.getText().toString().trim();
         if(text.isEmpty()) return;
-        MainActivity home=c instanceof MainActivity?(MainActivity)c:null;
+        Desktop home=c instanceof Desktop?(Desktop)c:null;
         TenNotaActions.Plan plan=contentOnly?null:TenNotaActions.resolve(text,
                 home==null?Collections.emptyList():home.notaAppTargets());
         JSONArray history=store.conversations.current().context();
@@ -285,8 +292,8 @@ final class ElevenNotaChat extends LinearLayout {
             LayoutParams p=new LayoutParams(-1,-2);p.bottomMargin=dp(6);block.addView(link,p);
         }
         TenNotaActions.Plan plan=localChoices.get(a);
-        if(plan!=null && c instanceof MainActivity) for(TenNotaActions.Action action:plan.actions) {
-            MainActivity home=(MainActivity)c;
+        if(plan!=null && c instanceof Desktop) for(TenNotaActions.Action action:plan.actions) {
+            Desktop home=(Desktop)c;
             LinearLayout row=new LinearLayout(c);
             row.setGravity(Gravity.CENTER_VERTICAL);row.setMinimumHeight(dp(48));
             row.addView(home.notaActionIcon(action),new LayoutParams(dp(32),dp(32)));
@@ -306,8 +313,8 @@ final class ElevenNotaChat extends LinearLayout {
     }
     private void open(String url) {
         if(!LiveAnswer.safeLink(url)) return;
-        if(c instanceof MainActivity) {
-            ((MainActivity)c).open("favorite-web:"+url);
+        if(c instanceof Desktop) {
+            ((Desktop)c).open("favorite-web:"+url);
             return;
         }
         try { c.startActivity(new Intent(Intent.ACTION_VIEW,Uri.parse(url))); }

@@ -59,6 +59,9 @@ else
  echo "SKIP: preceding retained artifact unavailable; upgrade phases require that baseline." > eleven-upgrade-unavailable.txt
 fi
 adb shell pm clear "$launcher"
+run_native ElevenChatSmoke ElevenChatSmoke
+collect
+adb shell pm clear "$launcher"
 run_native ElevenScreenshotSmoke ElevenScreenshotSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect
@@ -77,7 +80,7 @@ collect
 adb shell wm size reset
 adb shell pm clear "$launcher"
 run_native StorageSmoke StorageSetup -e suite storage -e phase setup
-for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke ElevenChatSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
+for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
  run_native "$runner" "$runner"
 done
 adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow
