@@ -63,10 +63,10 @@ final class ElevenSettingsPages {
                 s.card("App execution aliases","Available commands in Nth Run","terminal",()->s.navigate("app-aliases"));return true;
             case "app-aliases":
                 s.detail("Nth Run commands","These names open the corresponding Nth tool. Installed apps can also be opened by their full name.");
-                for(String[] alias:new String[][]{{"explorer","File Explorer"},{"calc / calculator","Calculator"},{"notepad","Notepad"},{"settings / control","Settings"},{"taskmgr","Task Manager"},{"winver","About"},{"nota / nth nota","Nth Nota"}})
+                for(String[] alias:new String[][]{{"explorer","File Explorer"},{"calc / calculator","Calculator"},{"notepad","Notepad"},{"settings / control","Settings"},{"taskmgr","Task Manager"},{"winver","About"},{"nota / nth nota","Nth Nota AI"}})
                     s.body.addView(note(s,alias[0],alias[1]),new LinearLayout.LayoutParams(-1,-2));
                 s.button("Open Run",()->s.open.accept("@run"));return true;
-            case "app-actions":s.detail("Apps and desktop actions","Open installed apps, find settings and manage desktops using Nth Nota's local actions.");s.button("Open Nth Nota",()->s.open.accept("@nota"));return true;
+            case "app-actions":s.detail("Apps and desktop actions","Open installed apps, find settings and manage desktops using Nth Nota's local actions.");s.button("Open Nth Nota AI",()->s.open.accept("@nota"));return true;
             case "app-links":s.detail("Opening links","Android manages which installed apps can open supported website addresses.");s.button("Manage Android app links",()->s.open.accept("setting:android:app-links"));return true;
             case "startup-apps":
                 s.detail("Nth startup experience","Choose when the Nth welcome animation plays. Android manages startup permissions for other apps.");
@@ -101,7 +101,7 @@ final class ElevenSettingsPages {
             for(String id:ElevenRemainingPages.recommendations(s)){TenSettingsCatalog.Page p=TenSettingsCatalog.page(id);s.card(p.title,p.detail,id,()->s.navigate(id));}
             s.detail("Personalize your device","");themes(s);
             s.card("Color mode",s.dark()?"Dark":"Light","personalization",()->s.navigate("colors"));
-            s.card("Nth Nota","Write, capture and launch apps","nota",()->s.open.accept("@nota"));
+            s.card("Nth Nota AI","Write, capture and launch apps","nota",()->s.open.accept("@nota"));
             return true;
         }
         if(category.equals("system"))deviceHeader(s);

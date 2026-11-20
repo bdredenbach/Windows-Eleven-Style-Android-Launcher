@@ -34,6 +34,7 @@ final class DesktopWindow extends LinearLayout {
     private int normalW, normalH,safeTop,safeRight;
     private float positionX=.5f,positionY=.33f;
     private final DesktopStore store;
+    private TextView conversationMenu;
     private String geometryKey,captionKind="",orientationKey,desktopSuffix="";
     final String toolId;
     private final GradientDrawable snapOutline = new GradientDrawable();
@@ -72,10 +73,18 @@ final class DesktopWindow extends LinearLayout {
         glass=new AeroGlass(wallpaper,AeroGlass.WINDOW);setBackground(glass);
         setPadding(Aero.dp(context,1),Aero.dp(context,1),Aero.dp(context,1),Aero.dp(context,1));
         LinearLayout bar=new LinearLayout(context); bar.setGravity(Gravity.CENTER_VERTICAL);
-        String icon=toolId.equals("@nota")?"notes":toolId.equals("@settings")?"settings":FolderLinks.id(toolId)||toolId.startsWith("@explorer:")?"files":toolId.equals("@recycle")?"recycle":toolId.equals("@taskmanager")?"taskmanager":toolId.equals("@welcome")?"orb":(toolId.startsWith("folder:")||toolId.startsWith("@organizer:"))?"folderapps":toolId.equals("@backup")?"drive":toolId.equals("@organize")||toolId.equals("@quicklaunch")?"folderapps":toolId.equals("@control")?"settings":toolId.equals("@appearance")?"appearance":toolId.equals("@files")?"file-explorer":toolId.equals("@filemanagers")?"folderapps":toolId.equals("@computer")||toolId.equals("@system")?"computer":toolId.equals("@notes")?"notes":toolId.equals("@photos")?"pictures-app":toolId.equals(MediaLibrary.PLAYER)?"mediaplayer":toolId.equals("@browser")?"browser":GadgetCatalog.toolIcon(toolId);if(toolId.equals("@powershell")||toolId.equals("@powershell-admin"))icon="terminal";LinearLayout.LayoutParams iconParams=new LinearLayout.LayoutParams(Aero.dp(context,32),Aero.dp(context,32));iconParams.leftMargin=Aero.dp(context,1);bar.addView(new AeroIcon(context,icon),iconParams);
+        String icon=toolId.equals("@nota")?"notes":toolId.equals("@settings")?"settings":FolderLinks.id(toolId)||toolId.startsWith("@explorer:")?"files":toolId.equals("@recycle")?"recycle":toolId.equals("@taskmanager")?"taskmanager":toolId.equals("@welcome")?"orb":(toolId.startsWith("folder:")||toolId.startsWith("@organizer:"))?"folderapps":toolId.equals("@backup")?"drive":toolId.equals("@organize")||toolId.equals("@quicklaunch")?"folderapps":toolId.equals("@control")?"settings":toolId.equals("@appearance")?"appearance":toolId.equals("@files")?"file-explorer":toolId.equals("@filemanagers")?"folderapps":toolId.equals("@computer")||toolId.equals("@system")?"computer":toolId.equals("@notes")?"notes":toolId.equals("@photos")?"pictures-app":toolId.equals(MediaLibrary.PLAYER)?"mediaplayer":toolId.equals("@browser")?"browser":GadgetCatalog.toolIcon(toolId);if(toolId.equals("@powershell")||toolId.equals("@powershell-admin"))icon="terminal";LinearLayout.LayoutParams iconParams=new LinearLayout.LayoutParams(Aero.dp(context,32),Aero.dp(context,32));iconParams.leftMargin=Aero.dp(context,1);bar.addView(body instanceof TenNotaPanel ? new NotaDesign.Mark(context) : new AeroIcon(context,icon),iconParams);
         TextView label=Aero.text(context,title,13,0xff111b22);titleLabel=label;label.setSingleLine();label.setEllipsize(android.text.TextUtils.TruncateAt.END);label.setLayerType(View.LAYER_TYPE_SOFTWARE,null);label.setShadowLayer(0,0,0,0); label.setPadding(Aero.dp(context,8),0,0,0);
         bar.addView(label,new LayoutParams(0,Aero.dp(context,44),1));
-        if(!toolId.equals("@nota")){TenStyle.Glyph nota=new TenStyle.Glyph(context,"nota",TenStyle.ACCENT);notaGlyph=nota;nota.captionRole=true;nota.setContentDescription("Ask Nth Nota about this window");nota.setTooltipText("Ask Nth Nota");nota.setFocusable(true);nota.setBackground(TenStyle.hover(context,Color.TRANSPARENT));nota.setOnClickListener(v->askNota.run());bar.addView(nota,new LayoutParams(Aero.dp(context,32),Aero.dp(context,40)));}
+        if(!toolId.equals("@nota")){TenStyle.Glyph nota=new TenStyle.Glyph(context,"nota",TenStyle.ACCENT);notaGlyph=nota;nota.captionRole=true;nota.setContentDescription("Ask Nth Nota about this window");nota.setTooltipText("Ask Nth Nota AI");nota.setFocusable(true);nota.setBackground(TenStyle.hover(context,Color.TRANSPARENT));nota.setOnClickListener(v->askNota.run());bar.addView(nota,new LayoutParams(Aero.dp(context,32),Aero.dp(context,40)));}
+        if(body instanceof TenNotaPanel) {
+            bar.setBackground(ElevenMaterial.app(context,0));
+            TextView more=chrome("⋯",((TenNotaPanel)body)::conversationMenu);
+            conversationMenu=more;
+            more.setContentDescription("Nth Nota AI conversation menu");
+            more.setTooltipText("Conversation menu");
+            bar.addView(more,new LayoutParams(Aero.dp(context,32),Aero.dp(context,40)));
+        }
         TextView minimize=chrome("—",this::minimize);minimizeButton=minimize;
         maximizeButton=chrome("□",this::toggleMaximize);
         maximizeButton.setOnLongClickListener(v->{showElevenSnap();return true;});
@@ -171,14 +180,14 @@ final class DesktopWindow extends LinearLayout {
     void showSystemMenu(View anchor,float x,float y){dismissSystemMenu();systemMenu=new DesktopContextMenu(getContext(),"Window commands");systemMenu.item("Restore","empty",fitted()||getVisibility()!=VISIBLE||minimizing,()->{if(getVisibility()!=VISIBLE||minimizing)restore();else if(fitted())restoreDown();});systemMenu.item("Minimize","empty",getVisibility()==VISIBLE&&!minimizing,this::minimize);systemMenu.item("Maximize","empty",!maximized(),this::maximize);systemMenu.item("Snap left","empty",canSplit(),()->{restore();snap(Placement.LEFT);});
         systemMenu.item("Snap right","empty",canSplit(),()->{restore();snap(Placement.RIGHT);});
         systemMenu.item("Minimize or restore other windows","empty",shake);
-        if(!toolId.equals("@nota"))systemMenu.item("Ask Nth Nota","notes",()->askNota.run());systemMenu.separator();systemMenu.item("Close","close",this::closeWindow);ContextMenus.show(systemMenu,anchor,x,y);}
+        if(!toolId.equals("@nota"))systemMenu.item("Ask Nth Nota AI","notes",()->askNota.run());systemMenu.separator();systemMenu.item("Close","close",this::closeWindow);ContextMenus.show(systemMenu,anchor,x,y);}
     void dismissSystemMenu(){if(systemMenu!=null){systemMenu.dismiss();systemMenu=null;}}
     void arrange(int x,int y,int width,int height){settle();placement=Placement.FLOATING;normalW=Math.max(1,width);normalH=Math.max(1,height);positionX=DesktopGeometry.fraction(x,hostWidth()-normalW);positionY=DesktopGeometry.fraction(y,host.getHeight()-safeTop-normalH);fitToHost();saveGeometry();}
     String caption(){return titleLabel.getText().toString();}
     void caption(String title){titleLabel.setText(title);titleLabel.setContentDescription(title+". Drag to move window.");}
     boolean minimizing(){return minimizing;}
     boolean active(){return active;}
-    void active(boolean value){active=value;glass.active(value);titleLabel.setTextColor(TenStyle.titleText(getContext(),value));titleLabel.setShadowLayer(0,0,0,0);minimizeButton.setTextColor(captionColors(false,value));maximizeButton.setTextColor(captionColors(false,value));closeButton.setTextColor(captionColors(true,value));for(View button:new View[]{minimizeButton,maximizeButton})TenAppearance.enable(getContext(),button.getBackground());if(notaGlyph!=null){notaGlyph.setActivated(value);notaGlyph.invalidate();}minimizeButton.setAlpha(value?1:.65f);maximizeButton.setAlpha(value?1:.65f);closeButton.setAlpha(value?1:.6f);}
+    void active(boolean value){active=value;glass.active(value);titleLabel.setTextColor(captionInk(value));if(conversationMenu!=null)conversationMenu.setTextColor(captionColors(false,value));titleLabel.setShadowLayer(0,0,0,0);minimizeButton.setTextColor(captionColors(false,value));maximizeButton.setTextColor(captionColors(false,value));closeButton.setTextColor(captionColors(true,value));for(View button:new View[]{minimizeButton,maximizeButton})TenAppearance.enable(getContext(),button.getBackground());if(notaGlyph!=null){notaGlyph.setActivated(value);notaGlyph.invalidate();}minimizeButton.setAlpha(value?1:.65f);maximizeButton.setAlpha(value?1:.65f);closeButton.setAlpha(value?1:.6f);}
     @Override public boolean dispatchTouchEvent(MotionEvent e){if(peeking)return true;if(e.getActionMasked()==MotionEvent.ACTION_DOWN&&!minimizing){bringToFront();changed.run();}return super.dispatchTouchEvent(e);}
     private int cornerReach(){return Aero.dp(getContext(),22);}
     private int resizeCornerAt(float x,float y){
@@ -320,7 +329,11 @@ final class DesktopWindow extends LinearLayout {
         resizeCorner=0;
         fitToHost();
     }
-    private android.content.res.ColorStateList captionColors(boolean close,boolean active){int hot=close?TenAccent.on(0xffe81123):TenAppearance.ink(getContext());return new android.content.res.ColorStateList(new int[][]{new int[]{android.R.attr.state_pressed},new int[]{android.R.attr.state_hovered},new int[]{android.R.attr.state_focused},new int[]{}},new int[]{hot,hot,hot,TenStyle.titleText(getContext(),active)});}
+    private int captionInk(boolean active) {
+        // Nota uses the app's Mica material even when other title bars follow the accent.
+        return body instanceof TenNotaPanel ? TenAppearance.ink(getContext()) : TenStyle.titleText(getContext(),active);
+    }
+    private android.content.res.ColorStateList captionColors(boolean close,boolean active){int hot=close?TenAccent.on(0xffe81123):TenAppearance.ink(getContext());return new android.content.res.ColorStateList(new int[][]{new int[]{android.R.attr.state_pressed},new int[]{android.R.attr.state_hovered},new int[]{android.R.attr.state_focused},new int[]{}},new int[]{hot,hot,hot,captionInk(active)});}
     private TextView chrome(String symbol,Runnable action){
         TextView view=TenStyle.command(getContext(),symbol,action);view.setBackground(TenStyle.appHover(getContext(),Color.TRANSPARENT));TenAppearance.enable(getContext(),view.getBackground());view.setTextColor(captionColors(symbol.equals("×"),active));if(symbol.equals("×")){android.graphics.drawable.StateListDrawable bg=new android.graphics.drawable.StateListDrawable();for(int state:new int[]{android.R.attr.state_pressed,android.R.attr.state_hovered})bg.addState(new int[]{state},new android.graphics.drawable.ColorDrawable(0xffe81123));bg.addState(new int[]{},new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));view.setBackground(bg);}
         view.setTextSize(16);view.setMinHeight(0);view.setPadding(0,0,0,0);LayoutParams lp=new LayoutParams(Aero.dp(getContext(),44),Aero.dp(getContext(),44));lp.leftMargin=Aero.dp(getContext(),1);view.setLayoutParams(lp);
@@ -333,7 +346,7 @@ final class DesktopWindow extends LinearLayout {
         int height=Math.min(Aero.dp(getContext(),490),host.getHeight()-safeTop-margin*2);
         FrameLayout.LayoutParams lp=new FrameLayout.LayoutParams(Math.max(1,width),Math.max(1,height));
         normalW=width;normalH=height;host.addView(this,lp); setX((hostWidth()-width)/2f); setY(safeTop+Math.max(margin,(host.getHeight()-safeTop-height)/3f));
-        if((toolId.equals("@nota")||toolId.equals("@settings")||toolId.equals("@browser")||toolId.equals("@photos")||toolId.equals(MediaLibrary.PLAYER))&&!store.prefs.contains(geometryKey))placement=Placement.MAXIMIZED;
+        if(((toolId.equals("@nota")&&hostWidth()<Aero.dp(getContext(),600))||toolId.equals("@settings")||toolId.equals("@browser")||toolId.equals("@photos")||toolId.equals(MediaLibrary.PLAYER))&&!store.prefs.contains(geometryKey))placement=Placement.MAXIMIZED;
         readGeometry(null);fitToHost();changed.run();if(Aero.motion(getContext())){setAlpha(0);setScaleX(.96f);setScaleY(.96f);int token=++transition;animate().alpha(1).scaleX(1).scaleY(1).setDuration(170).withEndAction(()->{if(token==transition)settle();}).start();}
     }
     private void hideKeyboard(){
@@ -344,7 +357,7 @@ final class DesktopWindow extends LinearLayout {
     void nota(Runnable action){askNota=action;}
     void taskAnchor(java.util.function.Supplier<android.graphics.PointF> anchor){taskAnchor=anchor;}
     private void pivotToTask(){android.graphics.PointF point=taskAnchor.get();setPivotX((point.x-getX()-.1f*getWidth()/2f)/.9f);setPivotY((point.y-getY()-.1f*getHeight()/2f)/.9f);}
-    void minimize(){dismissSystemMenu();hideKeyboard();settle();if(!Aero.motion(getContext())){setVisibility(GONE);changed.run();return;}minimizing=true;int token=++transition;pivotToTask();changed.run();animate().scaleX(.1f).scaleY(.1f).alpha(0).setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator()).setDuration(180).withEndAction(()->{if(token!=transition)return;setVisibility(GONE);settle();changed.run();}).start();}
+    void minimize(){if(body instanceof TenNotaPanel)((TenNotaPanel)body).chat.stop();dismissSystemMenu();hideKeyboard();settle();if(!Aero.motion(getContext())){setVisibility(GONE);changed.run();return;}minimizing=true;int token=++transition;pivotToTask();changed.run();animate().scaleX(.1f).scaleY(.1f).alpha(0).setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator()).setDuration(180).withEndAction(()->{if(token!=transition)return;setVisibility(GONE);settle();changed.run();}).start();}
     void restore(){boolean hidden=getVisibility()!=VISIBLE||minimizing;settle();setVisibility(VISIBLE);bringToFront();changed.run();if(hidden&&Aero.motion(getContext())){int token=++transition;pivotToTask();setScaleX(.1f);setScaleY(.1f);setAlpha(0);animate().scaleX(1).scaleY(1).alpha(1).setInterpolator(new android.view.animation.DecelerateInterpolator()).setDuration(190).withEndAction(()->{if(token==transition)settle();}).start();}}
     @Override protected void onDetachedFromWindow(){maximizeButton.removeCallbacks(hoverSnap);if(snapMenu!=null)snapMenu.dismiss();dismissSystemMenu();settle();super.onDetachedFromWindow();}
     private void beginCaptionDrag(MotionEvent e){

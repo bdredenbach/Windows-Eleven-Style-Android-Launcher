@@ -80,7 +80,7 @@ public class ElevenTaskbarSmoke extends Instrumentation {
     }
     Map<String,View> fixedViews(){
         View bar=TenSmoke.description(root,"Eleven taskbar");Map<String,View> result=new LinkedHashMap<>();for(String name:new String[]{"Start menu","Search","Task View","Widgets","Clock and calendar","Notifications and calendar","Show desktop","Restore desktop windows"}){View child=TenSmoke.description(bar,name);if(child!=null&&child.isShown())result.put(name,child);}
-        try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("tenNotaButton");field.setAccessible(true);result.put("Nth Nota",(View)field.get(home));}catch(Exception e){throw new RuntimeException(e);}result.put("System tray",TenSmoke.find(bar,SystemTray.class));return result;
+        try{java.lang.reflect.Field field=MainActivity.class.getDeclaredField("tenNotaButton");field.setAccessible(true);result.put("Nth Nota AI",(View)field.get(home));}catch(Exception e){throw new RuntimeException(e);}result.put("System tray",TenSmoke.find(bar,SystemTray.class));return result;
     }
     String bounds(View view){int[] at=new int[2];view.getLocationOnScreen(at);return at[0]+","+at[1]+","+view.getWidth()+","+view.getHeight();}
     void fixedControls()throws Exception{
@@ -151,12 +151,12 @@ public class ElevenTaskbarSmoke extends Instrumentation {
     }
     void assertProportions(){
         int width=home.getResources().getConfiguration().screenWidthDp,edge=Aero.dp(home,ElevenLayout.iconSize(width));
-        Map<String,View> fixed=fixedViews();View nota=((ViewGroup)fixed.get("Nth Nota")).getChildAt(0);
+        Map<String,View> fixed=fixedViews();View nota=((ViewGroup)fixed.get("Nth Nota AI")).getChildAt(0);
         for(View icon:new View[]{fixed.get("Start menu"),fixed.get("Search"),fixed.get("Task View"),nota}){
             Rect ink=iconInk(icon);int size=Math.max(ink.width(),ink.height());check(size>=edge-Aero.dp(home,4)&&size<=edge+Aero.dp(home,2),"Actual fixed icon scale: "+icon.getContentDescription()+"="+ink);
             check(Math.abs(ink.centerY()-icon.getHeight()/2)<=Aero.dp(home,2),"Fixed icon artwork is vertically centered");
         }
-        for(String name:new String[]{"Start menu","Search","Task View","Nth Nota"})check(fixed.get(name).getWidth()==Aero.dp(home,ElevenLayout.controlWidth(width)),"Uniform fixed button width: "+name);
+        for(String name:new String[]{"Start menu","Search","Task View","Nth Nota AI"})check(fixed.get(name).getWidth()==Aero.dp(home,ElevenLayout.controlWidth(width)),"Uniform fixed button width: "+name);
         ViewGroup widgets=(ViewGroup)fixed.get("Widgets");View widgetIcon=widgets.getChildAt(0);check(widgetIcon.getWidth()==edge&&widgetIcon.getHeight()==edge&&Math.abs(widgetIcon.getLeft()+edge/2-widgets.getWidth()/2)<=1,"Widgets icon uses the common centered canvas");
         ElevenTaskbarItems items=find(ElevenTaskbarItems.class);for(int i=0;i<items.getChildCount();i++){
             ViewGroup button=(ViewGroup)items.getChildAt(i);View icon=button.getChildAt(0);check(button.getWidth()==Aero.dp(home,ElevenLayout.taskButtonWidth(width)),"Pinned/running button uses common spacing");check(icon.getWidth()==edge&&icon.getHeight()==edge,"App icon shares the fixed icon canvas size");check(Math.abs(icon.getTop()+icon.getHeight()/2-button.getHeight()/2)<=1,"App icon centered vertically");

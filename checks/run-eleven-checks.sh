@@ -59,6 +59,9 @@ else
  echo "SKIP: preceding retained artifact unavailable; upgrade phases require that baseline." > eleven-upgrade-unavailable.txt
 fi
 adb shell pm clear "$launcher"
+run_native ElevenChatSmoke ElevenChatSmoke
+collect
+adb shell pm clear "$launcher"
 run_native ElevenScreenshotSmoke ElevenScreenshotSmoke
 if [ "${#failures[@]}" -ne 0 ]; then exit 1; fi
 collect

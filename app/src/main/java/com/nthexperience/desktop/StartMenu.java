@@ -78,7 +78,7 @@ final class StartMenu extends LinearLayout {
     void refreshName(){renderFooter();} void refreshHome(){renderFooter();}
     private List<StartSearch.Result> tools(){
         if(toolRows!=null)return toolRows;List<StartSearch.Result> out=new ArrayList<>();
-        String[][] rows={{"@nota","Nth Nota","notes"},{"@files","File Explorer","file-explorer"},{"@settings","Settings","settings"},{"@browser",BrowserPanel.NAME,"browser"},{"@notes","Notepad","notes"},{"@sticky","Sticky Notes","notes"},{"@gadget:calculator","Calculator","calculator"},{"@calendar","Calendar","calendar"},{"@weather","Weather","weather"},{"@news","Widgets","widgets"},{"@photos","Photos","pictures-app"},{MediaLibrary.PLAYER,"Nth Media Player","mediaplayer"},{"@taskview","Task View","taskview"},{"@taskmanager","Task Manager","taskmanager"},{"@recycle","Recycle Bin","recycle"},{"@run","Run","run"},{"@events","Event Viewer","notes"},{"@devices","Device Manager","computer"},{"@management","Computer Management","computer"},{"@powershell","Nth PowerShell","run"}};
+        String[][] rows={{"@nota","Nth Nota AI","notes"},{"@files","File Explorer","file-explorer"},{"@settings","Settings","settings"},{"@browser",BrowserPanel.NAME,"browser"},{"@notes","Notepad","notes"},{"@sticky","Sticky Notes","notes"},{"@gadget:calculator","Calculator","calculator"},{"@calendar","Calendar","calendar"},{"@weather","Weather","weather"},{"@news","Widgets","widgets"},{"@photos","Photos","pictures-app"},{MediaLibrary.PLAYER,"Nth Media Player","mediaplayer"},{"@taskview","Task View","taskview"},{"@taskmanager","Task Manager","taskmanager"},{"@recycle","Recycle Bin","recycle"},{"@run","Run","run"},{"@events","Event Viewer","notes"},{"@devices","Device Manager","computer"},{"@management","Computer Management","computer"},{"@powershell","Nth PowerShell","run"}};
         for(String[] r:rows)out.add(new StartSearch.Result(r[0],r[1],"Nth tools",r[2],null,true));toolRows=Collections.unmodifiableList(out);return toolRows;
     }
     private StartSearch.Result resolve(String id){
@@ -174,7 +174,7 @@ final class StartMenu extends LinearLayout {
         if(searchMode||!query.isEmpty())found.removeIf(r->!ElevenLocalState.accepts(store,r));
         found.sort(Comparator.comparing(r->r.title.toLowerCase(Locale.ROOT)));Set<String> seen=new HashSet<>();for(StartSearch.Result r:found)if(seen.add(r.id))appList.addView(shortcut(r,false),new LayoutParams(-1,dp(52)));
         if(seen.isEmpty())hint(appList,"No matching results.");
-        if(!query.isEmpty()){appList.addView(command("Ask Nth Nota",()->openResult("nota-query:"+android.net.Uri.encode(query))));appList.addView(command("Search linked files and folders",()->openResult("start-search:"+android.net.Uri.encode(query))));appList.addView(command("Search the web",()->openResult("web-search:"+android.net.Uri.encode(query))));}
+        if(!query.isEmpty()){appList.addView(command("Ask Nth Nota AI",()->openResult("nota-query:"+android.net.Uri.encode(query))));appList.addView(command("Search linked files and folders",()->openResult("start-search:"+android.net.Uri.encode(query))));appList.addView(command("Search the web",()->openResult("web-search:"+android.net.Uri.encode(query))));}
     }
     private void renderFooter(){
         Map<String,Object> current=snapshot(true);if(current.equals(footerSnapshot))return;footerSnapshot=current;
