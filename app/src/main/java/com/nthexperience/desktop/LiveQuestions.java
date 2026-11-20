@@ -39,7 +39,9 @@ final class LiveQuestions {
             List<LiveAnswer.Source> sources=new ArrayList<>();JSONArray refs=response.optJSONArray("sources");if(refs!=null)for(int n=0;n<refs.length()&&n<5;n++){JSONObject ref=refs.getJSONObject(n);String url=ref.optString("url","");if(LiveAnswer.safeLink(url))sources.add(new LiveAnswer.Source(LiveQuestionPolicy.limit(ref.optString("title","Source"),240),url,"",LiveQuestionPolicy.limit(ref.optString("detail","Web source"),240)));}
             boolean searched=response.optBoolean("searched",false),unavailable=response.optBoolean("unavailable",false);
             if (unavailable) return LiveAnswer.unavailable(text, now(), sources);
-            if ((searched || alwaysSearch || LiveQuestionPolicy.current(question)) && sources.isEmpty()) {
+            boolean currentFact = LiveQuestionPolicy.current(question) && !LiveQuestionPolicy.conversationalRequest(question)
+                    && !LiveQuestionPolicy.settings(question, settings);
+            if ((searched || alwaysSearch || currentFact) && sources.isEmpty()) {
                 return LiveAnswer.unavailable("I couldn’t verify this answer from a public source. Try again or search the web.", now(), sources);
             }
             return new LiveAnswer(text, sources.isEmpty() ? "AI answer" : "Web sources",

@@ -47,6 +47,28 @@ public final class ElevenChatSmoke extends TenCommandsSmoke {
             out.putString("stream","FAIL: "+android.util.Log.getStackTraceString(e));finish(Activity.RESULT_CANCELED,out);}
         finally{release.countDown();}
     }
+    @Override void shot(String name)throws Exception {
+        waitForIdleSync();
+        android.graphics.Bitmap image=getUiAutomation().takeScreenshot();
+        boolean usable=false;
+        if(image!=null){
+            for(int y=image.getHeight()/12;y<image.getHeight()&&!usable;y+=Math.max(1,image.getHeight()/12)){
+                for(int x=image.getWidth()/12;x<image.getWidth();x+=Math.max(1,image.getWidth()/12)){
+                    if((image.getPixel(x,y)&0xffffff)!=0){usable=true;break;}
+                }
+            }
+        }
+        if(!usable){
+            if(image!=null) image.recycle();
+            android.graphics.Bitmap appView=android.graphics.Bitmap.createBitmap(root.getWidth(),root.getHeight(),android.graphics.Bitmap.Config.ARGB_8888);
+            ui(()->root.draw(new android.graphics.Canvas(appView)));
+            image=appView;
+            name+="-app-view";
+        }
+        try(java.io.OutputStream out=new java.io.FileOutputStream(new java.io.File(getTargetContext().getFilesDir(),name+".png"))){
+            image.compress(android.graphics.Bitmap.CompressFormat.PNG,100,out);
+        }finally{image.recycle();}
+    }
     void fixtureWindow(){
         windows().get("@nota").closeWindow();
         TenNotaPanel p=new TenNotaPanel(home,store,desks().current(),emit->new TenAssistant(home,emit),
@@ -70,6 +92,7 @@ public final class ElevenChatSmoke extends TenCommandsSmoke {
     void sendChat(String question)throws Exception {ui(()->{chat().question.setText(question);chat().send.performClick();});}
     void enable()throws Exception {ui(()->chat().cloud.performClick());systemClick("Enable cloud");await(()->chat().cloud.isChecked(),"Cloud switch reflects opt-in");}
     void fixtures()throws Exception {
+        shot("eleven-chat-welcome");
         ui(()->TenSmoke.description(chat(),"Explore an idea").performClick());
         check(probes.get()==0&&posts.get()==0,"Opening and starter card are local");
         sendChat("Explain why rainbows appear.");
@@ -87,6 +110,8 @@ public final class ElevenChatSmoke extends TenCommandsSmoke {
         await(()->root.getWidth()>root.getHeight(),"Landscape available");
         ui(()->windows().get("@nota").restoreDown());waitForIdleSync();shot("eleven-chat-floating");
         ui(()->windows().get("@nota").snap(AeroSnap.Placement.LEFT));waitForIdleSync();shot("eleven-chat-snapped");
+        ui(()->{store.prefs.edit().putBoolean("ten_apps_dark",true).apply();home.applyTenAppearance();});
+        shot("eleven-chat-dark");
         ui(()->{chat().web.performClick();chat().question.requestFocus();home.getSystemService(InputMethodManager.class).showSoftInput(chat().question,InputMethodManager.SHOW_IMPLICIT);});
         await(()->root.getRootWindowInsets().isVisible(WindowInsets.Type.ime()),"Keyboard open");
         ui(()->{Rect r=new Rect();check(chat().send.getGlobalVisibleRect(r)&&r.height()==chat().send.getHeight(),"Send above keyboard");});

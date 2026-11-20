@@ -34,6 +34,7 @@ final class DesktopWindow extends LinearLayout {
     private int normalW, normalH,safeTop,safeRight;
     private float positionX=.5f,positionY=.33f;
     private final DesktopStore store;
+    private TextView conversationMenu;
     private String geometryKey,captionKind="",orientationKey,desktopSuffix="";
     final String toolId;
     private final GradientDrawable snapOutline = new GradientDrawable();
@@ -79,6 +80,7 @@ final class DesktopWindow extends LinearLayout {
         if(body instanceof TenNotaPanel) {
             bar.setBackground(ElevenMaterial.app(context,0));
             TextView more=chrome("⋯",((TenNotaPanel)body)::conversationMenu);
+            conversationMenu=more;
             more.setContentDescription("Nth Nota AI conversation menu");
             more.setTooltipText("Conversation menu");
             bar.addView(more,new LayoutParams(Aero.dp(context,32),Aero.dp(context,40)));
@@ -185,7 +187,7 @@ final class DesktopWindow extends LinearLayout {
     void caption(String title){titleLabel.setText(title);titleLabel.setContentDescription(title+". Drag to move window.");}
     boolean minimizing(){return minimizing;}
     boolean active(){return active;}
-    void active(boolean value){active=value;glass.active(value);titleLabel.setTextColor(TenStyle.titleText(getContext(),value));titleLabel.setShadowLayer(0,0,0,0);minimizeButton.setTextColor(captionColors(false,value));maximizeButton.setTextColor(captionColors(false,value));closeButton.setTextColor(captionColors(true,value));for(View button:new View[]{minimizeButton,maximizeButton})TenAppearance.enable(getContext(),button.getBackground());if(notaGlyph!=null){notaGlyph.setActivated(value);notaGlyph.invalidate();}minimizeButton.setAlpha(value?1:.65f);maximizeButton.setAlpha(value?1:.65f);closeButton.setAlpha(value?1:.6f);}
+    void active(boolean value){active=value;glass.active(value);titleLabel.setTextColor(captionInk(value));if(conversationMenu!=null)conversationMenu.setTextColor(captionColors(false,value));titleLabel.setShadowLayer(0,0,0,0);minimizeButton.setTextColor(captionColors(false,value));maximizeButton.setTextColor(captionColors(false,value));closeButton.setTextColor(captionColors(true,value));for(View button:new View[]{minimizeButton,maximizeButton})TenAppearance.enable(getContext(),button.getBackground());if(notaGlyph!=null){notaGlyph.setActivated(value);notaGlyph.invalidate();}minimizeButton.setAlpha(value?1:.65f);maximizeButton.setAlpha(value?1:.65f);closeButton.setAlpha(value?1:.6f);}
     @Override public boolean dispatchTouchEvent(MotionEvent e){if(peeking)return true;if(e.getActionMasked()==MotionEvent.ACTION_DOWN&&!minimizing){bringToFront();changed.run();}return super.dispatchTouchEvent(e);}
     private int cornerReach(){return Aero.dp(getContext(),22);}
     private int resizeCornerAt(float x,float y){
@@ -327,7 +329,11 @@ final class DesktopWindow extends LinearLayout {
         resizeCorner=0;
         fitToHost();
     }
-    private android.content.res.ColorStateList captionColors(boolean close,boolean active){int hot=close?TenAccent.on(0xffe81123):TenAppearance.ink(getContext());return new android.content.res.ColorStateList(new int[][]{new int[]{android.R.attr.state_pressed},new int[]{android.R.attr.state_hovered},new int[]{android.R.attr.state_focused},new int[]{}},new int[]{hot,hot,hot,TenStyle.titleText(getContext(),active)});}
+    private int captionInk(boolean active) {
+        // Nota uses the app's Mica material even when other title bars follow the accent.
+        return body instanceof TenNotaPanel ? TenAppearance.ink(getContext()) : TenStyle.titleText(getContext(),active);
+    }
+    private android.content.res.ColorStateList captionColors(boolean close,boolean active){int hot=close?TenAccent.on(0xffe81123):TenAppearance.ink(getContext());return new android.content.res.ColorStateList(new int[][]{new int[]{android.R.attr.state_pressed},new int[]{android.R.attr.state_hovered},new int[]{android.R.attr.state_focused},new int[]{}},new int[]{hot,hot,hot,captionInk(active)});}
     private TextView chrome(String symbol,Runnable action){
         TextView view=TenStyle.command(getContext(),symbol,action);view.setBackground(TenStyle.appHover(getContext(),Color.TRANSPARENT));TenAppearance.enable(getContext(),view.getBackground());view.setTextColor(captionColors(symbol.equals("×"),active));if(symbol.equals("×")){android.graphics.drawable.StateListDrawable bg=new android.graphics.drawable.StateListDrawable();for(int state:new int[]{android.R.attr.state_pressed,android.R.attr.state_hovered})bg.addState(new int[]{state},new android.graphics.drawable.ColorDrawable(0xffe81123));bg.addState(new int[]{},new android.graphics.drawable.ColorDrawable(Color.TRANSPARENT));view.setBackground(bg);}
         view.setTextSize(16);view.setMinHeight(0);view.setPadding(0,0,0,0);LayoutParams lp=new LayoutParams(Aero.dp(getContext(),44),Aero.dp(getContext(),44));lp.leftMargin=Aero.dp(getContext(),1);view.setLayoutParams(lp);

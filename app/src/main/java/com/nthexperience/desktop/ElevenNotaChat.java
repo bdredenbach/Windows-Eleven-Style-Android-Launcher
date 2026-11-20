@@ -152,15 +152,17 @@ final class ElevenNotaChat extends LinearLayout {
         TenNotaActions.Plan plan=contentOnly?null:TenNotaActions.resolve(text,
                 home==null?Collections.emptyList():home.notaAppTargets());
         JSONArray history=store.conversations.current().context();
-        pending=text;
-        question.setText("");
         if(plan!=null) {
-            LiveAnswer reply=LiveAnswer.plain(plan.autoOpen ? plan.message.replace("…","") : plan.message.replace("above","below"),"On this device");
+            String message=plan.autoOpen && home!=null ? home.performNotaAction(plan.actions.get(0)) : plan.message.replace("above","below");
+            pending=text;
+            question.setText("");
+            LiveAnswer reply=LiveAnswer.plain(message,"On this device");
             localChoices.put(reply,plan);
             finish(reply,false);
-            if(plan.autoOpen && home!=null) home.performNotaAction(plan.actions.get(0));
             return;
         }
+        pending=text;
+        question.setText("");
         String setting=contentSetting(text);
         if(setting!=null){
             finish(LiveAnswer.plain(setting,"On this device"),false);
