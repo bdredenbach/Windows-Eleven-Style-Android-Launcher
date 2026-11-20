@@ -77,7 +77,7 @@ collect
 adb shell wm size reset
 adb shell pm clear "$launcher"
 run_native StorageSmoke StorageSetup -e suite storage -e phase setup
-for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
+for runner in ElevenPurchaserSmoke ElevenCompletionSmoke ElevenTaskManagerSmoke ElevenMarketSmoke ElevenThemeSmoke ElevenSmoke ElevenGapSmoke TenCommandsSmoke ElevenNotaSmoke ElevenNotaColdSmoke ElevenChatSmoke BrowserSmoke SnapSmoke TenFeedSmoke; do
  run_native "$runner" "$runner"
 done
 adb shell appops set --uid "$launcher" MANAGE_EXTERNAL_STORAGE allow

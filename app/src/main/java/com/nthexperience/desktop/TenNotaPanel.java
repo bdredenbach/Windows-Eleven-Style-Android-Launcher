@@ -9,14 +9,19 @@ import org.json.*;
 
 /** The shared native Nota workspace. Context is reviewed in the composer before Send. */
 final class TenNotaPanel extends LinearLayout {
+    private final LinearLayout writing;
+    final ElevenNotaChat chat;
     final TenAssistant assistant;final CloudAI cloud;final DesktopStore store;final EditText input;
     final TextView status,answer,guidance,taskSummary,contextLabel,apply,send,copyReply,saveReply;final Spinner task;final LinearLayout actionChoices;final ScrollView replyScroll;
     int guidanceTask=-1,requestTask;boolean hydrating,commandReply;String draftScope;
     boolean compactLayout,closed,privateDraft,importedDraft;String pending="",lastReply="",requestText="";TenNotaContext context;
     TenNotaPanel(Context c,DesktopStore store,String scope){this(c,store,scope,emit->new TenAssistant(c,emit));}
     TenNotaPanel(Context c,DesktopStore store,String scope,java.util.function.Function<java.util.function.Consumer<JSONObject>,TenAssistant> factory){
-        super(c);this.store=store;draftScope=scope;setSaveFromParentEnabled(false);setOrientation(VERTICAL);setBackgroundColor(Color.WHITE);Aero.pad(this,12);setContentDescription("Nth Nota apps and writing assistant");
-        LinearLayout top=new LinearLayout(c);TextView title=Aero.text(c,"Nth Nota",22,Aero.INK);top.addView(title,new LayoutParams(0,Aero.dp(c,48),1));top.addView(button("New chat",this::newChat),new LayoutParams(Aero.dp(c,82),Aero.dp(c,44)));top.addView(button("History",this::history),new LayoutParams(Aero.dp(c,72),Aero.dp(c,44)));addView(top);
+        this(c,store,scope,factory,LiveQuestionHttp::new);
+    }
+    TenNotaPanel(Context c, DesktopStore store, String scope, java.util.function.Function<java.util.function.Consumer<JSONObject>,TenAssistant> factory, NotaSettingsClient.Factory transport){
+        super(c);writing=Aero.column(c);this.store=store;draftScope=scope;setSaveFromParentEnabled(false);setOrientation(VERTICAL);setBackgroundColor(Color.WHITE);Aero.pad(writing,12);setContentDescription("Nth Nota apps and writing assistant");
+        LinearLayout top=new LinearLayout(c);TextView title=Aero.text(c,"Writing tools",22,Aero.INK);top.addView(title,new LayoutParams(0,Aero.dp(c,48),1));top.addView(button("New chat",this::newChat),new LayoutParams(Aero.dp(c,82),Aero.dp(c,44)));top.addView(button("History",this::history),new LayoutParams(Aero.dp(c,72),Aero.dp(c,44)));addView(top);
         taskSummary=Aero.text(c,"",12,0xff666666);taskSummary.setPadding(Aero.dp(c,8),Aero.dp(c,6),Aero.dp(c,8),Aero.dp(c,8));taskSummary.setMaxLines(3);taskSummary.setEllipsize(android.text.TextUtils.TruncateAt.END);taskSummary.setAccessibilityLiveRegion(ACCESSIBILITY_LIVE_REGION_POLITE);addView(taskSummary);
         contextLabel=Aero.text(c,"",12,0xff666666);contextLabel.setVisibility(GONE);contextLabel.setPadding(Aero.dp(c,8),Aero.dp(c,6),Aero.dp(c,8),Aero.dp(c,8));contextLabel.setMaxLines(2);contextLabel.setEllipsize(android.text.TextUtils.TruncateAt.END);contextLabel.setContentDescription("Nota context source");contextLabel.setOnClickListener(v->{if(context!=null)Aero.dialog(c).setTitle("Context from "+context.title).setMessage("The text in the composer is the only passage used for this request. Edit it before sending. Clearing context keeps this passage in writing mode. Use New command to open apps.").setPositiveButton("Keep",null).setNeutralButton("Clear context",(d,w)->clearContext()).show();});addView(contextLabel);
         ScrollView scroll=new ScrollView(c);replyScroll=scroll;scroll.setFillViewport(true);LinearLayout reply=Aero.column(c);lastReply="";guidance=Aero.text(c,"",16,Aero.INK);Aero.pad(guidance,12);reply.addView(guidance);answer=Aero.text(c,lastReply,16,Aero.INK);answer.setVisibility(lastReply.isEmpty()?GONE:VISIBLE);answer.setTextIsSelectable(true);Aero.pad(answer,12);actionChoices=Aero.column(c);actionChoices.setContentDescription("Nota desktop actions");reply.addView(actionChoices,new LayoutParams(-1,-2));reply.addView(answer);scroll.addView(reply);addView(scroll,new LayoutParams(-1,0,1));
@@ -30,7 +35,51 @@ final class TenNotaPanel extends LinearLayout {
         restoreState(NotaDraftStore.read(store,draftScope));
         task.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener(){public void onItemSelected(android.widget.AdapterView<?> parent,View view,int position,long id){updateTaskSummary();persistDraft();if(pending.isEmpty()&&lastReply.isEmpty())status.setText(position==5?(importedDraft?"Writing passage kept · use New command to open apps":"Ready for a new command · nothing has been sent"):"Ready · nothing has been sent");}public void onNothingSelected(android.widget.AdapterView<?> parent){}});
         input.addTextChangedListener(new TextWatcher(){public void beforeTextChanged(CharSequence s,int a,int b,int d){}public void onTextChanged(CharSequence s,int a,int b,int d){actionChoices.removeAllViews();persistDraft();}public void afterTextChanged(Editable e){}});
-        addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{boolean compact=b-t<Aero.dp(c,500);suggestions.setVisibility(b-t<Aero.dp(c,360)?GONE:VISIBLE);if(compact!=compactLayout){compactLayout=compact;top.setVisibility(compact?GONE:VISIBLE);Aero.pad(this,compact?8:12);taskSummary.setTextSize(compact?11:12);contextLabel.setTextSize(compact?11:12);task.getLayoutParams().height=Aero.dp(c,compact?32:40);task.requestLayout();status.getLayoutParams().height=Aero.dp(c,compact?24:32);status.requestLayout();for(int i=0;i<replyTools.getChildCount();i++){replyTools.getChildAt(i).getLayoutParams().height=Aero.dp(c,compact?32:40);replyTools.getChildAt(i).requestLayout();}input.setMinLines(compact?1:2);input.setMaxLines(compact?2:5);}boolean tight=b-t<Aero.dp(c,280);taskSummary.setVisibility(tight?GONE:VISIBLE);contextLabel.setVisibility(tight||contextLabel.length()==0?GONE:VISIBLE);replyTools.setVisibility(tight?GONE:VISIBLE);status.setVisibility(tight?GONE:VISIBLE);int minLines=compact?1:2,maxLines=tight?1:compact?2:5;if(input.getMinLines()!=minLines)input.setMinLines(minLines);if(input.getMaxLines()!=maxLines)input.setMaxLines(maxLines);boolean shortest=b-t<Aero.dp(c,180);modes.setVisibility(shortest?GONE:VISIBLE);replyScroll.setVisibility(shortest?GONE:VISIBLE);ViewGroup commandHost=shortest?commands:modes;if(newCommandControl.getParent()!=commandHost){((ViewGroup)newCommandControl.getParent()).removeView(newCommandControl);if(shortest)commands.addView(newCommandControl,0,new LayoutParams(0,Aero.dp(c,44),1));else modes.addView(newCommandControl,new LayoutParams(-2,Aero.dp(c,44)));}int padding=shortest?2:tight?4:compact?8:12;if(getPaddingLeft()!=Aero.dp(c,padding))Aero.pad(this,padding);});
+        while (getChildCount()>0) {
+            View control=getChildAt(0);
+            removeViewAt(0);
+            writing.addView(control);
+        }
+        addView(writing,new LayoutParams(-1,-1));
+        chat=new ElevenNotaChat(c,scope,transport);
+        addView(chat,new LayoutParams(-1,-1));
+        showWriting(chat.store.writing(privateDraft || importedDraft || input.length()>0 || !lastReply.isEmpty()));
+        writing.addOnLayoutChangeListener((v,l,t,r,b,ol,ot,or,ob)->{boolean compact=b-t<Aero.dp(c,500);suggestions.setVisibility(b-t<Aero.dp(c,360)?GONE:VISIBLE);if(compact!=compactLayout){compactLayout=compact;top.setVisibility(compact?GONE:VISIBLE);Aero.pad(writing,compact?8:12);taskSummary.setTextSize(compact?11:12);contextLabel.setTextSize(compact?11:12);task.getLayoutParams().height=Aero.dp(c,compact?32:40);task.requestLayout();status.getLayoutParams().height=Aero.dp(c,compact?24:32);status.requestLayout();for(int i=0;i<replyTools.getChildCount();i++){replyTools.getChildAt(i).getLayoutParams().height=Aero.dp(c,compact?32:40);replyTools.getChildAt(i).requestLayout();}input.setMinLines(compact?1:2);input.setMaxLines(compact?2:5);}boolean tight=b-t<Aero.dp(c,280);taskSummary.setVisibility(tight?GONE:VISIBLE);contextLabel.setVisibility(tight||contextLabel.length()==0?GONE:VISIBLE);replyTools.setVisibility(tight?GONE:VISIBLE);status.setVisibility(tight?GONE:VISIBLE);int minLines=compact?1:2,maxLines=tight?1:compact?2:5;if(input.getMinLines()!=minLines)input.setMinLines(minLines);if(input.getMaxLines()!=maxLines)input.setMaxLines(maxLines);boolean shortest=b-t<Aero.dp(c,180);modes.setVisibility(shortest?GONE:VISIBLE);replyScroll.setVisibility(shortest?GONE:VISIBLE);ViewGroup commandHost=shortest?commands:modes;if(newCommandControl.getParent()!=commandHost){((ViewGroup)newCommandControl.getParent()).removeView(newCommandControl);if(shortest)commands.addView(newCommandControl,0,new LayoutParams(0,Aero.dp(c,44),1));else modes.addView(newCommandControl,new LayoutParams(-2,Aero.dp(c,44)));}int padding=shortest?2:tight?4:compact?8:12;if(writing.getPaddingLeft()!=Aero.dp(c,padding))Aero.pad(writing,padding);});
+    }
+    void showWriting(boolean value) {
+        if (value) chat.stop();
+        else cancelRequest();
+        writing.setVisibility(value ? VISIBLE : GONE);
+        chat.setVisibility(value ? GONE : VISIBLE);
+        chat.store.setWriting(value);
+    }
+    void conversationMenu() {
+        boolean inWriting = writing.getVisibility()==VISIBLE;
+        String[] items = inWriting
+                ? new String[]{"Back to chat","Writing options","Writing history","Assistant settings"}
+                : new String[]{"New chat","Recent chats","Writing tools","Local commands","Assistant settings","Delete this conversation"};
+        Aero.dialog(getContext()).setTitle("Nth Nota AI").setItems(items,(dialog,index)->{
+            if (inWriting) {
+                switch(index) {
+                    case 0: showWriting(false); break;
+                    case 1: tools(); break;
+                    case 2: history(); break;
+                    case 3: open("ten-setting:assistant"); break;
+                }
+            } else {
+                switch(index) {
+                    case 0: chat.newChat(); break;
+                    case 1: chat.recent(); break;
+                    case 2: showWriting(true); break;
+                    case 3:
+                        Aero.dialog(getContext()).setTitle("Local commands").setItems(TenNotaActions.EXAMPLES,
+                            (d,i)->chat.offerDraft(TenNotaActions.EXAMPLES[i],false)).show();
+                        break;
+                    case 4: open("ten-setting:assistant"); break;
+                    case 5: chat.delete(); break;
+                }
+            }
+        }).show();
     }
     private void contextVisibility(){contextLabel.setVisibility(contextLabel.length()==0||getHeight()>0&&getHeight()<Aero.dp(getContext(),280)?GONE:VISIBLE);}
     private void clearContext(){context=null;importedDraft=true;contextLabel.setText("Writing passage · use New command to open apps");contextVisibility();apply.setVisibility(GONE);persistDraft();}
@@ -64,7 +113,7 @@ final class TenNotaPanel extends LinearLayout {
     private void displayReply(String text,boolean command){commandReply=command;lastReply=text;replyStyle(command);answer.setText(text);answer.setVisibility(text.isEmpty()?GONE:VISIBLE);guidance.setVisibility(text.isEmpty()?VISIBLE:GONE);updateReplyActions();}
     private void chooseTask(int index){selectTask(index);input.requestFocus();}
     private TextView button(String label,Runnable run){TextView v=Aero.text(getContext(),label,13,TenStyle.accent(getContext()));TenAppearance.accentText(v);v.setGravity(Gravity.CENTER);v.setPadding(Aero.dp(getContext(),10),0,Aero.dp(getContext(),10),0);v.setMinHeight(Aero.dp(getContext(),40));v.setBackground(Aero.selection(getContext()));v.setFocusable(true);v.setContentDescription(label);v.setOnClickListener(w->run.run());return v;}
-    void context(TenNotaContext value){actionChoices.removeAllViews();cancelRequest();hydrating=true;context=value;privateDraft=value.privateText;importedDraft=true;input.setText(value.text);clearReply();selectTask(4);contextVisibility();contextLabel.setText("From "+value.title+(privateDraft?" · private, excluded from history":" · review before Send")+(value.text.length()>TenWritingPrompts.MAX_COMPOSER?" · shortened to 15,000 characters":""));apply.setVisibility(GONE);status.setText("Ready · nothing has been sent");hydrating=false;persistDraft();}
+    void context(TenNotaContext value){showWriting(true);actionChoices.removeAllViews();cancelRequest();hydrating=true;context=value;privateDraft=value.privateText;importedDraft=true;input.setText(value.text);clearReply();selectTask(4);contextVisibility();contextLabel.setText("From "+value.title+(privateDraft?" · private, excluded from history":" · review before Send")+(value.text.length()>TenWritingPrompts.MAX_COMPOSER?" · shortened to 15,000 characters":""));apply.setVisibility(GONE);status.setText("Ready · nothing has been sent");hydrating=false;persistDraft();}
     private void newChat(){cancelRequest();hydrating=true;context=null;privateDraft=false;importedDraft=false;clearReply();selectTask(0);input.setText("");contextLabel.setText("");contextLabel.setVisibility(GONE);status.setText("Commands on this device · local-first writing");apply.setVisibility(GONE);hydrating=false;persistDraft();}
     private void newCommand(){newChat();selectTask(5);persistDraft();input.requestFocus();status.setText("Ready for a new command · nothing has been sent");}
     private void tools(){Aero.dialog(getContext()).setTitle("Nth Nota tools").setItems(new String[]{"Prepare on-device AI","Cloud assistance settings","Share reply","Clear local chat history","Open Notepad","Find an app or setting","New chat","Recent chats","What can Nota do?"},(d,w)->{switch(w){case 0:prepare();break;case 1:consent(false);break;case 2:if(!lastReply.isEmpty())getContext().startActivity(Intent.createChooser(new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT,lastReply),"Share Nota reply"));break;case 3:Aero.dialog(getContext()).setTitle("Clear local chat history?").setMessage("This removes the saved writing requests and replies on this launcher.").setPositiveButton("Clear",(dialog,which)->store.prefs.edit().remove("ten_nota_history").apply()).setNegativeButton("Cancel",null).show();break;case 4:open("@notes");break;case 5:open("@search");break;case 6:newChat();break;case 7:history();break;case 8:showPlan(TenNotaActions.help());break;}}).show();}
@@ -115,13 +164,19 @@ final class TenNotaPanel extends LinearLayout {
         status.setText(privateDraft?"Private text was not saved":"Ready · nothing has been sent");hydrating=false;persistDraft();
     }
     private void persistDraft(){if(!hydrating&&input!=null&&task!=null&&draftScope!=null)NotaDraftStore.write(store,draftScope,state());}
-    void desktopScope(String scope){if(scope.equals(draftScope))return;persistDraft();NotaDraftStore.move(store,draftScope,scope);draftScope=scope;}
+    void desktopScope(String scope){if(scope.equals(draftScope))return;persistDraft();chat.stop();chat.store.move(getContext(),scope);NotaDraftStore.move(store,draftScope,scope);draftScope=scope;}
     private void cancelRequest(){String previous=pending;pending="";if(send!=null)send.setEnabled(true);if(assistant!=null&&!previous.isEmpty())assistant.cancel(previous);}
     private int presentationTransfers;
     void beginPresentationTransfer(){presentationTransfers++;}
     void endPresentationTransfer(){presentationTransfers=Math.max(0,presentationTransfers-1);if(presentationTransfers==0)assistant.foreground(isShown());}
-    void foreground(boolean active){if(presentationTransfers==0)assistant.foreground(active);}void close(){closed=true;assistant.close();}
-    @Override protected void onWindowVisibilityChanged(int visible){super.onWindowVisibilityChanged(visible);if(assistant!=null&&presentationTransfers==0)assistant.foreground(visible==VISIBLE);}
-    @Override public void onVisibilityAggregated(boolean visible){super.onVisibilityAggregated(visible);if(assistant!=null&&presentationTransfers==0)assistant.foreground(visible);}
+    void foreground(boolean active){
+        if(presentationTransfers==0) {
+            assistant.foreground(active);
+            if(!active && chat!=null) chat.stop();
+        }
+    }
+    void close(){if(closed)return;closed=true;chat.close();assistant.close();}
+    @Override protected void onWindowVisibilityChanged(int visible){super.onWindowVisibilityChanged(visible);if(assistant!=null&&presentationTransfers==0)foreground(visible==VISIBLE);}
+    @Override public void onVisibilityAggregated(boolean visible){super.onVisibilityAggregated(visible);if(assistant!=null&&presentationTransfers==0)foreground(visible);}
     @Override protected void onDetachedFromWindow(){super.onDetachedFromWindow();if(presentationTransfers==0)close();}
 }
